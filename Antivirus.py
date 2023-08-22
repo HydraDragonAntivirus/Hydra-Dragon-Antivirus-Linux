@@ -426,11 +426,12 @@ def is_website_infected(url):
         conn.close()
 def format_url(url):
     if url:
-        # URL'deki https:// ve sonunda / işaretini kaldır
         formatted_url = url.strip().lower()
         if formatted_url.startswith("https://"):
             formatted_url = formatted_url.replace("https://", "")
-        formatted_url = formatted_url.split('/')[0]  # / karakterinden önceki kısmı al
+        elif formatted_url.startswith("http://"):
+            formatted_url = formatted_url.replace("http://", "")
+        formatted_url = formatted_url.split('/')[0]
         
         return formatted_url
     
