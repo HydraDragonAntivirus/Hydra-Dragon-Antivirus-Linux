@@ -35,7 +35,12 @@ def is_file_infected_md5(md5):
     if daily_result > 0:
         daily_connection.close()
         return True
-    
+      # Check in the daily0 table
+    daily0_command = daily_connection.execute("SELECT COUNT(*) FROM daily0 WHERE field2 = ?;", (md5,))
+    daily0_result = daily0_command.fetchone()[0]
+    if daily0_result > 0:
+        daily_connection.close()
+        return True
     # Check in the oldvirusbase table
     old_virus_base_command = old_virus_base_connection.execute("SELECT COUNT(*) FROM oldvirusbase WHERE field2 = ?;", (md5,))
     old_virus_base_result = old_virus_base_command.fetchone()[0]
@@ -390,14 +395,15 @@ def is_website_infected(url):
             "SELECT * FROM viruswebsite WHERE field1 = ?",
             "SELECT * FROM inactive WHERE field1 = ?",
             "SELECT * FROM malwarebazaar WHERE field1 = ?",
-            "SELECT * FROM ultimatehostblacklist WHERE field1 = ?",
+            "SELECT * FROM ultimatehostblacklist WHERE field2 = ?",
             "SELECT * FROM continue WHERE field1 = ?",
             "SELECT * FROM virusip WHERE field1 = ?"
             "SELECT * FROM mcafee WHERE field1 = ?",
-            "SELECT * FROM full_urls WHERE field1 = ?",
-            "SELECT * FROM full_domains WHERE field1 = ?",
+            "SELECT * FROM full_urls WHERE field3 = ?",
+            "SELECT * FROM full_domains WHERE field3 = ?",
             "SELECT * FROM paloaltofirewall WHERE field1 = ?",
-            "SELECT * FROM \"full_ip-port\" WHERE field1 = ?"
+            "SELECT * FROM SSBLIP WHERE field2 = ?",
+            "SELECT * FROM \"full_ip-port\" WHERE field3 = ?"
         ]
 
         for query in queries:
@@ -436,6 +442,7 @@ def format_url(url):
         return formatted_url
     
     return url
+import subprocess
 def get_running_ips():
     try:
         netstat_output = subprocess.run(["netstat", "-tn"], capture_output=True, text=True)
@@ -446,14 +453,16 @@ def get_running_ips():
             parts = line.split()
             if len(parts) >= 5:
                 ip_port = parts[4]
-                ip = ip_port.split(":")[0]
-                running_ips.add(ip)
+                ip_port_parts = ip_port.split(":")
+                if len(ip_port_parts) == 2:
+                    ip, port = ip_port_parts
+                    running_ips.add(ip)
+                    running_ips.add(f"{ip}:{port}")
 
         return list(running_ips)
     except Exception as e:
-        print(f"Error getting running IPs: {e}")
+        print(f"Hata: {e}")
         return []
-
 def real_time_web_protection():
     infected_ips = []
     while True:
