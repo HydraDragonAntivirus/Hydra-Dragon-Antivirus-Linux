@@ -7,6 +7,7 @@ import tempfile
 import shutil
 import webbrowser
 import glob
+import socket 
 def is_file_infected_md5(md5):
     md5_connection = sqlite3.connect("MD5basedatabase.db")
     main_connection = sqlite3.connect("main.db")
@@ -437,11 +438,11 @@ def format_url(url):
             formatted_url = formatted_url.replace("https://", "")
         elif formatted_url.startswith("http://"):
             formatted_url = formatted_url.replace("http://", "")
+        if formatted_url.startswith("www."):
+            formatted_url = formatted_url.replace("www.", "")
         formatted_url = formatted_url.split('/')[0]
         
         return formatted_url
-    
-    return url
 import subprocess
 def get_running_ips():
     try:
@@ -549,28 +550,39 @@ def access_firefox_history_continuous():
             cursor.execute(query)
             results = cursor.fetchall()
 
-            # Ziyaret edilen siteleri tarayın ve sonuçları gösterin
+           # Ziyaret edilen siteleri tarayın ve sonuçları gösterin
             for row in results:
                 title, url = row
                 print(f"Scanning URL: {url}")
                 if is_website_infected(url):
-                    print(f"The website is infected: {url}")
-                    if last_visited_websites:
-                        last_visited_websites.pop()  # Remove the last visited website
-                        open_webguard_page()  # Open the webguard.html file
+                    ip_address = extract_ip_from_url(url)
+                    if ip_address:
+                        print(f"The website is infected: {url}")
+                        print(f"Infected IP address: {ip_address}")
+                        disconnect_ip(ip_address)  # Disconnect the infected IP address
+                        if last_visited_websites:
+                            last_visited_websites.pop()  # Remove the last visited website
+                            open_webguard_page()  # Open the webguard.html file
                 else:
                     print(f"The website is clean: {url}")
 
                 if len(last_visited_websites) >= 5:
                     last_visited_websites.pop(0)  # Remove the oldest visited website
                 last_visited_websites.append(url)
-
             # Bağlantıyı kapatın ve geçici klasörü temizleyin
             connection.close()
             shutil.rmtree(temp_dir, ignore_errors=True)
 
     except Exception as e:
         print(f"Error accessing Firefox history: {e}")
+def extract_ip_from_url(url):
+    try:
+        hostname = url.split('/')[2]  # Extract hostname from URL
+        ip_address = socket.gethostbyname(hostname)
+        return ip_address
+    except Exception as e:
+        print(f"Error extracting IP from URL {url}: {e}")
+        return None
 def run_clamonacc_with_remove():
     try:
         # clamavdaki clamonacc komutunu çalıştırırken "--remove" argümanını kullanarak çağırın
