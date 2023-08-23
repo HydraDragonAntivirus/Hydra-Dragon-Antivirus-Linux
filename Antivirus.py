@@ -8,6 +8,8 @@ import shutil
 import webbrowser
 import glob
 import socket 
+import re
+import requests
 def is_file_infected_md5(md5):
     md5_connection = sqlite3.connect("MD5basedatabase.db")
     main_connection = sqlite3.connect("main.db")
@@ -431,6 +433,7 @@ def is_website_infected(url):
 
         cursor.close()
         conn.close()
+
 def format_url(url):
     if url:
         formatted_url = url.strip().lower()
@@ -441,9 +444,7 @@ def format_url(url):
         if formatted_url.startswith("www."):
             formatted_url = formatted_url.replace("www.", "")
         formatted_url = formatted_url.split('/')[0]
-        
         return formatted_url
-import subprocess
 def get_running_ips():
     try:
         netstat_output = subprocess.run(["netstat", "-tn"], capture_output=True, text=True)
@@ -514,7 +515,8 @@ def find_firefox_profile(default_esr=False):
         return None
 def access_firefox_history_continuous():
     try:
-        # Firefox profil klasörünü bulun
+        # Firefox profil klasörünü bulunimport re
+
         profile_path = find_firefox_profile()
 
         if profile_path is None:
@@ -590,15 +592,170 @@ def run_clamonacc_with_remove():
         print("clamonacc successfully executed with --remove argument.")
     except subprocess.CalledProcessError as e:
         print("Error executing clamonacc:", e)
+def is_website_infected0(content):
+    databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db']
+
+    formatted_content = format_url(content)
+    ip_prefixed_content = "0.0.0.0" + formatted_content
+    zero_content = "0.0.0.0" + formatted_content
+
+    for database in databases:
+        conn = sqlite3.connect(database)
+        cursor = conn.cursor()
+
+        queries = [
+            "SELECT * FROM viruswebsites WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM viruswebsite WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM inactive WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM malwarebazaar WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM ultimatehostblacklist WHERE ? LIKE '%' || field2 || '%'",
+            "SELECT * FROM continue WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM virusip WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM mcafee WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM full_urls WHERE ? LIKE '%' || field3 || '%'",
+            "SELECT * FROM full_domains WHERE ? LIKE '%' || field3 || '%'",
+            "SELECT * FROM paloaltofirewall WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM SSBLIP WHERE ? LIKE '%' || field2 || '%'",
+            "SELECT * FROM \"full_ip-port\" WHERE ? LIKE '%' || field3 || '%'"
+        ]
+
+        for query in queries:
+            try:
+                result = cursor.execute(query, (formatted_content,)).fetchone()
+                if result:
+                    cursor.close()
+                    conn.close()
+                    return True
+            except sqlite3.OperationalError:
+                pass  # Tablo bulunmadı hatasını yok say
+
+        cursor.close()
+        conn.close()
+
+    return False
+# Firejail'i indirme komutunu çalıştır
+firejail_install_command = "sudo apt install firejail -y"
+subprocess.run(firejail_install_command, shell=True)
+def scan_file_for_malicious_content(file_path):
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            content = file.read()
+    except Exception as e:
+        return "Error reading file " + file_path + ": " + str(e)
+
+    # Exclude specific patterns like localhost, 127.0.0.1, and 0.0.0.0
+    if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
+        return "Excluded IP/Host: " + file_path
+
+    if is_website_infected0(content) or is_website_infected0(format_url(content)):
+        print("Infected file (Malicious Website Content): " + file_path)
+    # Sandbox komutunu çalıştırma
+    sandbox_command = f"firejail --noprofile python {file_path}"
+
+    try:
+        result = subprocess.run(sandbox_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        sandbox_output = result.stdout.decode('utf-8')
+        
+        # Dosyanın çıktısını inceleyerek zararlı içerik kontrolü yapabilirsiniz
+        if re.search(r'localhost|127\.0\.0\.1|0\.0\.0\.0', sandbox_output, re.IGNORECASE):
+            print("Excluded IP/Host found in sandbox output")
+        
+        # URL veya IP adreslerini kontrol edebilirsiniz
+        urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', sandbox_output)
+        for url in urls:
+            response = requests.get(url)
+            if is_website_infected(response.content):
+                print("Infected website found in sandbox output")
+        
+        # Sandbox çıktısını inceleme ve analiz etme devam edebilirsiniz
+    except subprocess.CalledProcessError as e:
+        print("Error running sandbox:", e)
+
+    return "Clean file: " + file_path
+def scan_file_for_malicious_content(file_path):
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            content = file.read()
+    except Exception as e:
+        return "Error reading file " + file_path + ": " + str(e)
+
+    # Exclude specific patterns like localhost, 127.0.0.1, and 0.0.0.0
+    if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
+        return "Excluded IP/Host: " + file_path
+
+    if is_website_infected0(content) or is_website_infected0(format_url(content)):
+        print("Infected file (Malicious Website Content): " + file_path)
+    # Sandbox komutunu çalıştırma
+    sandbox_command = f"firejail --noprofile python {file_path}"
+
+    try:
+        result = subprocess.run(sandbox_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        sandbox_output = result.stdout.decode('utf-8')
+        
+        # Dosyanın çıktısını inceleyerek zararlı içerik kontrolü yapabilirsiniz
+        if re.search(r'localhost|127\.0\.0\.1|0\.0\.0\.0', sandbox_output, re.IGNORECASE):
+            print("Excluded IP/Host found in sandbox output")
+        
+        # URL veya IP adreslerini kontrol edebilirsiniz
+        urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', sandbox_output)
+        for url in urls:
+            response = requests.get(url)
+            if is_website_infected(response.content):
+                print("Infected website found in sandbox output")
+        
+        # Sandbox çıktısını inceleme ve analiz etme devam edebilirsiniz
+    except subprocess.CalledProcessError as e:
+        print("Error running sandbox:", e)
+
+    return "Clean file: " + file_path
+def scan_file_for_malicious_content_without_sandbox(file_path):
+    try:
+        with open(file_path, "r", encoding="utf-8") as file:
+            content = file.read()
+    except Exception as e:
+        return "Error reading file " + file_path + ": " + str(e)
+
+    # Exclude specific patterns like localhost, 127.0.0.1, and 0.0.0.0
+    if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
+        return "Excluded IP/Host: " + file_path
+
+    if is_website_infected0(content) or is_website_infected0(format_url(content)):
+        return "Infected file (Malicious Website Content): " + file_path
+
+    return "Clean file: " + file_path
+def scan_running_files_with_custom_method0():
+    running_files = []
+
+    for pid in os.listdir("/proc"):
+        if pid.isdigit():
+            pid_dir = os.path.join("/proc", pid)
+            exe_link = os.path.join(pid_dir, "exe")
+
+            try:
+                exe_path = os.readlink(exe_link)
+                if os.path.exists(exe_path) and os.path.isfile(exe_path):
+                    running_files.append(exe_path)
+            except (OSError, FileNotFoundError):
+                pass
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        results = executor.map(scan_file_for_malicious_content_without_sandbox, running_files)
+
+    print("Scanning running files finished.")
+    
+    for result in results:
+        print(result)
 def main():
     while True:
         print("Select an option:")
         print("1. Perform a file scan")
         print("2. Enable real-time protection (scan running files with ClamAV)")
-        print("3. Check is website infected or not by typing.")
+        print("3. Check if a website is infected by typing the URL")
         print("4. Real-time web protection")
-        print("5.Real-time web and file protection")
-        print("6. Quit")
+        print("5. Real-time web and file protection")
+        print("6. Perform intuitive file scan")
+        print("7. Exit")
+        
         choice = input("Enter your choice: ")
 
         if choice == "1":
@@ -627,15 +784,22 @@ def main():
             with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
                 executor.submit(real_time_web_protection)
                 executor.submit(access_firefox_history_continuous)
+        
         elif choice == "5":
-            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-               executor.submit(real_time_web_protection)
-               executor.submit(access_firefox_history_continuous)
-               executor.submit(scan_running_files_with_custom_and_clamav_continuous)
-            break 
+            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+                executor.submit(real_time_web_protection)
+                executor.submit(access_firefox_history_continuous)
+                executor.submit(scan_running_files_with_custom_method)
+                executor.submit(scan_running_files_with_custom_method0)
         elif choice == "6":
+            file_path = input("Enter the path of the file to intuitively scan: ")
+            scan_result = scan_file_for_malicious_content(file_path)
+            print(scan_result)
+
+        elif choice == "7":
             print("Exiting...")
-            break 
+            break
+
         else:
             print("Invalid choice. Please select a valid option.")
 
