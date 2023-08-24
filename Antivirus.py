@@ -643,71 +643,38 @@ def scan_file_for_malicious_content(file_path):
     except Exception as e:
         return "Error reading file " + file_path + ": " + str(e)
 
-    # Exclude specific patterns like localhost, 127.0.0.1, and 0.0.0.0
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
         return "Excluded IP/Host: " + file_path
 
     if is_website_infected0(content) or is_website_infected0(format_url(content)):
         print("Infected file (Malicious Website Content): " + file_path)
-    # Sandbox komutunu çalıştırma
+        delete_file(file_path)  # Enfekte dosyayı sil
+
     sandbox_command = f"firejail --noprofile python {file_path}"
 
     try:
         result = subprocess.run(sandbox_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         sandbox_output = result.stdout.decode('utf-8')
         
-        # Dosyanın çıktısını inceleyerek zararlı içerik kontrolü yapabilirsiniz
         if re.search(r'localhost|127\.0\.0\.1|0\.0\.0\.0', sandbox_output, re.IGNORECASE):
             print("Excluded IP/Host found in sandbox output")
         
-        # URL veya IP adreslerini kontrol edebilirsiniz
         urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', sandbox_output)
         for url in urls:
             response = requests.get(url)
             if is_website_infected(response.content):
                 print("Infected website found in sandbox output")
-        
-        # Sandbox çıktısını inceleme ve analiz etme devam edebilirsiniz
+
+        ip_addresses = re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', sandbox_output)
+        for ip in ip_addresses:
+            try:
+                hostname = socket.gethostbyaddr(ip)
+                print(f"IP Address: {ip}, Hostname: {hostname[0]}")
+            except socket.herror:
+                print(f"IP Address: {ip}, Hostname: Not found")
+
     except subprocess.CalledProcessError as e:
         print("Error running sandbox:", e)
-
-    return "Clean file: " + file_path
-def scan_file_for_malicious_content(file_path):
-    try:
-        with open(file_path, "r", encoding="utf-8") as file:
-            content = file.read()
-    except Exception as e:
-        return "Error reading file " + file_path + ": " + str(e)
-
-    # Exclude specific patterns like localhost, 127.0.0.1, and 0.0.0.0
-    if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
-        return "Excluded IP/Host: " + file_path
-
-    if is_website_infected0(content) or is_website_infected0(format_url(content)):
-        print("Infected file (Malicious Website Content): " + file_path)
-    # Sandbox komutunu çalıştırma
-    sandbox_command = f"firejail --noprofile python {file_path}"
-
-    try:
-        result = subprocess.run(sandbox_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        sandbox_output = result.stdout.decode('utf-8')
-        
-        # Dosyanın çıktısını inceleyerek zararlı içerik kontrolü yapabilirsiniz
-        if re.search(r'localhost|127\.0\.0\.1|0\.0\.0\.0', sandbox_output, re.IGNORECASE):
-            print("Excluded IP/Host found in sandbox output")
-        
-        # URL veya IP adreslerini kontrol edebilirsiniz
-        urls = re.findall(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', sandbox_output)
-        for url in urls:
-            response = requests.get(url)
-            if is_website_infected(response.content):
-                print("Infected website found in sandbox output")
-        
-        # Sandbox çıktısını inceleme ve analiz etme devam edebilirsiniz
-    except subprocess.CalledProcessError as e:
-        print("Error running sandbox:", e)
-
-    return "Clean file: " + file_path
 def scan_file_for_malicious_content_without_sandbox(file_path):
     try:
         with open(file_path, "r", encoding="utf-8") as file:
@@ -715,14 +682,14 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
     except Exception as e:
         return "Error reading file " + file_path + ": " + str(e)
 
-    # Exclude specific patterns like localhost, 127.0.0.1, and 0.0.0.0
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
         return "Excluded IP/Host: " + file_path
 
     if is_website_infected0(content) or is_website_infected0(format_url(content)):
-        return "Infected file (Malicious Website Content): " + file_path
+        print("Infected file (Malicious Website Content): " + file_path)
+        delete_file(file_path)  # Enfekte dosyayı sil
 
-    return "Clean file: " + file_path
+    return "Clean file according to malware content check: " + file_path
 def scan_running_files_with_custom_method0():
     running_files = []
 
@@ -745,6 +712,30 @@ def scan_running_files_with_custom_method0():
     
     for result in results:
         print(result)
+def scan_folder_with_malware_content_check(folder_path):
+    if os.path.exists(folder_path) and os.path.isdir(folder_path):
+        for root, _, files in os.walk(folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                try:
+                    with open(file_path, "r", encoding="utf-8") as file:
+                        content = file.read()
+                except Exception as e:
+                    print("Error reading file", file_path, ":", e)
+                    continue
+
+                if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
+                    print("Excluded IP/Host:", file_path)
+                    continue
+
+                if is_website_infected0(content) or is_website_infected0(format_url(content)):
+                    print("Infected file (Malicious Website Content):", file_path)
+                    delete_file(file_path)
+                # Add more conditions to check for different types of content
+
+                # You can include additional checks here based on your requirements
+
+                print("Clean file according to malware content check :", file_path)
 def main():
     while True:
         print("Select an option:")
@@ -753,7 +744,7 @@ def main():
         print("3. Check if a website is infected by typing the URL")
         print("4. Real-time web protection")
         print("5. Real-time web and file protection")
-        print("6. Perform intuitive file scan")
+        print("6. Perform intuitive  sandbox file scan (Run on vm)")
         print("7. Exit")
         
         choice = input("Enter your choice: ")
@@ -766,6 +757,7 @@ def main():
                 scan_folder_with_clamscan(folder_path)
                 print(f"\nScanning folder: {folder_path} with Known Hashes...")
                 scan_folder_parallel(folder_path)
+                scan_folder_with_malware_content_check(folder_path)
             else:
                 print("Invalid folder path.")
 
