@@ -513,6 +513,65 @@ def find_firefox_profile(default_esr=False):
     except Exception as e:
         print(f"Error finding Firefox profile: {e}")
         return None
+def extract_ip_from_url(url):
+    try:
+        hostname = url.split('/')[2]  # Extract hostname from URL
+        ip_address = socket.gethostbyname(hostname)
+        return ip_address
+    except Exception as e:
+        print(f"Error extracting IP from URL {url}: {e}")
+        return None
+def run_clamonacc_with_remove():
+    try:
+        # clamavdaki clamonacc komutunu çalıştırırken "--remove" argümanını kullanarak çağırın
+        subprocess.run(["clamonacc", "--remove"], check=True)
+        print("clamonacc successfully executed with --remove argument.")
+    except subprocess.CalledProcessError as e:
+        print("Error executing clamonacc:", e)
+def is_website_infected0(content):
+    databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db']
+
+    formatted_content = format_url(content)
+    ip_prefixed_content = "0.0.0.0" + formatted_content
+    zero_content = "0.0.0.0" + formatted_content
+
+    for database in databases:
+        conn = sqlite3.connect(database)
+        cursor = conn.cursor()
+
+        queries = [
+            "SELECT * FROM viruswebsites WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM viruswebsite WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM inactive WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM malwarebazaar WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM ultimatehostblacklist WHERE ? LIKE '%' || field2 || '%'",
+            "SELECT * FROM continue WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM virusip WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM mcafee WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM full_urls WHERE ? LIKE '%' || field3 || '%'",
+            "SELECT * FROM full_domains WHERE ? LIKE '%' || field3 || '%'",
+            "SELECT * FROM paloaltofirewall WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM SSBLIP WHERE ? LIKE '%' || field2 || '%'",
+            "SELECT * FROM \"full_ip-port\" WHERE ? LIKE '%' || field3 || '%'"
+        ]
+
+        for query in queries:
+            try:
+                result = cursor.execute(query, (formatted_content,)).fetchone()
+                if result:
+                    cursor.close()
+                    conn.close()
+                    return True
+            except sqlite3.OperationalError:
+                pass  # Tablo bulunmadı hatasını yok say
+
+        cursor.close()
+        conn.close()
+
+    return False
+# Firejail'i indirme komutunu çalıştır
+firejail_install_command = "sudo apt install firejail -y"
+subprocess.run(firejail_install_command, shell=True)
 def access_firefox_history_continuous():
     try:
         # Firefox profil klasörünü bulunimport re
@@ -577,65 +636,71 @@ def access_firefox_history_continuous():
 
     except Exception as e:
         print(f"Error accessing Firefox history: {e}")
-def extract_ip_from_url(url):
+def access_firefox_history_continuous0(file_path):
     try:
-        hostname = url.split('/')[2]  # Extract hostname from URL
-        ip_address = socket.gethostbyname(hostname)
-        return ip_address
+        # Firefox profil klasörünü bulunimport re
+
+        profile_path = find_firefox_profile()
+
+        if profile_path is None:
+            print("Firefox profile not found.")
+            return
+
+        # Firefox geçmiş veritabanının yolunu oluşturun
+        firefox_db_path = os.path.join(profile_path, "places.sqlite")
+
+        if not os.path.exists(firefox_db_path):
+            # If the database doesn't exist in the default folder, try default-esr folder
+            profile_path_esr = find_firefox_profile(default_esr=True)
+            if profile_path_esr:
+                firefox_db_path = os.path.join(profile_path_esr, "places.sqlite")
+            else:
+                print("Firefox history database not found.")
+                return
+
+        last_visited_websites = []  # To keep track of the last visited websites
+
+        while True:
+            # Firefox geçmiş veritabanını geçici bir klasöre kopyalayın
+            temp_dir = tempfile.mkdtemp(prefix="firefox_history_")
+            copied_db_path = os.path.join(temp_dir, "places.sqlite")
+            shutil.copy2(firefox_db_path, copied_db_path)
+
+            # Kopyalanan veritabanıyla bağlantı kurun
+            connection = sqlite3.connect(copied_db_path)
+            cursor = connection.cursor()
+
+            # Ziyaret edilen siteleri sorgu ile alın
+            query = "SELECT title, url FROM moz_places ORDER BY id DESC LIMIT 5;"
+            cursor.execute(query)
+            results = cursor.fetchall()
+
+           # Ziyaret edilen siteleri tarayın ve sonuçları gösterin
+            for row in results:
+                title, url = row
+                print(f"Scanning URL: {url}")
+                if is_website_infected(url):
+                    ip_address = extract_ip_from_url(url)
+                    if ip_address:
+                        print(f"The website is infected: {url}")
+                        print(f"Infected IP address: {ip_address}")
+                        disconnect_ip(ip_address)  # Disconnect the infected IP address
+                        if last_visited_websites:
+                            last_visited_websites.pop()  # Remove the last visited website
+                            open_webguard_page()  # Open the webguard.html file
+                            delete_file(file_path)
+                else:
+                    print(f"The website is clean: {url}")
+
+                if len(last_visited_websites) >= 5:
+                    last_visited_websites.pop(0)  # Remove the oldest visited website
+                last_visited_websites.append(url)
+            # Bağlantıyı kapatın ve geçici klasörü temizleyin
+            connection.close()
+            shutil.rmtree(temp_dir, ignore_errors=True)
+
     except Exception as e:
-        print(f"Error extracting IP from URL {url}: {e}")
-        return None
-def run_clamonacc_with_remove():
-    try:
-        # clamavdaki clamonacc komutunu çalıştırırken "--remove" argümanını kullanarak çağırın
-        subprocess.run(["clamonacc", "--remove"], check=True)
-        print("clamonacc successfully executed with --remove argument.")
-    except subprocess.CalledProcessError as e:
-        print("Error executing clamonacc:", e)
-def is_website_infected0(content):
-    databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db']
-
-    formatted_content = format_url(content)
-    ip_prefixed_content = "0.0.0.0" + formatted_content
-    zero_content = "0.0.0.0" + formatted_content
-
-    for database in databases:
-        conn = sqlite3.connect(database)
-        cursor = conn.cursor()
-
-        queries = [
-            "SELECT * FROM viruswebsites WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM viruswebsite WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM inactive WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM malwarebazaar WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM ultimatehostblacklist WHERE ? LIKE '%' || field2 || '%'",
-            "SELECT * FROM continue WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM virusip WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM mcafee WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM full_urls WHERE ? LIKE '%' || field3 || '%'",
-            "SELECT * FROM full_domains WHERE ? LIKE '%' || field3 || '%'",
-            "SELECT * FROM paloaltofirewall WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM SSBLIP WHERE ? LIKE '%' || field2 || '%'",
-            "SELECT * FROM \"full_ip-port\" WHERE ? LIKE '%' || field3 || '%'"
-        ]
-
-        for query in queries:
-            try:
-                result = cursor.execute(query, (formatted_content,)).fetchone()
-                if result:
-                    cursor.close()
-                    conn.close()
-                    return True
-            except sqlite3.OperationalError:
-                pass  # Tablo bulunmadı hatasını yok say
-
-        cursor.close()
-        conn.close()
-
-    return False
-# Firejail'i indirme komutunu çalıştır
-firejail_install_command = "sudo apt install firejail -y"
-subprocess.run(firejail_install_command, shell=True)
+        print(f"Error accessing Firefox history: {e}")
 def scan_file_for_malicious_content(file_path):
     try:
         with open(file_path, "r", encoding="utf-8") as file:
@@ -664,7 +729,7 @@ def scan_file_for_malicious_content(file_path):
             response = requests.get(url)
             if is_website_infected(response.content):
                 print("Infected website found in sandbox output")
-
+                delete_file(file_path)
         ip_addresses = re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', sandbox_output)
         for ip in ip_addresses:
             try:
@@ -744,7 +809,7 @@ def main():
         print("3. Check if a website is infected by typing the URL")
         print("4. Real-time web protection")
         print("5. Real-time web and file protection")
-        print("6. Perform intuitive  sandbox file scan (Run on vm)")
+        print("6. Perform intuitive  sandbox file scan (Run on vm and do perform a file scan first)")
         print("7. Exit")
         
         choice = input("Enter your choice: ")
@@ -785,9 +850,22 @@ def main():
                 executor.submit(scan_running_files_with_custom_method0)
         elif choice == "6":
             file_path = input("Enter the path of the file to intuitively scan: ")
-            scan_result = scan_file_for_malicious_content(file_path)
-            print(scan_result)
 
+            # Paralel olarak iki fonksiyonu başlat
+            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+                future1 = executor.submit(access_firefox_history_continuous0, file_path)
+                future2 = executor.submit(scan_file_for_malicious_content, file_path)
+
+                # Wait for both functions to complete
+                concurrent.futures.wait([future1, future2])
+                
+                # Get the results from the futures (if needed)
+                result1 = future1.result()
+                result2 = future2.result()
+
+                # Print or handle results as needed
+                print("access_firefox_history_continuous0 result:", result1)
+                print("scan_file_for_malicious_content result:", result2)
         elif choice == "7":
             print("Exiting...")
             break
