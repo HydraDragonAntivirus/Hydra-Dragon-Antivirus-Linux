@@ -43,10 +43,10 @@ def is_file_infected_md5(md5):
         main_connection.close()
         return True
     # Check in the daily table
-    daily_command = daily_connection.execute("SELECT COUNT(*) FROM daily WHERE field2 = ?;", (md5,))
+    daily_command = old_virus_base_connection.execute("SELECT COUNT(*) FROM daily WHERE field2 = ?;", (md5,))
     daily_result = daily_command.fetchone()[0]
     if daily_result > 0:
-        daily_connection.close()
+        old_virus_base_connection.close()
         return True    
       # Check in the daily0 table
     daily0_command = daily_connection.execute("SELECT COUNT(*) FROM daily0 WHERE field1 = ?;", (md5,))
@@ -104,7 +104,6 @@ def is_file_infected_md5(md5):
     
     md5_connection.close()
     main_connection.close()
-    daily_connection.close()
     old_virus_base_connection.close()
     virus_base_connection.close()
     full_md5_connection.close()
@@ -759,7 +758,7 @@ def scan_file_for_malicious_content(file_path):
         return "Error reading file " + file_path + ": " + str(e)
 
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
-        return "Excluded IP/Host: " + file_path
+        print( "Excluded IP/Host: " + file_path)
 
     if is_website_infected0(content) or is_website_infected0(format_url(content)):
         print("Infected file (Malicious Website Content): " + file_path)
@@ -853,7 +852,7 @@ def scan_folder_with_malware_content_check(folder_path):
                 print("Clean file according to malware content check :", file_path)
 def main():
     while True:
-        print("Please run program as root.") 
+        print("Please run program as root. This program flags antiviruses due to malicious website content sorry for that.") 
         print("Select an option:")
         print("1. Perform a file scan")
         print("2. Enable real-time protection (scan running files with ClamAV)")
@@ -864,19 +863,16 @@ def main():
         print("7. Exit")
         
         choice = input("Enter your choice: ")
-
         if choice == "1":
             folder_path = input("Enter the path of the folder to scan: ")
 
             if os.path.exists(folder_path) and os.path.isdir(folder_path):
-                print(f"Scanning folder: {folder_path} with ClamScan...")
-                scan_folder_with_clamscan(folder_path)
-                print(f"\nScanning folder: {folder_path} with Known Hashes...")
-                scan_folder_parallel(folder_path)
-                scan_folder_with_malware_content_check(folder_path)
+                with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+                    executor.submit(scan_folder_with_clamscan, folder_path)
+                    executor.submit(scan_folder_parallel, folder_path)
+                    executor.submit(scan_folder_with_malware_content_check, folder_path)
             else:
                 print("Invalid folder path.")
-
         elif choice == "2":
             scan_running_files_with_custom_and_clamav_continuous()
 
