@@ -571,7 +571,9 @@ def is_website_infected0(content):
     return False
 # Firejail'i indirme komutunu çalıştır
 firejail_install_command = "sudo apt install firejail -y"
+auditd_install_command = "sudo apt install  auditd  -y"
 subprocess.run(firejail_install_command, shell=True)
+subprocess.run(auditd_install_command , shell=True)
 def access_firefox_history_continuous():
     try:
         # Firefox profil klasörünü bulunimport re
@@ -803,6 +805,7 @@ def scan_folder_with_malware_content_check(folder_path):
                 print("Clean file according to malware content check :", file_path)
 def main():
     while True:
+        print("Please run program as root.") 
         print("Select an option:")
         print("1. Perform a file scan")
         print("2. Enable real-time protection (scan running files with ClamAV)")
