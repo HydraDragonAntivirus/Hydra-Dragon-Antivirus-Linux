@@ -431,7 +431,7 @@ def scan_running_files_with_clamav():
         # Clean up temporary directory
         shutil.rmtree(temp_dir, ignore_errors=True)
 def is_website_infected(url):
-    databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db']
+    databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
     formatted_url = format_url(url)  # URL'yi biçimlendir
     ip_prefixed_url = "0.0.0.0" + formatted_url  # Başına 0.0.0.0 ve format_url eklenmiş URL
     zero_url = "0.0.0.0" # Başına 0.0.0.0 eklenmiş URL
@@ -441,6 +441,11 @@ def is_website_infected(url):
         cursor = conn.cursor()
 
         queries = [
+             "SELECT * FROM targetedthreatsurl WHERE ioc = ?",
+            "SELECT * FROM ipsamnestytech WHERE field1 = ?",
+            "SELECT * FROM hostsstalkware WHERE field1 = ?",
+            "SELECT * FROM networkstalkware WHERE indicator = ?",
+            "SELECT * FROM domainsamnestytech WHERE field1 = ?",
             "SELECT * FROM viruswebsites WHERE field1 = ?",
             "SELECT * FROM viruswebsite WHERE field1 = ?",
             "SELECT * FROM inactive WHERE field1 = ?",
@@ -576,7 +581,7 @@ def run_clamonacc_with_remove():
     except subprocess.CalledProcessError as e:
         print("Error executing clamonacc:", e)
 def is_website_infected0(content):
-    databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db']
+    databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','oldvirusbase.db']
 
     formatted_content = format_url(content)
     ip_prefixed_content = "0.0.0.0" + formatted_content
@@ -587,6 +592,12 @@ def is_website_infected0(content):
         cursor = conn.cursor()
 
         queries = [
+            "SELECT * FROM targetedthreatsurl WHERE ioc = ?",
+             "SELECT * FROM targetdthreatsurl WHERE ? LIKE '%' || ioc || '%'",
+            "SELECT * FROM ipsamnestytech WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM hostsstalkware WHERE ? LIKE '%' || field1 || '%'",
+            "SELECT * FROM networkstalkware WHERE ? LIKE '%' || indicator || '%'",
+            "SELECT * FROM domainsamnestytech WHERE ? LIKE '%' || field1 || '%'",
             "SELECT * FROM viruswebsites WHERE ? LIKE '%' || field1 || '%'",
             "SELECT * FROM viruswebsite WHERE ? LIKE '%' || field1 || '%'",
             "SELECT * FROM inactive WHERE ? LIKE '%' || field1 || '%'",
@@ -852,7 +863,7 @@ def scan_folder_with_malware_content_check(folder_path):
                 print("Clean file according to malware content check :", file_path)
 def main():
     while True:
-        print("Please run program as root. This program flags antiviruses due to malicious website content sorry for that.") 
+        print("Please run program as root. Please login your virusshare account. This program flags antiviruses due to malicious website content sorry for that.") 
         print("Select an option:")
         print("1. Perform a file scan")
         print("2. Enable real-time protection (scan running files with ClamAV)")
