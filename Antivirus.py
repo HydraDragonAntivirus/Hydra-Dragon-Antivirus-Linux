@@ -23,26 +23,42 @@ def is_file_infected_md5(md5):
     md5_result = md5_command.fetchone()[0]
     if md5_result > 0:
         md5_connection.close()
-        return True
-    
+        return True 
     # Check in the main table
     main_command = main_connection.execute("SELECT COUNT(*) FROM main WHERE field2 = ?;", (md5,))
     main_result = main_command.fetchone()[0]
     if main_result > 0:
         main_connection.close()
         return True
-    
+       # Check in the main table at field1
+    main1_command = main_connection.execute("SELECT COUNT(*) FROM main WHERE field1 = ?;", (md5,))
+    main1_result = main1_command.fetchone()[0]
+    if main1_result > 0:
+        main_connection.close()
+        return True
+       # Check in the main0 table
+    main0_command = main_connection.execute("SELECT COUNT(*) FROM main0 WHERE field2 = ?;", (md5,))
+    main0_result = main0_command.fetchone()[0]
+    if main0_result > 0:
+        main_connection.close()
+        return True
     # Check in the daily table
     daily_command = daily_connection.execute("SELECT COUNT(*) FROM daily WHERE field2 = ?;", (md5,))
     daily_result = daily_command.fetchone()[0]
     if daily_result > 0:
         daily_connection.close()
-        return True
+        return True    
       # Check in the daily0 table
-    daily0_command = daily_connection.execute("SELECT COUNT(*) FROM daily0 WHERE field2 = ?;", (md5,))
+    daily0_command = daily_connection.execute("SELECT COUNT(*) FROM daily0 WHERE field1 = ?;", (md5,))
     daily0_result = daily0_command.fetchone()[0]
     if daily0_result > 0:
         daily_connection.close()
+        return True
+    # Check in the targetedthreats table
+    old_virus_base4_command = old_virus_base_connection.execute("SELECT COUNT(*) FROM targetedthreats WHERE MD5 = ?;", (md5,))
+    old_virus_base4_result = old_virus_base4_command.fetchone()[0]
+    if old_virus_base4_result > 0:
+        old_virus_base_connection.close()
         return True
     # Check in the oldvirusbase table
     old_virus_base_command = old_virus_base_connection.execute("SELECT COUNT(*) FROM oldvirusbase WHERE field2 = ?;", (md5,))
@@ -128,7 +144,40 @@ def is_file_infected_sha256(sha256):
     database_path_emotet_ioc = "IOC_Emotet.db"  # New database path
     database_path_full_sha256 = "full_sha256.db"  # New database path
     database_path_abusech = "abusech.db"  # New database path
+    database_path_oldvirusbase = "oldvirusbase.db"  # New database path
+    # Check in the targetedthreats tablE
+    connection_oldvirusbase= sqlite3.connect(database_path_oldvirusbase)
+    targetedthreats_command_text = "SELECT EXISTS(SELECT 1 FROM targetedthreats WHERE SHA256 = ? LIMIT 1) FROM targetedthreats WHERE SHA256 = ?;"
+    targetedthreats_result = connection.execute(targetedthreats_command_text, (sha256, sha256)).fetchone()
 
+    if targetedthreats_result and targetedthreats_result[0]:
+        connection_oldvirusbase.close()
+        return True
+      # Check in the sha256amnestytech table
+    connection_oldvirusbase= sqlite3.connect(database_path_oldvirusbase)
+    tech_command_text = "SELECT EXISTS(SELECT 1 FROM sha256amnestytech WHERE field1 = ? LIMIT 1) FROM sha256amnsteytech WHERE field1 = ?;"
+    tech_result = connection.execute(tech_command_text, (sha256, sha256)).fetchone()
+
+    if tech_result and tech_result[0]:
+        connection_oldvirusbase.close()
+        return True
+      # Check in the samplesstalkware table
+    connection_oldvirusbase = sqlite3.connect(database_path_oldvirusbase)
+    stalkware_command_text = "SELECT EXISTS(SELECT 1 FROM samplesstalkware WHERE SHA256 = ? LIMIT 1) FROM samplesstalkware WHERE SHA256 = ?;"
+    stalkware_result = connection.execute(stalkware_command_text, (sha256, sha256)).fetchone()
+
+    if stalkware_result and stalkware_result[0]:
+        connection_oldvirusbase.close()
+        return True
+  # Check in the esetmalwareioc table
+    connection_oldvirusbase = sqlite3.connect(database_path_oldvirusbase)
+
+    eset_command_text = "SELECT EXISTS(SELECT 1 FROM esetmalwareioc WHERE field1 = ? LIMIT 1) FROM esetmalwareioc WHERE field1 = ?;"
+    eset_result = connection.execute(eset_command_text, (sha256, sha256)).fetchone()
+
+    if eset_result and eset_result[0]:
+        connection_oldvirusbase.close()
+        return True
     # Check in the SHA256 table
     connection = sqlite3.connect(database_path_0)
 
@@ -137,8 +186,7 @@ def is_file_infected_sha256(sha256):
 
     if sha256_result and sha256_result[0]:
         connection.close()
-        return True, ""
-
+        return True
     # Check in the abusech database
     connection_abusech = sqlite3.connect(database_path_abusech)
 
