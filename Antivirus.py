@@ -43,7 +43,7 @@ def is_file_infected_md5(md5):
         main_connection.close()
         return True
     # Check in the daily table
-    daily_command = old_virus_base_connection.execute("SELECT COUNT(*) FROM daily WHERE field2 = ?;", (md5,))
+    daily_command = daily_connection.execute("SELECT COUNT(*) FROM daily WHERE field2 = ?;", (md5,))
     daily_result = daily_command.fetchone()[0]
     if daily_result > 0:
         old_virus_base_connection.close()
