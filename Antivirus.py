@@ -890,7 +890,7 @@ def real_time_web_protection0(file_path):
         return infected_ips
 def main():
     while True:
-        print("Please run program as root. This program flags false positive to some files due to malicious website content sorry for that.") 
+        print("Please run program as root.") 
         print("Select an option:")
         print("1. Perform a file scan")
         print("2. Enable real-time protection (scan running files with ClamAV)")
