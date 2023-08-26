@@ -782,7 +782,7 @@ def scan_file_for_malicious_content(file_path):
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
         print( "Excluded IP/Host: " + file_path)
 
-    if is_website_infected0(content) or is_website_infected0(format_url(content)):
+    if is_website_infected0(content) or is_website_infected0("www." + format_url(content)):
         print("Infected file (Malicious Website Content): " + file_path)
         delete_file(file_path)  # Enfekte dosyayı sil
     else:
@@ -822,7 +822,7 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
         return "Excluded IP/Host: " + file_path
 
-    if is_website_infected0(content) or is_website_infected0(format_url(content)):
+    if is_website_infected0(content) or is_website_infected0("www." + format_url(content)):
         print("Infected file (Malicious Website Content): " + file_path)
         delete_file(file_path)  # Enfekte dosyayı sil
 
