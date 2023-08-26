@@ -138,7 +138,23 @@ def is_file_infected_sha256(sha256):
     database_path_full_sha256 = "full_sha256.db"  # New database path
     database_path_abusech = "abusech.db"  # New database path
     database_path_oldvirusbase = "oldvirusbase.db"  # New database path
-    # Check in the targetedthreats tablE
+     # Check in the virusign table
+    connection_oldvirusbase= sqlite3.connect(database_path_oldvirusbase)
+    virusign_command_text = "SELECT EXISTS(SELECT 1 FROM virusign WHERE field3 = ? LIMIT 1) FROM virusign WHERE field3 = ?;"
+    virusign_result = connection.execute(virusign_command_text, (sha256, sha256)).fetchone()
+
+    if virusign_result and virusign_result[0]:
+        connection_oldvirusbase.close()
+        return True
+    # Check in the virusignfull table
+    connection_oldvirusbase= sqlite3.connect(database_path_oldvirusbase)
+    virusignfull_command_text = "SELECT EXISTS(SELECT 1 FROM virusignfull WHERE field3 = ? LIMIT 1) FROM virusignfull WHERE field3 = ?;"
+    virusignfull_result = connection.execute(virusignfull_command_text, (sha256, sha256)).fetchone()
+
+    if virusignfull_result and virusignfull_result[0]:
+        connection_oldvirusbase.close()
+        return True
+    # Check in the targetedthreats table
     connection_oldvirusbase= sqlite3.connect(database_path_oldvirusbase)
     targetedthreats_command_text = "SELECT EXISTS(SELECT 1 FROM targetedthreats WHERE SHA256 = ? LIMIT 1) FROM targetedthreats WHERE SHA256 = ?;"
     targetedthreats_result = connection.execute(targetedthreats_command_text, (sha256, sha256)).fetchone()
@@ -319,13 +335,6 @@ def scan_folder_parallel(folder_path):
                 infected_files.append(result)
             elif result:
                 print(result)
-    
-    if infected_files:
-        print("\nInfected files:")
-        for infected_file in infected_files:
-            print(infected_file)
-    else:
-        print("\nNo infected files found.")
 
 def scan_running_files_with_custom_method():
     temp_dir = tempfile.mkdtemp(prefix="running_file_scan_")
