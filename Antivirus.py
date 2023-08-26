@@ -866,7 +866,7 @@ def scan_folder_with_malware_content_check(folder_path):
                 print("Clean file according to malware content check :", file_path)
 def main():
     while True:
-        print("Please run program as root. Please login your virusshare account. This program flags antiviruses due to malicious website content sorry for that.") 
+        print("Please run program as root. This program flags false positive to some files due to malicious website content sorry for that.") 
         print("Select an option:")
         print("1. Perform a file scan")
         print("2. Enable real-time protection (scan running files with ClamAV)")
