@@ -584,42 +584,52 @@ def run_clamonacc_with_remove():
     except subprocess.CalledProcessError as e:
         print("Error executing clamonacc:", e)
 def is_website_infected0(content):
-    databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','oldvirusbase.db']
-
-    formatted_content = format_url(content)
-    ip_prefixed_content = "0.0.0.0" + formatted_content
-    zero_content = "0.0.0.0" + formatted_content
+    databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
+    formatted_url = format_url(content)  # URL'yi biçimlendir
+    ip_prefixed_url = "0.0.0.0" + formatted_url  # Başına 0.0.0.0 ve format_url eklenmiş URL
+    zero_url = "0.0.0.0" # Başına 0.0.0.0 eklenmiş URL
 
     for database in databases:
         conn = sqlite3.connect(database)
         cursor = conn.cursor()
 
         queries = [
-            "SELECT * FROM targetedthreatsurl WHERE ioc = ?",
-             "SELECT * FROM targetdthreatsurl WHERE ? LIKE '%' || ioc || '%'",
-            "SELECT * FROM ipsamnestytech WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM hostsstalkware WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM networkstalkware WHERE ? LIKE '%' || indicator || '%'",
-            "SELECT * FROM domainsamnestytech WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM viruswebsites WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM viruswebsite WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM inactive WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM malwarebazaar WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM ultimatehostblacklist WHERE ? LIKE '%' || field2 || '%'",
-            "SELECT * FROM continue WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM virusip WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM mcafee WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM full_urls WHERE ? LIKE '%' || field3 || '%'",
-            "SELECT * FROM full_domains WHERE ? LIKE '%' || field3 || '%'",
-            "SELECT * FROM paloaltofirewall WHERE ? LIKE '%' || field1 || '%'",
-            "SELECT * FROM SSBLIP WHERE ? LIKE '%' || field2 || '%'",
-            "SELECT * FROM \"full_ip-port\" WHERE ? LIKE '%' || field3 || '%'"
+             "SELECT * FROM targetedthreatsurl WHERE ioc = ?",
+            "SELECT * FROM ipsamnestytech WHERE field1 = ?",
+            "SELECT * FROM hostsstalkware WHERE field1 = ?",
+            "SELECT * FROM networkstalkware WHERE indicator = ?",
+            "SELECT * FROM domainsamnestytech WHERE field1 = ?",
+            "SELECT * FROM viruswebsites WHERE field1 = ?",
+            "SELECT * FROM viruswebsite WHERE field1 = ?",
+            "SELECT * FROM inactive WHERE field1 = ?",
+            "SELECT * FROM malwarebazaar WHERE field1 = ?",
+            "SELECT * FROM ultimatehostblacklist WHERE field2 = ?",
+            "SELECT * FROM continue WHERE field1 = ?",
+            "SELECT * FROM virusip WHERE field1 = ?"
+            "SELECT * FROM mcafee WHERE field1 = ?",
+            "SELECT * FROM full_urls WHERE field3 = ?",
+            "SELECT * FROM full_domains WHERE field3 = ?",
+            "SELECT * FROM paloaltofirewall WHERE field1 = ?",
+            "SELECT * FROM SSBLIP WHERE field2 = ?",
+            "SELECT * FROM \"full_ip-port\" WHERE field3 = ?"
         ]
 
         for query in queries:
             try:
-                result = cursor.execute(query, (formatted_content,)).fetchone()
+                result = cursor.execute(query, (formatted_url,)).fetchone()
                 if result:
+                    cursor.close()
+                    conn.close()
+                    return True
+
+                result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
+                if result_ip:
+                    cursor.close()
+                    conn.close()
+                    return True
+
+                result_zero = cursor.execute(query, (zero_url,)).fetchone()
+                if result_zero:
                     cursor.close()
                     conn.close()
                     return True
@@ -628,8 +638,6 @@ def is_website_infected0(content):
 
         cursor.close()
         conn.close()
-
-    return False
 # Firejail'i indirme komutunu çalıştır
 firejail_install_command = "sudo apt install firejail -y"
 auditd_install_command = "sudo apt install  auditd  -y"
@@ -777,7 +785,8 @@ def scan_file_for_malicious_content(file_path):
     if is_website_infected0(content) or is_website_infected0(format_url(content)):
         print("Infected file (Malicious Website Content): " + file_path)
         delete_file(file_path)  # Enfekte dosyayı sil
-
+    else:
+        print("Clean file:" + file_path )
     sandbox_command = f"firejail --noprofile python {file_path}"
 
     try:
@@ -949,6 +958,5 @@ def main():
 
         else:
             print("Invalid choice. Please select a valid option.")
-
 if __name__ == "__main__":
     main()
