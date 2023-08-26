@@ -888,6 +888,24 @@ def real_time_web_protection0(file_path):
             else:
                 print(f"The IP address {ip} is clean.")
         return infected_ips
+
+def calculate_hashes_in_folder(folder_path):
+    if os.path.exists(folder_path) and os.path.isdir(folder_path):
+        print(f"Calculating hashes for files in {folder_path}")
+        for root, _, files in os.walk(folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                print(f"Calculating hashes for {file_path}")
+                md5_hash = calculate_md5(file_path)
+                sha1_hash = calculate_sha1(file_path)
+                sha256_hash = calculate_sha256(file_path)
+                print(f"File: {file_path}")
+                print(f"MD5 Hash: {md5_hash}")
+                print(f"SHA-1 Hash: {sha1_hash}")
+                print(f"SHA-256 Hash: {sha256_hash}")
+                print("-" * 40)
+    else:
+        print("Invalid folder path.")
 def main():
     while True:
         print("Please run program as root.") 
@@ -898,7 +916,8 @@ def main():
         print("4. Real-time web protection")
         print("5. Real-time web and file protection")
         print("6. Perform intuitive  sandbox file scan (Run on vm and do perform a file scan first)")
-        print("7. Exit")
+        print("7. Calculate hashes of files in a folder")
+        print("8. Exit")
         
         choice = input("Enter your choice: ")
         if choice == "1":
@@ -953,6 +972,9 @@ def main():
                 print("scan_file_for_malicious_content result:", result2)
                 print("scan_file_for_malicious_ip result:", result3)
         elif choice == "7":
+            folder_path = input("Enter the path of the folder to calculate hashes for: ")
+            calculate_hashes_in_folder(folder_path)
+        elif choice == "8":
             print("Exiting...")
             break
 
