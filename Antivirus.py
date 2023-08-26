@@ -724,7 +724,7 @@ def access_firefox_history_continuous0(file_path):
         last_visited_websites = []  # To keep track of the last visited websites
 
         while True:
-            # Firefox geçmiş veritabanını geçici bir klasöre kopyalayın
+            # Firefox geçmiş vaccess_firefox_history_continuous0eritabanını geçici bir klasöre kopyalayın
             temp_dir = tempfile.mkdtemp(prefix="firefox_history_")
             copied_db_path = os.path.join(temp_dir, "places.sqlite")
             shutil.copy2(firefox_db_path, copied_db_path)
@@ -864,6 +864,21 @@ def scan_folder_with_malware_content_check(folder_path):
                 # You can include additional checks here based on your requirements
 
                 print("Clean file according to malware content check :", file_path)
+def real_time_web_protection0(file_path):
+    infected_ips = []
+    while True:
+        running_ips = get_running_ips()
+        
+        for ip in running_ips:
+            if is_website_infected(ip):
+                print(f"The IP address {ip} is infected.")
+                infected_ips.append(ip)
+                disconnect_ip(ip)
+                open_webguard_page()
+                delete_file(file_path)
+            else:
+                print(f"The IP address {ip} is clean.")
+        return infected_ips
 def main():
     while True:
         print("Please run program as root. This program flags false positive to some files due to malicious website content sorry for that.") 
@@ -916,17 +931,18 @@ def main():
             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
                 future1 = executor.submit(access_firefox_history_continuous0, file_path)
                 future2 = executor.submit(scan_file_for_malicious_content, file_path)
-
+                future3 = executor.submit(real_time_web_protection0, file_path)
                 # Wait for both functions to complete
-                concurrent.futures.wait([future1, future2])
+                concurrent.futures.wait([future1, future2,future3])
                 
                 # Get the results from the futures (if needed)
                 result1 = future1.result()
                 result2 = future2.result()
-
+                result3 = future3.result()
                 # Print or handle results as needed
                 print("access_firefox_history_continuous0 result:", result1)
                 print("scan_file_for_malicious_content result:", result2)
+                print("scan_file_for_malicious_ip result:", result3)
         elif choice == "7":
             print("Exiting...")
             break
