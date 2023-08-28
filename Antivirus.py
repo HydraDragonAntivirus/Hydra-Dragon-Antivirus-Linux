@@ -23,12 +23,6 @@ def is_file_infected_md5(md5):
     md5_result = md5_command.fetchone()[0]
     if md5_result > 0:
         md5_connection.close()
-        return True 
-    # Check in the main table
-    main_command = main_connection.execute("SELECT COUNT(*) FROM main WHERE field2 = ?;", (md5,))
-    main_result = main_command.fetchone()[0]
-    if main_result > 0:
-        main_connection.close()
         return True
        # Check in the main table at field1
     main1_command = main_connection.execute("SELECT COUNT(*) FROM main WHERE field1 = ?;", (md5,))
