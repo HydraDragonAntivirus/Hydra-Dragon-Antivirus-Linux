@@ -10,3 +10,4 @@ Web protection
 SHA256-SHA1-MD5 calculator
 Big databases for free. Above the 60 million virus hashes here.
 ClamAV on python
+Project stopped I didn't add daily0 table. Now going to create Android one.
