@@ -30,6 +30,12 @@ def is_file_infected_md5(md5):
     if main_result > 0:
         main_connection.close()
         return True
+    # Check in the main table field1
+    main1_command = main_connection.execute("SELECT COUNT(*) FROM main WHERE field1 = ?;", (md5,))
+    main1_result = main1_command.fetchone()[0]
+    if main1_result > 0:
+        main_connection.close()
+        return True
        # Check in the main0 table
     main0_command = main_connection.execute("SELECT COUNT(*) FROM main0 WHERE field2 = ?;", (md5,))
     main0_result = main0_command.fetchone()[0]
@@ -46,6 +52,12 @@ def is_file_infected_md5(md5):
     daily_command = daily_connection.execute("SELECT COUNT(*) FROM daily WHERE field2 = ?;", (md5,))
     daily_result = daily_command.fetchone()[0]
     if daily_result > 0:
+        daily_connection.close()
+        return True 
+      # Check in the daily table at field1
+    daily1_command = daily_connection.execute("SELECT COUNT(*) FROM daily WHERE field1 = ?;", (md5,))
+    daily1_result = daily1_command.fetchone()[0]
+    if daily1_result > 0:
         daily_connection.close()
         return True 
     # Check in the targetedthreats table
