@@ -142,7 +142,7 @@ def is_file_infected_sha256(sha256):
      # Check in the virusign table
     connection_oldvirusbase= sqlite3.connect(database_path_oldvirusbase)
     virusign_command_text = "SELECT EXISTS(SELECT 1 FROM virusign WHERE field3 = ? LIMIT 1) FROM virusign WHERE field3 = ?;"
-    virusign_result = connection.execute(virusign_command_text, (sha256, sha256)).fetchone()
+    virusign_result = connection_oldvirusbase.execute(virusign_command_text, (sha256, sha256)).fetchone()
 
     if virusign_result and virusign_result[0]:
         connection_oldvirusbase.close()
@@ -150,7 +150,7 @@ def is_file_infected_sha256(sha256):
     # Check in the virusignfull table
     connection_oldvirusbase= sqlite3.connect(database_path_oldvirusbase)
     virusignfull_command_text = "SELECT EXISTS(SELECT 1 FROM virusignfull WHERE field3 = ? LIMIT 1) FROM virusignfull WHERE field3 = ?;"
-    virusignfull_result = connection.execute(virusignfull_command_text, (sha256, sha256)).fetchone()
+    virusignfull_result = connection_oldvirusbase.execute(virusignfull_command_text, (sha256, sha256)).fetchone()
 
     if virusignfull_result and virusignfull_result[0]:
         connection_oldvirusbase.close()
@@ -158,7 +158,7 @@ def is_file_infected_sha256(sha256):
     # Check in the targetedthreats table
     connection_oldvirusbase= sqlite3.connect(database_path_oldvirusbase)
     targetedthreats_command_text = "SELECT EXISTS(SELECT 1 FROM targetedthreats WHERE SHA256 = ? LIMIT 1) FROM targetedthreats WHERE SHA256 = ?;"
-    targetedthreats_result = connection.execute(targetedthreats_command_text, (sha256, sha256)).fetchone()
+    targetedthreats_result = connection_oldvirusbase.execute(targetedthreats_command_text, (sha256, sha256)).fetchone()
 
     if targetedthreats_result and targetedthreats_result[0]:
         connection_oldvirusbase.close()
@@ -166,7 +166,7 @@ def is_file_infected_sha256(sha256):
       # Check in the sha256amnestytech table
     connection_oldvirusbase= sqlite3.connect(database_path_oldvirusbase)
     tech_command_text = "SELECT EXISTS(SELECT 1 FROM sha256amnestytech WHERE field1 = ? LIMIT 1) FROM sha256amnsteytech WHERE field1 = ?;"
-    tech_result = connection.execute(tech_command_text, (sha256, sha256)).fetchone()
+    tech_result = connection_oldvirusbase.execute(tech_command_text, (sha256, sha256)).fetchone()
 
     if tech_result and tech_result[0]:
         connection_oldvirusbase.close()
@@ -174,7 +174,7 @@ def is_file_infected_sha256(sha256):
       # Check in the samplesstalkware table
     connection_oldvirusbase = sqlite3.connect(database_path_oldvirusbase)
     stalkware_command_text = "SELECT EXISTS(SELECT 1 FROM samplesstalkware WHERE SHA256 = ? LIMIT 1) FROM samplesstalkware WHERE SHA256 = ?;"
-    stalkware_result = connection.execute(stalkware_command_text, (sha256, sha256)).fetchone()
+    stalkware_result = connection_oldvirusbase.execute(stalkware_command_text, (sha256, sha256)).fetchone()
 
     if stalkware_result and stalkware_result[0]:
         connection_oldvirusbase.close()
@@ -183,7 +183,7 @@ def is_file_infected_sha256(sha256):
     connection_oldvirusbase = sqlite3.connect(database_path_oldvirusbase)
 
     eset_command_text = "SELECT EXISTS(SELECT 1 FROM esetmalwareioc WHERE field1 = ? LIMIT 1) FROM esetmalwareioc WHERE field1 = ?;"
-    eset_result = connection.execute(eset_command_text, (sha256, sha256)).fetchone()
+    eset_result = connection_oldvirusbase.execute(eset_command_text, (sha256, sha256)).fetchone()
 
     if eset_result and eset_result[0]:
         connection_oldvirusbase.close()
