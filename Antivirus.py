@@ -24,18 +24,12 @@ def is_file_infected_md5(md5):
     if md5_result > 0:
         md5_connection.close()
         return True 
-    # Check in the main table
-    main_command = main_connection.execute("SELECT COUNT(*) FROM main WHERE field2 = ?;", (md5,))
+   # Check in the main table at field2 or field1
+    main_command = main_connection.execute("SELECT COUNT(*) FROM main WHERE field2 = ? OR field1 = ?;", (md5, md5))
     main_result = main_command.fetchone()[0]
     if main_result > 0:
-        main_connection.close()
-        return True
-    # Check in the main table field1
-    main1_command = main_connection.execute("SELECT COUNT(*) FROM main WHERE field1 = ?;", (md5,))
-    main1_result = main1_command.fetchone()[0]
-    if main1_result > 0:
-        main_connection.close()
-        return True
+     main_connection.close()
+     return True
        # Check in the main0 table
     main0_command = main_connection.execute("SELECT COUNT(*) FROM main0 WHERE field2 = ?;", (md5,))
     main0_result = main0_command.fetchone()[0]
@@ -48,22 +42,23 @@ def is_file_infected_md5(md5):
     if daily0_result > 0:
         daily_connection.close()
         return True 
-    # Check in the daily table
-    daily_command = daily_connection.execute("SELECT COUNT(*) FROM daily WHERE field2 = ?;", (md5,))
+    # Check in the daily table at field2 or field1
+    daily_command = daily_connection.execute("SELECT COUNT(*) FROM daily WHERE field2 = ? OR field1 = ?;", (md5, md5))
     daily_result = daily_command.fetchone()[0]
     if daily_result > 0:
-        daily_connection.close()
-        return True 
-      # Check in the daily table at field1
-    daily1_command = daily_connection.execute("SELECT COUNT(*) FROM daily WHERE field1 = ?;", (md5,))
-    daily1_result = daily1_command.fetchone()[0]
-    if daily1_result > 0:
-        daily_connection.close()
-        return True 
+     daily_connection.close()
+     return True
+
     # Check in the targetedthreats table
     old_virus_base4_command = old_virus_base_connection.execute("SELECT COUNT(*) FROM targetedthreats WHERE MD5 = ?;", (md5,))
     old_virus_base4_result = old_virus_base4_command.fetchone()[0]
     if old_virus_base4_result > 0:
+        old_virus_base_connection.close()
+        return True
+       # Check in the oldmalwares table
+    old_malwares_command = old_virus_base_connection.execute("SELECT COUNT(*) FROM oldmalwares WHERE field1 = ?;", (md5,))
+    old_malwares_result = old_malwares_command.fetchone()[0]
+    if old_malwares_result > 0:
         old_virus_base_connection.close()
         return True
     # Check in the oldvirusbase table
@@ -72,35 +67,30 @@ def is_file_infected_md5(md5):
     if old_virus_base_result > 0:
         old_virus_base_connection.close()
         return True
-    
     # Check in the oldvirusbase2 table
     old_virus_base2_command = old_virus_base_connection.execute("SELECT COUNT(*) FROM oldvirusbase2 WHERE field1 = ?;", (md5,))
     old_virus_base2_result = old_virus_base2_command.fetchone()[0]
     if old_virus_base2_result > 0:
         old_virus_base_connection.close()
-        return True
-    
+        return True   
     # Check in the oldvirusbase3 table
     old_virus_base3_command = old_virus_base_connection.execute("SELECT COUNT(*) FROM oldvirusbase3 WHERE field2 = ?;", (md5,))
     old_virus_base3_result = old_virus_base3_command.fetchone()[0]
     if old_virus_base3_result > 0:
         old_virus_base_connection.close()
-        return True
-    
+        return True  
     # Check in the virusbase table
     virus_base_command = virus_base_connection.execute("SELECT COUNT(*) FROM virusbase WHERE field1 = ?;", (md5,))
     virus_base_result = virus_base_command.fetchone()[0]
     if virus_base_result > 0:
         virus_base_connection.close()
-        return True
-    
+        return True  
     # Check in the virusbase2 table
     virus_base2_command = virus_base_connection.execute("SELECT COUNT(*) FROM virusbase2 WHERE field1 = ?;", (md5,))
     virus_base2_result = virus_base2_command.fetchone()[0]
     if virus_base2_result > 0:
         virus_base_connection.close()
-        return True
-    
+        return True  
     # Check in the HashDB table
     full_md5_command = full_md5_connection.execute("SELECT COUNT(*) FROM HashDB WHERE hash = ?;", (md5,))
     full_md5_result = full_md5_command.fetchone()[0]
