@@ -188,7 +188,7 @@ def is_file_infected_sha256(sha256):
     if eset_result and eset_result[0]:
         connection_oldvirusbase.close()
         return True
-    # Check in the SHA256 table
+    # Check in the SHA256 table in abusech
     connection = sqlite3.connect(database_path_0)
 
     sha256_command_text = "SELECT EXISTS(SELECT 1 FROM SHA256 WHERE field1 = ? LIMIT 1) FROM SHA256 WHERE field1 = ?;"
