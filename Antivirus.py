@@ -197,7 +197,7 @@ def is_file_infected_sha256(sha256):
     if sha256_result and sha256_result[0]:
         connection.close()
         return True
-    # Check in the abusech database
+    # Check in the abusech database full_sha256 table
     connection_abusech = sqlite3.connect(database_path_abusech)
 
     abusech_command_text = "SELECT EXISTS(SELECT 1 FROM full_sha256 WHERE field3 = ? LIMIT 1) FROM full_sha256 WHERE field3 = ?;"
@@ -208,7 +208,7 @@ def is_file_infected_sha256(sha256):
     if abusech_result and abusech_result[0]:
         return True
 
-    # Check in the full_sha256 database
+    # Check in the full_sha256 database full_sha256 table
     connection_full_sha256 = sqlite3.connect(database_path_full_sha256)
 
     full_sha256_command_text = "SELECT EXISTS(SELECT 1 FROM full_sha256 WHERE field1 = ? LIMIT 1) FROM full_sha256 WHERE field1 = ?;"
