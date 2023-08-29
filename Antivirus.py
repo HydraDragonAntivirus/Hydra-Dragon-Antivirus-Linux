@@ -163,9 +163,9 @@ def is_file_infected_sha256(sha256):
     if targetedthreats_result and targetedthreats_result[0]:
         connection_oldvirusbase.close()
         return True
-      # Check in the sha256amnestytech table
+      # Check in the sha256amnestytech0 table
     connection_oldvirusbase= sqlite3.connect(database_path_oldvirusbase)
-    tech_command_text = "SELECT EXISTS(SELECT 1 FROM sha256amnestytech WHERE field1 = ? LIMIT 1) FROM sha256amnsteytech WHERE field1 = ?;"
+    tech_command_text = "SELECT EXISTS(SELECT 1 FROM sha256amnestytech0 WHERE field1 = ? LIMIT 1) FROM sha256amnestytech0 WHERE field1 = ?;"
     tech_result = connection_oldvirusbase.execute(tech_command_text, (sha256, sha256)).fetchone()
 
     if tech_result and tech_result[0]:
@@ -822,7 +822,7 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
         return "Error reading file " + file_path + ": " + str(e)
 
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
-        return "Excluded IP/Host: " + file_path
+        print ("Excluded IP/Host: " + file_path)
 
     if is_website_infected0(content) or is_website_infected0("www." + format_url(content)):
         print("Infected file (Malicious Website Content): " + file_path)
