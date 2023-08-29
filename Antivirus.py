@@ -188,7 +188,7 @@ def is_file_infected_sha256(sha256):
     if eset_result and eset_result[0]:
         connection_oldvirusbase.close()
         return True
-    # Check in the SHA256 table in abusech
+    # Check in the SHA256 table in abusech database
     connection = sqlite3.connect(database_path_0)
 
     sha256_command_text = "SELECT EXISTS(SELECT 1 FROM SHA256 WHERE field1 = ? LIMIT 1) FROM SHA256 WHERE field1 = ?;"
@@ -436,9 +436,9 @@ def scan_running_files_with_clamav():
         shutil.rmtree(temp_dir, ignore_errors=True)
 def is_website_infected(url):
     databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
-    formatted_url = format_url(url)  # URL'yi biçimlendir
-    ip_prefixed_url = "0.0.0.0" + formatted_url  # Başına 0.0.0.0 ve format_url eklenmiş URL
-    zero_url = "0.0.0.0" # Başına 0.0.0.0 eklenmiş URL
+    formatted_url = format_url(url)  # Format the URL
+    ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
+    zero_url = "0.0.0.0" # URL with 0.0.0.0 prefixed
 
     for database in databases:
         conn = sqlite3.connect(database)
@@ -485,7 +485,7 @@ def is_website_infected(url):
                     conn.close()
                     return True
             except sqlite3.OperationalError:
-                pass  # Tablo bulunmadı hatasını yok say
+                pass  # Table is not found, ignore it.
 
         cursor.close()
         conn.close()
@@ -504,7 +504,7 @@ def format_url(url):
 def get_running_ips():
     try:
         netstat_output = subprocess.run(["netstat", "-tn"], capture_output=True, text=True)
-        lines = netstat_output.stdout.split("\n")[2:]  # İlk iki satırı atla
+        lines = netstat_output.stdout.split("\n")[2:]  # Skip the first two lines
         running_ips = set()
 
         for line in lines:
@@ -537,26 +537,26 @@ def real_time_web_protection():
         return infected_ips
 def disconnect_ip(ip):
     try:
-        # Örnek olarak Linux üzerinde IP adresini engellemek için kullanılabilecek bir komut
+        # For example, a command that can be used to block the IP address on Linux
         subprocess.run(['sudo', 'iptables', '-A', 'INPUT', '-s', ip, '-j', 'DROP'])
         print(f"Disconnected IP address: {ip}")
     except Exception as e:
         print(f"Error disconnecting IP address {ip}: {e}")
 def open_webguard_page():
-    # Geçerli dizinin yolu
+    # Path to current directory
     current_directory = os.getcwd()
 
-    # webguard.html dosyasının yolu
+    # WebGuard.html path
     webguard_path = os.path.join(current_directory, 'WebGuard.html')
 
-    # webguard.html dosyasını Firefox ile aç
+    # Open WebGuard.html with Firefox
     webbrowser.get('firefox').open('file://' + webguard_path)
 def find_firefox_profile(default_esr=False):
     try:
-        # Kullanıcının ev dizinini alın
+        # Get the user's home directory        
         home_dir = os.path.expanduser("~")
 
-        # Firefox profil klasörünü bulmak için glob kullanın
+        # Use glob to find Firefox profile folder
         profile_paths = glob.glob(os.path.join(home_dir, ".mozilla/firefox/*default"))
         
         if default_esr:
@@ -579,16 +579,16 @@ def extract_ip_from_url(url):
         return None
 def run_clamonacc_with_remove():
     try:
-        # clamavdaki clamonacc komutunu çalıştırırken "--remove" argümanını kullanarak çağırın
+        # When running the clamonacc command in clamav call it using the "--remove" argument
         subprocess.run(["clamonacc", "--remove"], check=True)
         print("clamonacc successfully executed with --remove argument.")
     except subprocess.CalledProcessError as e:
         print("Error executing clamonacc:", e)
 def is_website_infected0(content):
     databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
-    formatted_url = format_url(content)  # URL'yi biçimlendir
-    ip_prefixed_url = "0.0.0.0" + formatted_url  # Başına 0.0.0.0 ve format_url eklenmiş URL
-    zero_url = "0.0.0.0" # Başına 0.0.0.0 eklenmiş URL
+    formatted_url = format_url(content)  # Format URL
+    ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
+    zero_url = "0.0.0.0" # URL with 0.0.0.0 prefixed
 
     for database in databases:
         conn = sqlite3.connect(database)
@@ -635,18 +635,18 @@ def is_website_infected0(content):
                     conn.close()
                     return True
             except sqlite3.OperationalError:
-                pass  # Tablo bulunmadı hatasını yok say
+                pass  # Ignore the table is not found error.
 
         cursor.close()
         conn.close()
-# Firejail'i indirme komutunu çalıştır
+# Run command to download firejail
 firejail_install_command = "sudo apt install firejail -y"
 auditd_install_command = "sudo apt install  auditd  -y"
 subprocess.run(firejail_install_command, shell=True)
 subprocess.run(auditd_install_command , shell=True)
 def access_firefox_history_continuous():
     try:
-        # Firefox profil klasörünü bulunimport re
+        # Find the Firefox profile folder
 
         profile_path = find_firefox_profile()
 
@@ -654,7 +654,7 @@ def access_firefox_history_continuous():
             print("Firefox profile not found.")
             return
 
-        # Firefox geçmiş veritabanının yolunu oluşturun
+        # Create the path to the Firefox history database
         firefox_db_path = os.path.join(profile_path, "places.sqlite")
 
         if not os.path.exists(firefox_db_path):
@@ -669,21 +669,21 @@ def access_firefox_history_continuous():
         last_visited_websites = []  # To keep track of the last visited websites
 
         while True:
-            # Firefox geçmiş veritabanını geçici bir klasöre kopyalayın
+            # Copy the Firefox history database to a temporary folder
             temp_dir = tempfile.mkdtemp(prefix="firefox_history_")
             copied_db_path = os.path.join(temp_dir, "places.sqlite")
             shutil.copy2(firefox_db_path, copied_db_path)
 
-            # Kopyalanan veritabanıyla bağlantı kurun
+            # Connect with the copied database
             connection = sqlite3.connect(copied_db_path)
             cursor = connection.cursor()
 
-            # Ziyaret edilen siteleri sorgu ile alın
+            # Get visited sites with query
             query = "SELECT title, url FROM moz_places ORDER BY id DESC LIMIT 5;"
             cursor.execute(query)
             results = cursor.fetchall()
 
-           # Ziyaret edilen siteleri tarayın ve sonuçları gösterin
+           # Scan visited websites and show results
             for row in results:
                 title, url = row
                 print(f"Scanning URL: {url}")
@@ -702,7 +702,8 @@ def access_firefox_history_continuous():
                 if len(last_visited_websites) >= 5:
                     last_visited_websites.pop(0)  # Remove the oldest visited website
                 last_visited_websites.append(url)
-            # Bağlantıyı kapatın ve geçici klasörü temizleyin
+            # Close the connection and clean the temporary folder
+
             connection.close()
             shutil.rmtree(temp_dir, ignore_errors=True)
 
@@ -710,7 +711,7 @@ def access_firefox_history_continuous():
         print(f"Error accessing Firefox history: {e}")
 def access_firefox_history_continuous0(file_path):
     try:
-        # Firefox profil klasörünü bulunimport re
+        # Find the Firefox profile folder
 
         profile_path = find_firefox_profile()
 
@@ -718,7 +719,7 @@ def access_firefox_history_continuous0(file_path):
             print("Firefox profile not found.")
             return
 
-        # Firefox geçmiş veritabanının yolunu oluşturun
+        # Create the path to the Firefox history database
         firefox_db_path = os.path.join(profile_path, "places.sqlite")
 
         if not os.path.exists(firefox_db_path):
@@ -733,21 +734,21 @@ def access_firefox_history_continuous0(file_path):
         last_visited_websites = []  # To keep track of the last visited websites
 
         while True:
-            # Firefox geçmiş vaccess_firefox_history_continuous0eritabanını geçici bir klasöre kopyalayın
+            # Copy the Firefox history and access_firefox_history_continuous0 database to a temporary folder
             temp_dir = tempfile.mkdtemp(prefix="firefox_history_")
             copied_db_path = os.path.join(temp_dir, "places.sqlite")
             shutil.copy2(firefox_db_path, copied_db_path)
 
-            # Kopyalanan veritabanıyla bağlantı kurun
+            # Connect with the copied database
             connection = sqlite3.connect(copied_db_path)
             cursor = connection.cursor()
 
-            # Ziyaret edilen siteleri sorgu ile alın
+            # Get visited sites with query
             query = "SELECT title, url FROM moz_places ORDER BY id DESC LIMIT 5;"
             cursor.execute(query)
             results = cursor.fetchall()
 
-           # Ziyaret edilen siteleri tarayın ve sonuçları gösterin
+           # Scan visited sites and show results
             for row in results:
                 title, url = row
                 print(f"Scanning URL: {url}")
@@ -767,7 +768,7 @@ def access_firefox_history_continuous0(file_path):
                 if len(last_visited_websites) >= 5:
                     last_visited_websites.pop(0)  # Remove the oldest visited website
                 last_visited_websites.append(url)
-            # Bağlantıyı kapatın ve geçici klasörü temizleyin
+            # Close the connection and clean the temporary folder
             connection.close()
             shutil.rmtree(temp_dir, ignore_errors=True)
 
@@ -785,7 +786,7 @@ def scan_file_for_malicious_content(file_path):
 
     if is_website_infected0(content) or is_website_infected0("www." + format_url(content)):
         print("Infected file (Malicious Website Content): " + file_path)
-        delete_file(file_path)  # Enfekte dosyayı sil
+        delete_file(file_path)  # Remove the infected file
     else:
         print("Clean file:" + file_path )
     sandbox_command = f"firejail --noprofile python {file_path}"
@@ -825,7 +826,7 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
 
     if is_website_infected0(content) or is_website_infected0("www." + format_url(content)):
         print("Infected file (Malicious Website Content): " + file_path)
-        delete_file(file_path)  # Enfekte dosyayı sil
+        delete_file(file_path)  # Remove the infected file
 
     return "Clean file according to malware content check: " + file_path
 def scan_running_files_with_custom_method0():
@@ -942,7 +943,7 @@ def main():
                 print("The website is clean.")
 
         elif choice == "4":
-            # Paralel olarak iki fonksiyonu başlat
+            # Start two functions in parallel
             with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
                 executor.submit(real_time_web_protection)
                 executor.submit(access_firefox_history_continuous)
@@ -956,7 +957,7 @@ def main():
         elif choice == "6":
             file_path = input("Enter the path of the file to intuitively scan: ")
 
-            # Paralel olarak iki fonksiyonu başlat
+            #  Start two functions in parallel
             with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
                 future1 = executor.submit(access_firefox_history_continuous0, file_path)
                 future2 = executor.submit(scan_file_for_malicious_content, file_path)
