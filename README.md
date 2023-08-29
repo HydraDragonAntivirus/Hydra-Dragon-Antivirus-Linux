@@ -11,5 +11,3 @@ Web protection
 SHA256-SHA1-MD5 calculator
 Big databases for free. Above the 60 million virus hashes here.
 ClamAV on python
-Test my av with this: 
-# https://github.com/JonathanSalwan/binary-samples/tree/master
