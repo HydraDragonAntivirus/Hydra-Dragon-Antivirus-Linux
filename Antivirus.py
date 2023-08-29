@@ -96,7 +96,7 @@ def is_file_infected_md5(md5):
     if full_md5_result > 0:
         full_md5_connection.close()
         return True
-    
+    daily_connection.close()
     md5_connection.close()
     main_connection.close()
     old_virus_base_connection.close()
