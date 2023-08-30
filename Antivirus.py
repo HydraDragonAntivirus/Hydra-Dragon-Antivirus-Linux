@@ -10,6 +10,8 @@ import glob
 import socket 
 import re
 import requests
+from watchdog.observers.polling import PollingObserver
+from watchdog.events import FileSystemEventHandler
 def is_file_infected_md5(md5):
     md5_connection = sqlite3.connect("MD5basedatabase.db")
     main_connection = sqlite3.connect("main.db")
@@ -796,7 +798,7 @@ def scan_file_for_malicious_content(file_path):
         print("Infected file (Malicious Website Content): " + file_path)
         delete_file(file_path)  # Remove the infected file
     else:
-        print("Clean file:" + file_path )
+        print("Clean file according to malicious content check:" + file_path )
     sandbox_command = f"firejail --noprofile python {file_path}"
 
     try:
@@ -916,6 +918,43 @@ def calculate_hashes_in_folder(folder_path):
                 print("-" * 40)
     else:
         print("Invalid folder path.")
+# Get the current username
+current_username = os.getlogin()
+
+# Directory paths to monitor
+directories_to_monitor = [
+    f"/home/{current_username}"
+]
+
+# Action to take when suspicious change is detected
+def handle_suspicious_change(file_path):
+    print(f"Suspicious change detected: {file_path}")
+    os.remove(file_path)
+    print(f"File deleted: {file_path}")
+class FileChangeHandler(FileSystemEventHandler):
+    def on_modified(self, event):
+        if not event.is_directory:
+            handle_suspicious_change(event.src_path)
+
+    def on_moved(self, event):
+        if not event.is_directory:
+            handle_suspicious_change(event.dest_path)
+
+def start_monitoring(file_path):
+    event_handler = FileChangeHandler()
+    observer = PollingObserver()
+
+    directory = os.path.dirname(file_path)
+    observer.schedule(event_handler, directory, recursive=True)
+
+    observer.start()
+    print("Ransomware detector started for:", file_path)
+
+    try:
+        observer.join()
+    except KeyboardInterrupt:
+        observer.stop()
+        observer.join()
 def main():
     while True:
         print("Please run program as root.") 
@@ -957,7 +996,7 @@ def main():
                 executor.submit(access_firefox_history_continuous)
         
         elif choice == "5":
-            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
                 executor.submit(real_time_web_protection)
                 executor.submit(access_firefox_history_continuous)
                 executor.submit(scan_running_files_with_custom_method)
@@ -966,18 +1005,21 @@ def main():
             file_path = input("Enter the path of the file to intuitively scan: ")
 
             #  Start two functions in parallel
-            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+                future4 = executor.submit(start_monitoring, file_path)
                 future1 = executor.submit(access_firefox_history_continuous0, file_path)
                 future2 = executor.submit(scan_file_for_malicious_content, file_path)
                 future3 = executor.submit(real_time_web_protection0, file_path)
                 # Wait for both functions to complete
-                concurrent.futures.wait([future1, future2,future3])
+                concurrent.futures.wait([future4,future1, future2,future3])
                 
                 # Get the results from the futures (if needed)
                 result1 = future1.result()
                 result2 = future2.result()
                 result3 = future3.result()
+                result4 = future4.result()
                 # Print or handle results as needed
+                print("scan_file_for_ransomware result:", result4)
                 print("access_firefox_history_continuous0 result:", result1)
                 print("scan_file_for_malicious_content result:", result2)
                 print("scan_file_for_malicious_ip result:", result3)
