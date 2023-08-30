@@ -147,6 +147,14 @@ def is_file_infected_sha256(sha256):
     if virusign_result and virusign_result[0]:
         connection_oldvirusbase.close()
         return True
+         # Check in the kicomantivirus table
+    connection_oldvirusbase= sqlite3.connect(database_path_oldvirusbase)
+    kicomantivirus_command_text = "SELECT EXISTS(SELECT 1 FROM kicomantivirus WHERE field4 = ? LIMIT 1) FROM kicomantivirus WHERE field4 = ?;"
+    kicomantivirus_result = connection_oldvirusbase.execute(kicomantivirus_command_text, (sha256, sha256)).fetchone()
+
+    if kicomantivirus_result and kicomantivirus_result[0]:
+        connection_oldvirusbase.close()
+        return True
     # Check in the virusignfull table
     connection_oldvirusbase= sqlite3.connect(database_path_oldvirusbase)
     virusignfull_command_text = "SELECT EXISTS(SELECT 1 FROM virusignfull WHERE field3 = ? LIMIT 1) FROM virusignfull WHERE field3 = ?;"
