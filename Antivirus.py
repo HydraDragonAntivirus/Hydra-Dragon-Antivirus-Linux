@@ -173,7 +173,7 @@ def is_file_infected_sha256(sha256):
         return True
       # Check in the sha256amnestytech0 table
     connection_oldvirusbase= sqlite3.connect(database_path_oldvirusbase)
-    tech_command_text = "SELECT EXISTS(SELECT 1 FROM sha256amnestytech0 WHERE field1 = ? LIMIT 1) FROM sha256amnestytech0 WHERE field1 = ?;"
+    tech_command_text = "SELECT EXISTS(SELECT 1 FROM sha256amnestytech WHERE field1 = ? LIMIT 1) FROM sha256amnestytech WHERE field1 = ?;"
     tech_result = connection_oldvirusbase.execute(tech_command_text, (sha256, sha256)).fetchone()
 
     if tech_result and tech_result[0]:
