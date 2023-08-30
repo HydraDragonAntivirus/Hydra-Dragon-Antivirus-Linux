@@ -23,3 +23,4 @@ Download full version [here](https://mega.nz/file/DkgzAC6R#pbNmaC2_TUrB5ZQlFjJpa
 - Don't forget to use latest version of the Python script at **GitHub** not at mega.nz
 
 - It really disconnect infected ip address and it deletes file so be careful!
+- Don't forget to use clamonacc.
