@@ -9,7 +9,7 @@
 - Real-time protection
 - Web protection
 - SHA256-SHA1-MD5 calculator
-- Big databases for free. Above the 60 million virus hashes here.
+- Big databases for free. Above the 60 million virus hashes here
 - ClamAV on Python
 
 ## Download
