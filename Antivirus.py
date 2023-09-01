@@ -949,13 +949,6 @@ class FileChangeHandler(pyinotify.ProcessEvent):
             print(f"File is not readable as UTF-8: {file_path}")
             delete_file(self.suspicious_file_path)  # Delete suspicious file
 
-def delete_file(file_path):
-    try:
-        os.remove(file_path)
-        print(f"Suspicious file deleted: {file_path}")
-    except Exception as e:
-        print(f"Error deleting file {file_path}: {e}")
-
 def start_monitoring(suspicious_file_path, file_path):
     wm = pyinotify.WatchManager()
     mask = pyinotify.IN_CLOSE_WRITE
