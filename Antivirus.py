@@ -975,7 +975,7 @@ def start_monitoring(suspicious_file_path, file_path):
         notifier.stop()
 def main():
     while True:
-        print("Please run program as root.") 
+        print("Please run program as a root") 
         print("Select an option:")
         print("1. Perform a file scan")
         print("2. Enable real-time protection (scan running files with ClamAV)")
