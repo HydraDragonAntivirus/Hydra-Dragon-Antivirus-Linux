@@ -938,17 +938,30 @@ class FileChangeHandler(pyinotify.ProcessEvent):
         file_extension = os.path.splitext(file_path)[1]
         
         if file_extension == '.db':
-            return  # .db dosyalarının değişikliklerini görmezden gel
+            return  # Ignore changes to .db files
 
-        print(f"File changed: {file_path}")
-        delete_file(self.suspicious_file_path)  # Şüpheli dosyayı sil
+        try:
+            # Attempt to read the file as UTF-8
+            with open(file_path, 'r', encoding='utf-8') as file:
+                file.read()
+        except UnicodeDecodeError:
+            # File is not readable as UTF-8 (potentially encrypted)
+            print(f"File is not readable as UTF-8: {file_path}")
+            delete_file(self.suspicious_file_path)  # Delete suspicious file
+
+def delete_file(file_path):
+    try:
+        os.remove(file_path)
+        print(f"Suspicious file deleted: {file_path}")
+    except Exception as e:
+        print(f"Error deleting file {file_path}: {e}")
 
 def start_monitoring(suspicious_file_path, file_path):
     wm = pyinotify.WatchManager()
     mask = pyinotify.IN_CLOSE_WRITE
 
     event_handler = FileChangeHandler(suspicious_file_path)
-    event_handler.file_path = file_path  # Dosya yolu bilgisini de iletiyoruz
+    event_handler.file_path = file_path
     notifier = pyinotify.Notifier(wm, event_handler)
 
     for directory in directories_to_monitor:
