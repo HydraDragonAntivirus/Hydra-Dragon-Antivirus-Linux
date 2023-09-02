@@ -917,7 +917,7 @@ def calculate_hashes_in_folder(folder_path):
                 print("-" * 40)
     else:
         print("Invalid folder path.")
-#Get the current username
+# Get the current username
 current_username = os.getlogin()
 
 directories_to_monitor = [
@@ -927,19 +927,26 @@ directories_to_monitor = [
 class FileChangeHandler(pyinotify.ProcessEvent):
     def __init__(self, suspicious_file_path):
         self.suspicious_file_path = suspicious_file_path
+        self.suspicious_file_hash = self.calculate_file_hash(suspicious_file_path)
         super().__init__()
 
     def process_IN_CLOSE_WRITE(self, event):
         if not event.dir:
             file_path = event.pathname
-            self.handle_file_change(file_path)
+            original_extension = os.path.splitext(self.suspicious_file_path)[1]
+            new_extension = os.path.splitext(file_path)[1]
+
+            if original_extension != new_extension:
+                print(f"File extension has changed: {self.suspicious_file_path} -> {file_path}")
+                new_file_hash = self.calculate_file_hash(file_path)
+
+                if new_file_hash != self.suspicious_file_hash:
+                    print(f"File content has changed: {self.suspicious_file_path} -> {file_path}")
+                    delete_file(self.suspicious_file_path)  # Delete suspicious file
+            else:
+                self.handle_file_change(file_path)
 
     def handle_file_change(self, file_path):
-        file_extension = os.path.splitext(file_path)[1]
-        
-        if file_extension == '.db':
-            return  # Ignore changes to .db files
-
         try:
             # Attempt to read the file as UTF-8
             with open(file_path, 'r', encoding='utf-8') as file:
@@ -948,6 +955,23 @@ class FileChangeHandler(pyinotify.ProcessEvent):
             # File is not readable as UTF-8 (potentially encrypted)
             print(f"File is not readable as UTF-8: {file_path}")
             delete_file(self.suspicious_file_path)  # Delete suspicious file
+
+    def calculate_file_hash(self, file_path):
+        hasher = hashlib.sha256()
+        with open(file_path, 'rb') as file:
+            while True:
+                data = file.read(65536)
+                if not data:
+                    break
+                hasher.update(data)
+        return hasher.hexdigest()
+
+def delete_file(file_path):
+    try:
+        os.remove(file_path)
+        print(f"Deleted file: {file_path}")
+    except Exception as e:
+        print(f"Error deleting file: {file_path} - {e}")
 
 def start_monitoring(suspicious_file_path, file_path):
     wm = pyinotify.WatchManager()
