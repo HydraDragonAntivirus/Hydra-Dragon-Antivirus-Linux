@@ -936,7 +936,10 @@ class FileChangeHandler(pyinotify.ProcessEvent):
             original_extension = os.path.splitext(self.suspicious_file_path)[1]
             new_extension = os.path.splitext(file_path)[1]
 
-            if original_extension != new_extension:
+            # Ignore changes to files with a .db extension
+            if new_extension == '.db':
+                pass
+            elif original_extension != new_extension:
                 print(f"File extension has changed: {self.suspicious_file_path} -> {file_path}")
                 new_file_hash = self.calculate_file_hash(file_path)
 
