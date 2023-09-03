@@ -25,3 +25,4 @@ Download full version [here](https://mega.nz/file/Kp5izZ5A#wOe5RmlqOe0rNrez4pfVB
 - It really disconnect infected ip address and it deletes file so be careful!
 - Don't forget to use clamonacc
 - Test the suspicous file in home folder
+# Join Discord Server: https://discord.gg/W2N27aF5
