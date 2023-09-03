@@ -11,6 +11,7 @@ import socket
 import re
 import requests
 import pyinotify
+import curses
 def is_file_infected_md5(md5):
     md5_connection = sqlite3.connect("MD5basedatabase.db")
     main_connection = sqlite3.connect("main.db")
@@ -297,8 +298,7 @@ def calculate_sha256(file_path):
 def scan_folder_with_clamscan(folder_path):
     try:
         current_folder = os.getcwd()
-        clamscan_path = os.path.join(current_folder, "clamscan")
-        subprocess.run([clamscan_path, "-r", "--heuristic-alerts=yes", "--remove=yes", "--detect-pua=yes", "--normalize=no", folder_path])
+        subprocess.run(["clamscan","-r", "--heuristic-alerts=yes", "--remove=yes", "--detect-pua=yes", "--normalize=no", folder_path])
     except Exception as e:
         print(f"Error running ClamScan: {e}")
 def delete_file(file_path):
@@ -430,10 +430,8 @@ def scan_running_files_with_clamav():
                     pass
 
         # Perform a ClamAV scan on the copied running files
-        clamscan_path = shutil.which("clamscan")
-        if clamscan_path:
             print("Scanning running files with ClamAV...")
-            subprocess.run([clamscan_path, "-r", temp_dir])
+            subprocess.run(["clamscan", "-r", temp_dir])
         else:
             print("ClamAV not found, skippiget_running_firefox_urlsng running file scan.")
 
@@ -968,14 +966,6 @@ class FileChangeHandler(pyinotify.ProcessEvent):
                     break
                 hasher.update(data)
         return hasher.hexdigest()
-
-def delete_file(file_path):
-    try:
-        os.remove(file_path)
-        print(f"Deleted file: {file_path}")
-    except Exception as e:
-        print(f"Error deleting file: {file_path} - {e}")
-
 def start_monitoring(suspicious_file_path, file_path):
     wm = pyinotify.WatchManager()
     mask = pyinotify.IN_CLOSE_WRITE
@@ -993,6 +983,29 @@ def start_monitoring(suspicious_file_path, file_path):
         notifier.loop()
     except KeyboardInterrupt:
         notifier.stop()
+# Constants for tuning the detection sensitivity
+THRESHOLD_KEYPRESS_COUNT = 15  # Adjust this threshold as needed
+
+# Global variables to keep track of keyboard events
+key_events = []
+rat_detected = False
+
+# Function to handle key presses
+def on_key_press(stdscr):
+    while True:
+        char = stdscr.getch()
+        key = chr(char) if char >= 32 and char <= 126 else f"Keycode {char}"
+        key_events.append(key)
+        
+        if len(key_events) >= THRESHOLD_KEYPRESS_COUNT:
+            detect_rat()
+
+# Function for RAT detection
+def detect_rat():
+    global rat_detected
+    rat_detected = True
+    print("Possible Remote Access Trojan (RAT) activity detected!")
+    # You can take further actions here, such as notifying the user or logging the event.
 def main():
     while True:
         print("Please run program as a root") 
@@ -1003,7 +1016,8 @@ def main():
         print("4. Real-time web and file protection")
         print("5. Perform intuitive  sandbox file scan (Run on vm and do perform a file scan first)")
         print("6. Calculate hashes of files in a folder")
-        print("7. Exit")
+        print("7. Are someone clicking on your keyboard? Test it!")
+        print("8. Exit")
         
         choice = input("Enter your choice: ")
         if choice == "1":
@@ -1056,10 +1070,11 @@ def main():
         elif choice == "6":
             folder_path = input("Enter the path of the folder to calculate hashes for: ")
             calculate_hashes_in_folder(folder_path)
-        elif choice == "7":
+        elif choice =="7": 
+            curses.wrapper(on_key_press)  
+        elif choice == "8":
             print("Exiting...")
             break
-
         else:
             print("Invalid choice. Please select a valid option.")
 if __name__ == "__main__":
