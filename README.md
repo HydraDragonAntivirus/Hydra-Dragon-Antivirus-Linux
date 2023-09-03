@@ -27,3 +27,4 @@ Download full version [here](https://mega.nz/file/Kp5izZ5A#wOe5RmlqOe0rNrez4pfVB
 - Test the suspicous file in home folder
 ## Contact
 <a href="https://discord.gg/W2N27aF5"><img src="https://img.shields.io/discord/72895893221067986?style=flat-square&logo=appveyor"></a>
+### semaemirhan555@gmail.com
