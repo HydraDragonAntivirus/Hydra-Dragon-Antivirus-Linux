@@ -1000,11 +1000,10 @@ def main():
         print("1. Perform a file scan")
         print("2. Enable real-time protection (scan running files with ClamAV)")
         print("3. Check if a website is infected by typing the URL")
-        print("4. Real-time web protection")
-        print("5. Real-time web and file protection")
-        print("6. Perform intuitive  sandbox file scan (Run on vm and do perform a file scan first)")
-        print("7. Calculate hashes of files in a folder")
-        print("8. Exit")
+        print("4. Real-time web and file protection")
+        print("5. Perform intuitive  sandbox file scan (Run on vm and do perform a file scan first)")
+        print("6. Calculate hashes of files in a folder")
+        print("7. Exit")
         
         choice = input("Enter your choice: ")
         if choice == "1":
@@ -1026,20 +1025,13 @@ def main():
                 print("The website is infected.")
             else:
                 print("The website is clean.")
-
         elif choice == "4":
-            # Start two functions in parallel
-            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-                executor.submit(real_time_web_protection)
-                executor.submit(access_firefox_history_continuous)
-        
-        elif choice == "5":
             with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
                 executor.submit(real_time_web_protection)
                 executor.submit(access_firefox_history_continuous)
                 executor.submit(scan_running_files_with_custom_method)
                 executor.submit(scan_running_files_with_custom_method0)
-        elif choice == "6":
+        elif choice == "5":
             file_path = input("Enter the path of the file to intuitively scan: ")
             suspicious_file_path = input("Enter the path of potential ransomware file: ")
             #  Start two functions in parallel
@@ -1061,10 +1053,10 @@ def main():
                 print("access_firefox_history_continuous0 result:", result1)
                 print("scan_file_for_malicious_content result:", result2)
                 print("scan_file_for_malicious_ip result:", result3)
-        elif choice == "7":
+        elif choice == "6":
             folder_path = input("Enter the path of the folder to calculate hashes for: ")
             calculate_hashes_in_folder(folder_path)
-        elif choice == "8":
+        elif choice == "7":
             print("Exiting...")
             break
 
