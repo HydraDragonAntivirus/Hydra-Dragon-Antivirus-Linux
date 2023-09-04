@@ -28,3 +28,5 @@ Download full version [here](https://mega.nz/file/SpAjgTzA#OVnif6OZFOMCnaGXf3aMo
 ## Contact
 <a href="https://discord.gg/W2N27aF5"><img src="https://img.shields.io/discord/72895893221067986?style=flat-square&logo=appveyor"></a>
 ### semaemirhan555@gmail.com
+## Common Issues
+Flagging github website and ip as a virus like other 3 AVs did for github ip.
