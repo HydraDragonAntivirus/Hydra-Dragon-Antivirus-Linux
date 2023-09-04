@@ -1,4 +1,4 @@
-# Hydra Dragon Antivirus For Linux
+# Hydra Dragon Anti-virus For Linux
 
 <p align="center">
 <img src="assets/logo.png" width= 200px>
