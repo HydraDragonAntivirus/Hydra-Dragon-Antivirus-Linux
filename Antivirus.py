@@ -790,8 +790,7 @@ def scan_file_for_malicious_content(file_path):
 
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
         print( "Excluded IP/Host: " + file_path)
-
-    if is_website_infected0(content) or is_website_infected0("www." + format_url(content)):
+    if is_website_infected0(content) or is_website_infected0("www."+format_url(content) or (format_url(content))):
         print("Infected file (Malicious Website Content): " + file_path)
         delete_file(file_path)  # Remove the infected file
     else:
@@ -828,12 +827,18 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
     except Exception as e:
         return "Error reading file " + file_path + ": " + str(e)
 
+    if re.search(r'sudo\s+rm\s+-rf', content):
+        print ("Infected file (Malicious Content): " + file_path)
+        delete_file(file_path) # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
+
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
         print ("Excluded IP/Host: " + file_path)
 
-    if is_website_infected0(content) or is_website_infected0("www." + format_url(content)):
+    if is_website_infected0(content) or is_website_infected0("www."+format_url(content) or (format_url(content))):
         print("Infected file (Malicious Website Content): " + file_path)
         delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
 
     return "Clean file according to malware content check: " + file_path
 def scan_running_files_with_custom_method0():
@@ -874,14 +879,17 @@ def scan_folder_with_malware_content_check(folder_path):
                     print("Excluded IP/Host:", file_path)
                     continue
 
-                if is_website_infected0(content) or is_website_infected0(format_url(content)):
+                if re.search(r'sudo\s+rm\s+-rf', content):
+                    print("Infected file (Malicious Content):", file_path)
+                    delete_file(file_path)
+                    continue
+
+                if is_website_infected0(content) or is_website_infected0("www."+format_url(content) or (format_url(content))):
                     print("Infected file (Malicious Website Content):", file_path)
                     delete_file(file_path)
-                # Add more conditions to check for different types of content
+                    continue
 
-                # You can include additional checks here based on your requirements
-
-                print("Clean file according to malware content check :", file_path)
+                print("Clean file according to malware content check:", file_path)
 def real_time_web_protection0(file_path):
     infected_ips = []
     while True:
