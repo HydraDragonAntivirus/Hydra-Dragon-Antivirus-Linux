@@ -1041,7 +1041,7 @@ def main():
         print("8. Exit")
         
         choice = input("Enter your choice: ")
-        if choice == "check_website_in_blist()1":
+        if choice == "1":
             folder_path = input("Enter the path of the folder to scan: ")
 
             if os.path.exists(folder_path) and os.path.isdir(folder_path):
