@@ -346,48 +346,55 @@ def scan_folder_parallel(folder_path):
             elif result:
                 print(result)
 def scan_running_files_with_custom_method():
-    temp_dir = tempfile.mkdtemp(prefix="running_file_scan_")
+    while True:
+        temp_dir = tempfile.mkdtemp(prefix="running_file_scan_")
+        try:
+            running_files = []
 
-    try:
-        running_files = []
+            for pid in os.listdir("/proc"):
+                if pid.isdigit():
+                    pid_dir = os.path.join("/proc", pid)
+                    exe_link = os.path.join(pid_dir, "exe")
 
-        for pid in os.listdir("/proc"):
-            if pid.isdigit():
-                pid_dir = os.path.join("/proc", pid)
-                exe_link = os.path.join(pid_dir, "exe")
+                    try:
+                        exe_path = os.readlink(exe_link)
+                        if os.path.exists(exe_path) and os.path.isfile(exe_path):
+                            running_files.append(exe_path)
+                    except (OSError, FileNotFoundError):
+                        pass
 
-                try:
-                    exe_path = os.readlink(exe_link)
-                    if os.path.exists(exe_path) and os.path.isfile(exe_path):
-                        running_files.append(exe_path)
-                except (OSError, FileNotFoundError):
-                    pass
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                scan_results = list(executor.map(scan_and_check_file, running_files, [temp_dir] * len(running_files)))
+                malicious_results = list(executor.map(scan_file_for_malicious_content_without_sandbox, running_files))
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.map(scan_and_check_file, running_files, [temp_dir] * len(running_files))
+            print("Custom scan finished.")
 
-        print("Custom scan finished.")
+            # Print the results
+            print("Scan Results:")
+            for result in scan_results:
+                print(result)
 
-    except Exception as e:
-        print(f"Error scanning running files: {e}")
+            print("Malicious Results:")
+            for result in malicious_results:
+                print(result)
 
-    finally:
-        shutil.rmtree(temp_dir, ignore_errors=True)
+        except Exception as e:
+            print(f"Error scanning running files: {e}")
 def scan_and_check_file(file_path, temp_dir):
     try:
         md5 = calculate_md5(file_path)
         sha1 = calculate_sha1(file_path)
         sha256 = calculate_sha256(file_path)
+        
         if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256):
             print(f"Infected file detected: {file_path}")
             print(delete_file(file_path))  # Automatically delete infected file 
         else:
-            print(f"Clean file: {file_path}")
+            print(f"Clean file according to databases: {file_path}")
         
         shutil.copy2(file_path, temp_dir)
     except Exception as e:
         print(f"Error scanning file {file_path}: {e}")
-
 def scan_running_files_with_custom_and_clamav_continuous():
     try:
         while True:
@@ -821,6 +828,7 @@ def scan_file_for_malicious_content(file_path):
 
     except subprocess.CalledProcessError as e:
         print("Error running sandbox:", e)
+
 def scan_file_for_malicious_content_without_sandbox(file_path):
     try:
         with open(file_path, "r", encoding="utf-8") as file:
@@ -829,40 +837,19 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
         return "Error reading file " + file_path + ": " + str(e)
 
     if re.search(r'sudo\s+rm\s+-rf', content):
-        print ("Infected file (Malicious Content): " + file_path)
-        delete_file(file_path) # Remove the infected file
+        print("Infected file (Malicious Content): " + file_path)
+        delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
 
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
-        print ("Excluded IP/Host: " + file_path)
+        print("Excluded IP/Host: " + file_path)
 
-    if is_website_infected0(content) or is_website_infected0("www."+format_url(content) or (format_url(content))):
+    if is_website_infected(content) or is_website_infected("www." + format_url(content)) or is_website_infected(format_url(content)):
         print("Infected file (Malicious Website Content): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
-    return "Clean file according to malware content check: " + file_path
-def scan_running_files_with_custom_method0():
-    running_files = []
-
-    for pid in os.listdir("/proc"):
-        if pid.isdigit():
-            pid_dir = os.path.join("/proc", pid)
-            exe_link = os.path.join(pid_dir, "exe")
-
-            try:
-                exe_path = os.readlink(exe_link)
-                if os.path.exists(exe_path) and os.path.isfile(exe_path):
-                    running_files.append(exe_path)
-            except (OSError, FileNotFoundError):
-                pass
-
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        results = executor.map(scan_file_for_malicious_content_without_sandbox, running_files)
-
-    print("Scanning running files finished.")
-    
-    for result in results:
-        print(result)
+    else:
+        return "Clean file according to malware content check: " + file_path
 def scan_folder_with_malware_content_check(folder_path):
     if os.path.exists(folder_path) and os.path.isdir(folder_path):
         for root, _, files in os.walk(folder_path):
@@ -1048,7 +1035,6 @@ def main():
                 executor.submit(real_time_web_protection)
                 executor.submit(access_firefox_history_continuous)
                 executor.submit(scan_running_files_with_custom_and_clamav_continuous)
-                executor.submit(scan_running_files_with_custom_method0)
         elif choice == "4":
             file_path = input("Enter the path of the file to intuitively scan: ")
             suspicious_file_path = input("Enter the path of potential ransomware file: ")
