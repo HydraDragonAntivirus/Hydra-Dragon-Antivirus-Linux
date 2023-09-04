@@ -834,7 +834,6 @@ def scan_file_for_malicious_content(file_path):
 
     except subprocess.CalledProcessError as e:
         print("Error running sandbox:", e)
-
 def scan_file_for_malicious_content_without_sandbox(file_path):
     try:
         with open(file_path, "r", encoding="utf-8") as file:
@@ -1006,7 +1005,30 @@ def detect_rat():
     global rat_detected
     rat_detected = True
     print("Possible Remote Access Trojan (RAT) activity detected!")
-    # You can take further actions here, such as notifying the user or logging the event.
+def check_website_in_blist():
+    # Get the website URL from the user
+    website_url = input("Please enter the website URL to check: ")
+
+    try:
+        # Connect to or create the database (if it doesn't exist)
+        conn = sqlite3.connect("urlbl2.db")
+        cursor = conn.cursor()
+
+        # Search for the URL in the blist table in the database
+        cursor.execute("SELECT * FROM blist WHERE url=?", (website_url,))
+        result = cursor.fetchone()
+
+        if result:
+            print(f"{website_url} found in the blist table. This website is known.")
+        else:
+            print(f"{website_url} not found in the blist table. This site is not known. Maybe clean website. Check with other databases.")
+
+    except sqlite3.Error as e:
+        print(f"Database error: {e}")
+
+    finally:
+        # Close the database connection
+        conn.close()
 def main():
     while True:
         print("Please run program as a root") 
@@ -1017,10 +1039,11 @@ def main():
         print("4. Perform intuitive  sandbox file scan (Run on vm and do perform a file scan first)")
         print("5. Calculate hashes of files in a folder")
         print("6. Are someone clicking on your keyboard? Test it!")
-        print("7. Exit")
+        print("7. Check urlbl2.db for known websites. Don't add www. or http etc")
+        print("8. Exit")
         
         choice = input("Enter your choice: ")
-        if choice == "1":
+        if choice == "check_website_in_blist()1":
             folder_path = input("Enter the path of the folder to scan: ")
 
             if os.path.exists(folder_path) and os.path.isdir(folder_path):
@@ -1068,7 +1091,9 @@ def main():
             calculate_hashes_in_folder(folder_path)
         elif choice =="6": 
             curses.wrapper(on_key_press)  
-        elif choice == "7":
+        elif choice =="7":
+            check_website_in_blist()
+        elif choice == "8":
             print("Exiting...")
             break
         else:
