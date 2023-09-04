@@ -417,27 +417,34 @@ def scan_running_files_with_clamav():
     temp_dir = tempfile.mkdtemp(prefix="running_file_scan_")
 
     try:
-        # Iterate through the /proc directory to find running process IDs
-        for pid in os.listdir("/proc"):
-            if pid.isdigit():
-                pid_dir = os.path.join("/proc", pid)
-                exe_link = os.path.join(pid_dir, "exe")
-                
-                try:
-                    # Resolve symbolic link to get the path of the running file
-                    exe_path = os.readlink(exe_link)
-                    if os.path.exists(exe_path) and os.path.isfile(exe_path):
-                        # Copy the running file to the temporary directory for scanning
-                        shutil.copy2(exe_path, temp_dir)
-                except (OSError, FileNotFoundError):
-                    # Some processes may have restricted permissions, skip them
-                    pass
+        # Check if ClamAV is installed and available in the system
+        clamav_installed = shutil.which("clamscan")
+        if clamav_installed:
+            # Iterate through the /proc directory to find running process IDs
+            for pid in os.listdir("/proc"):
+                if pid.isdigit():
+                    pid_dir = os.path.join("/proc", pid)
+                    exe_link = os.path.join(pid_dir, "exe")
+                    
+                    try:
+                        # Resolve symbolic link to get the path of the running file
+                        exe_path = os.readlink(exe_link)
+                        if os.path.exists(exe_path) and os.path.isfile(exe_path):
+                            # Copy the running file to the temporary directory for scanning
+                            shutil.copy2(exe_path, temp_dir)
+                    except (OSError, FileNotFoundError):
+                        # Some processes may have restricted permissions, skip them
+                        pass
 
-        # Perform a ClamAV scan on the copied running files
-            print("Scanning running files with ClamAV...")
-            subprocess.run(["clamscan", "-r", temp_dir])
+            # Perform a ClamAV scan on the copied running files
+            if os.listdir(temp_dir):
+                print("Scanning running files with ClamAV...")
+                subprocess.run(["clamscan", "-r", temp_dir])
+            else:
+                print("No running files found for scanning.")
+
         else:
-            print("ClamAV not found, skippiget_running_firefox_urlsng running file scan.")
+            print("ClamAV not found, skipping running file scan.")
 
     except Exception as e:
         print(f"Error scanning running files: {e}")
