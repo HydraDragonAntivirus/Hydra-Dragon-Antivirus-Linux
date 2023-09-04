@@ -413,6 +413,7 @@ def scan_running_files_with_custom_and_clamav_continuous():
     except KeyboardInterrupt:
         print("\nContinuous combined scan stopped.")
 def scan_running_files_with_clamav():
+ while True:
     # Create a temporary directory to store copies of running files
     temp_dir = tempfile.mkdtemp(prefix="running_file_scan_")
 
