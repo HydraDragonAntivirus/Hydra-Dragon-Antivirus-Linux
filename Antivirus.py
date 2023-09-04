@@ -507,7 +507,6 @@ def is_website_infected(url):
 
         cursor.close()
         conn.close()
-
 def format_url(url):
     if url:
         formatted_url = url.strip().lower()
@@ -1021,8 +1020,7 @@ def check_website_in_blist():
         if result:
             print(f"{website_url} found in the blist table. This website is known.")
         else:
-            print(f"{website_url} not found in the blist table. This site is not known. Maybe clean website. Check with other databases.")
-
+            print(f"{website_url} not found in the blist table. This site is not known. Maybe it's a clean website. Check with other databases.")
     except sqlite3.Error as e:
         print(f"Database error: {e}")
 
