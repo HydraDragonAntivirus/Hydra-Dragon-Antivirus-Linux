@@ -839,7 +839,6 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
         print("Infected file (Malicious Website Content): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
-
     return "Clean file according to malware content check: " + file_path
 def scan_running_files_with_custom_method0():
     running_files = []
