@@ -397,7 +397,7 @@ def scan_running_files_with_custom_and_clamav_continuous():
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 clamav_scan = executor.submit(scan_running_files_with_clamav)
                 custom_scan = executor.submit(scan_running_files_with_custom_method)
-                clamonacc_scan = executor.submit(scan_running_files_with_clamav)
+                clamonacc_scan = executor.submit(run_clamonacc_with_remove)
                 # Wait for both scans to complete
                 clamav_scan.result()
                 custom_scan.result()
@@ -1021,13 +1021,12 @@ def main():
         print("Please run program as a root") 
         print("Select an option:")
         print("1. Perform a file scan")
-        print("2. Enable real-time protection (scan running files with ClamAV)")
-        print("3. Check if a website is infected by typing the URL")
-        print("4. Real-time web and file protection")
-        print("5. Perform intuitive  sandbox file scan (Run on vm and do perform a file scan first)")
-        print("6. Calculate hashes of files in a folder")
-        print("7. Are someone clicking on your keyboard? Test it!")
-        print("8. Exit")
+        print("2. Check if a website is infected by typing the URL")
+        print("3. Real-time web and file protection")
+        print("4. Perform intuitive  sandbox file scan (Run on vm and do perform a file scan first)")
+        print("5. Calculate hashes of files in a folder")
+        print("6. Are someone clicking on your keyboard? Test it!")
+        print("7. Exit")
         
         choice = input("Enter your choice: ")
         if choice == "1":
@@ -1041,21 +1040,18 @@ def main():
             else:
                 print("Invalid folder path.")
         elif choice == "2":
-            scan_running_files_with_custom_and_clamav_continuous()
-
-        elif choice == "3":
             website_url = input("Enter the website URL to check: ")
             if is_website_infected(website_url):
                 print("The website is infected.")
             else:
                 print("The website is clean.")
-        elif choice == "4":
+        elif choice == "3":
             with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
                 executor.submit(real_time_web_protection)
                 executor.submit(access_firefox_history_continuous)
-                executor.submit(scan_running_files_with_custom_method)
+                executor.submit(scan_running_files_with_custom_and_clamav_continuous)
                 executor.submit(scan_running_files_with_custom_method0)
-        elif choice == "5":
+        elif choice == "4":
             file_path = input("Enter the path of the file to intuitively scan: ")
             suspicious_file_path = input("Enter the path of potential ransomware file: ")
             #  Start two functions in parallel
@@ -1077,12 +1073,12 @@ def main():
                 print("access_firefox_history_continuous0 result:", result1)
                 print("scan_file_for_malicious_content result:", result2)
                 print("scan_file_for_malicious_ip result:", result3)
-        elif choice == "6":
+        elif choice == "5":
             folder_path = input("Enter the path of the folder to calculate hashes for: ")
             calculate_hashes_in_folder(folder_path)
-        elif choice =="7": 
+        elif choice =="6": 
             curses.wrapper(on_key_press)  
-        elif choice == "8":
+        elif choice == "7":
             print("Exiting...")
             break
         else:
