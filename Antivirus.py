@@ -345,7 +345,6 @@ def scan_folder_parallel(folder_path):
                 infected_files.append(result)
             elif result:
                 print(result)
-
 def scan_running_files_with_custom_method():
     temp_dir = tempfile.mkdtemp(prefix="running_file_scan_")
 
@@ -374,7 +373,6 @@ def scan_running_files_with_custom_method():
 
     finally:
         shutil.rmtree(temp_dir, ignore_errors=True)
-
 def scan_and_check_file(file_path, temp_dir):
     try:
         md5 = calculate_md5(file_path)
