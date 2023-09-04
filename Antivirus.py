@@ -787,7 +787,10 @@ def scan_file_for_malicious_content(file_path):
             content = file.read()
     except Exception as e:
         return "Error reading file " + file_path + ": " + str(e)
-
+    if re.search(r'sudo\s+rm\s+-rf', content):
+        print ("Infected file (Malicious Content): " + file_path)
+        delete_file(file_path) # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
         print( "Excluded IP/Host: " + file_path)
     if is_website_infected0(content) or is_website_infected0("www."+format_url(content) or (format_url(content))):
