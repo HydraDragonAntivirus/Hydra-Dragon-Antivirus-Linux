@@ -25,8 +25,6 @@ Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-n
 - It really disconnect infected ip address and it deletes file so be careful!
 - Don't forget to use clamonacc
 - Test the suspicous file in home folder
- ## Common Issues
-Flagging github website and ip as a virus like other 3 AVs did for github ip
 ## Contact
 <a href="https://discord.gg/W2N27aF5"><img src="https://img.shields.io/discord/72895893221067986?style=flat-square&logo=appveyor"></a>
 ### semaemirhan555@gmail.com
