@@ -14,7 +14,7 @@
 
 ## Download
 
-Download full version [here](https://mega.nz/file/SpAjgTzA#OVnif6OZFOMCnaGXf3aMoM_8a_FVfbejCFkgcx9W3Hw)
+Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA)
 
 ### Read before using
 
