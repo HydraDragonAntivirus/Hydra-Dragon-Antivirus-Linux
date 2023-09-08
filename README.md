@@ -19,9 +19,6 @@ Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-n
 ### Read before using
 
 - Don't forget give permission access.
-
-- Don't forget to use latest version of the Python script at **GitHub** not at mega.nz
-
 - It really disconnect infected ip address and it deletes file so be careful!
 - Don't forget to use clamonacc
 - Test the suspicous file in home folder
