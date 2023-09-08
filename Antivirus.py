@@ -38,6 +38,12 @@ def is_file_infected_md5(md5):
     if main0_result > 0:
         main_connection.close()
         return True
+       # Check in the main0 table at field4
+    main1_command = main_connection.execute("SELECT COUNT(*) FROM main0 WHERE field4 = ?;", (md5,))
+    main1_result = main1_command.fetchone()[0]
+    if main1_result > 0:
+        main_connection.close()
+        return True
      # Check in the dailyz table
     daily0_command = daily_connection.execute("SELECT COUNT(*) FROM dailyz WHERE field1 = ?;", (md5,))
     daily0_result = daily0_command.fetchone()[0]
