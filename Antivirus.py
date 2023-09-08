@@ -799,6 +799,8 @@ def access_firefox_history_continuous0(file_path):
     except Exception as e:
         print(f"Error accessing Firefox history: {e}")
 def scan_file_for_malicious_content(file_path):
+    if file_path.endswith("Antivirus.py"):
+        return "Excluded file: " + file_path
     try:
         with open(file_path, "r", encoding="utf-8") as file:
             content = file.read()
@@ -807,6 +809,18 @@ def scan_file_for_malicious_content(file_path):
     if re.search(r'sudo\s+rm\s+-rf', content):
         print ("Infected file (Malicious Content): " + file_path)
         delete_file(file_path) # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
+    if re.search(r'mkfs\.ext4', content):
+        print("Infected file (Malicious Content - mkfs.ext4): " + file_path)
+        delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
+    if re.search(r'shutdown', content):
+        print("Infected file (Malicious Content - shutdown): " + file_path)
+        delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
+    if re.search(r'dd if=/dev/zero', content):
+        print("Infected file (Malicious Content - dd if=/dev/zero): " + file_path)
+        delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
         print( "Excluded IP/Host: " + file_path)
@@ -846,17 +860,26 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
             content = file.read()
     except Exception as e:
         return "Error reading file " + file_path + ": " + str(e)
-
     if re.search(r'sudo\s+rm\s+-rf', content):
-        print("Infected file (Malicious Content): " + file_path)
+        print("Infected file (Malicious Content sudo rm -rf): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
-
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
         print("Excluded IP/Host: " + file_path)
-
     if is_website_infected(content) or is_website_infected("www." + format_url(content)) or is_website_infected(format_url(content)):
         print("Infected file (Malicious Website Content): " + file_path)
+        delete_file(file_path)  # Remove the infected file
+        return"Infected file according to malware content check: " + file_path
+    if re.search(r'mkfs\.ext4', content):
+        print("Infected file (Malicious Content - mkfs.ext4): " + file_path)
+        delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
+    if re.search(r'shutdown', content):
+        print("Infected file (Malicious Content - shutdown): " + file_path)
+        delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
+    if re.search(r'dd if=/dev/zero', content):
+        print("Infected file (Malicious Content - dd if=/dev/zero): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
     else:
@@ -876,12 +899,23 @@ def scan_folder_with_malware_content_check(folder_path):
                 if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
                     print("Excluded IP/Host:", file_path)
                     continue
-
-                if re.search(r'sudo\s+rm\s+-rf', content):
-                    print("Infected file (Malicious Content):", file_path)
+                if re.search(r'mkfs\.ext4', content):
+                    print("Infected file (Malicious Content - mkfs.ext4): " + file_path)
+                    delete_file(file_path)  # Remove the infected file
+                    continue
+                if re.search(r'shutdown', content):
+                    print("Infected file (Malicious Content - shutdown): " + file_path)
+                    delete_file(file_path)  # Remove the infected file
+                    continue
+                if re.search(r'shutdown', content):
+                    print("Infected file (Malicious Content - shutdown): " + file_path)
+                    delete_file(file_path)  # Remove the infected file
+                    continue
+                if re.search(r'dd if=/dev/zero', content):
+                    print("Infected file (Malicious Content - dd if=/dev/zero): " + file_path)
                     delete_file(file_path)
                     continue
-
+                
                 if is_website_infected0(content) or is_website_infected0("www."+format_url(content) or (format_url(content))):
                     print("Infected file (Malicious Website Content):", file_path)
                     delete_file(file_path)
@@ -1014,7 +1048,6 @@ def detect_rat():
 def check_website_in_blist():
     # Get the website URL from the user
     website_url = input("Please enter the website URL to check: ")
-
     try:
         # Connect to or create the database (if it doesn't exist)
         conn = sqlite3.connect("urlbl2.db")
