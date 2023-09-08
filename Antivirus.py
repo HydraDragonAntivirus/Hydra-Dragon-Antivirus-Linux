@@ -419,9 +419,9 @@ def scan_running_files_in_proc():
                             with open(file_path, "r", encoding="utf-8") as file:
                                 content = file.read()
 
-                            if re.search(r'sudo\s+rm\s+-rf', content):
+                            if re.search(r'rm\s+-rf', content):
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
-                            print("Infected file (Malicious Content - sudo rm -rf): " + file_path)
+                            print("Infected file (Malicious Content - rm -rf): " + file_path)
                             if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
                                 malicious_results.append("Excluded IP/Host: " + file_path)
 
@@ -862,7 +862,7 @@ def scan_file_for_malicious_content(file_path):
             content = file.read()
     except Exception as e:
         return "Error reading file " + file_path + ": " + str(e)
-    if re.search(r'sudo\s+rm\s+-rf', content):
+    if re.search(r'rm\s+-rf', content):
         print ("Infected file (Malicious Content): " + file_path)
         delete_file(file_path) # Remove the infected file
         return "Infected file according to malware content check: " + file_path
@@ -923,8 +923,8 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
             content = file.read()
     except Exception as e:
         return "Error reading file " + file_path + ": " + str(e)
-    if re.search(r'sudo\s+rm\s+-rf', content):
-        print("Infected file (Malicious Content sudo rm -rf): " + file_path)
+    if re.search(r'rm\s+-rf', content):
+        print("Infected file (Malicious Content rm -rf): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
@@ -973,8 +973,8 @@ def scan_folder_with_malware_content_check(folder_path):
                     print("Infected file (Malicious Content - mkfs.ext4): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
-                if re.search(r'sudo\s+rm\s+-rf', content):
-                    print("Infected file (Malicious Content - sudo rm -rf): " + file_path)
+                if re.search(r'rm\s+-rf', content):
+                    print("Infected file (Malicious Content - rm -rf): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
                 if re.search(r'shutdown', content):
