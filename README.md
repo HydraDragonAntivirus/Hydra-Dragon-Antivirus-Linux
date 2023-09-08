@@ -26,4 +26,4 @@ Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-n
 <a href="https://discord.gg/W2N27aF5"><img src="https://img.shields.io/discord/72895893221067986?style=flat-square&logo=appveyor"></a>
 ### semaemirhan555@gmail.com
 ## How To Not Get Virused While Using This Antivirus
-Don't open Elf files is enough. We currently can detect elf files but detection rate is not too high aganist elf files.
+Don't open Elf files is enough. I currently can detect elf files but detection rate is not too high aganist elf files.
