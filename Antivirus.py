@@ -380,7 +380,7 @@ def scan_running_files_with_custom_method():
             for result in scan_results:
                 print(result)
 
-            print("Malicious COntent Check Results:")
+            print("Malicious Content Check Results:")
             for result in malicious_results:
                 print(result)
 
