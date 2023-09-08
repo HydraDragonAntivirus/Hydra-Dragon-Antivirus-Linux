@@ -434,6 +434,9 @@ def scan_running_files_in_proc():
                             if re.search(r'shutdown', content):
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
                             print("Infected file (Malicious Content - shutdown): " + file_path)
+                            if re.search(r'chmod 777 /', content):
+                                malicious_results.append(delete_file(file_path))  # Remove the infected file
+                            print("Infected file (Malicious Content - chmod 777 /): " + file_path)
                             if re.search(r'dd if=/dev/zero', content):
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
                             if re.search(r'init 0', content):
@@ -870,12 +873,18 @@ def scan_file_for_malicious_content(file_path):
         print("Infected file (Malicious Content - mkfs.ext4): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
+    if re.search(r'chmod 777 /', content):
+        print("Infected file (Malicious Content - chmod 777 /): " + file_path)
+        delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
     if re.search(r'shutdown', content):
         print("Infected file (Malicious Content - shutdown): " + file_path)
         delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
     if re.search(r'init 0', content):
         print("Infected file (Malicious Content - init 0): " + file_path)
         delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
     if re.search(r'init 6', content):
         print("Infected file (Malicious Content - init 6): " + file_path)
         delete_file(file_path)  # Remove the infected file
@@ -889,6 +898,7 @@ def scan_file_for_malicious_content(file_path):
     if is_website_infected0(content) or is_website_infected0("www."+format_url(content) or (format_url(content))):
         print("Infected file (Malicious Website Content): " + file_path)
         delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
     else:
         print("Clean file according to malicious content check:" + file_path )
     sandbox_command = f"firejail --noprofile python {file_path}"
@@ -941,6 +951,10 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
         print("Infected file (Malicious Content - shutdown): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
+    if re.search(r'chmod 777 /', content):
+        print("Infected file (Malicious Content - chmod 777 /): " + file_path)
+        delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
     if re.search(r'init 0', content):
         print("Infected file (Malicious Content - init 0): " + file_path)
         delete_file(file_path)  # Remove the infected file
@@ -978,6 +992,10 @@ def scan_folder_with_malware_content_check(folder_path):
                     delete_file(file_path)  # Remove the infected file
                     continue
                 if re.search(r'shutdown', content):
+                    print("Infected file (Malicious Content - shutdown): " + file_path)
+                    delete_file(file_path)  # Remove the infected file
+                    continue
+                if re.search(r'chmod 777 /', content):
                     print("Infected file (Malicious Content - shutdown): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
