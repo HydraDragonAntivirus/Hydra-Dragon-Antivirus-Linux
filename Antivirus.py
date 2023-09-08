@@ -376,11 +376,11 @@ def scan_running_files_with_custom_method():
             print("Custom scan finished.")
 
             # Print the results
-            print("Scan Results:")
+            print("Custom Scan Results:")
             for result in scan_results:
                 print(result)
 
-            print("Malicious Results:")
+            print("Malicious COntent Check Results:")
             for result in malicious_results:
                 print(result)
 
@@ -854,6 +854,7 @@ def scan_file_for_malicious_content(file_path):
 
     except subprocess.CalledProcessError as e:
         print("Error running sandbox:", e)
+
 def scan_file_for_malicious_content_without_sandbox(file_path):
     try:
         with open(file_path, "r", encoding="utf-8") as file:
