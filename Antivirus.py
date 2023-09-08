@@ -401,6 +401,56 @@ def scan_and_check_file(file_path, temp_dir):
         shutil.copy2(file_path, temp_dir)
     except Exception as e:
         print(f"Error scanning file {file_path}: {e}")
+
+def scan_running_files_in_proc():
+    try:
+        malicious_results = []
+
+        for pid in os.listdir("/proc"):
+            if pid.isdigit():
+                pid_dir = os.path.join("/proc", pid)
+                exe_link = os.path.join(pid_dir, "exe")
+
+                try:
+                    file_path = os.readlink(exe_link)
+                    if os.path.exists(file_path) and os.path.isfile(file_path):
+                        try:
+                            with open(file_path, "r", encoding="utf-8") as file:
+                                content = file.read()
+
+                            if re.search(r'sudo\s+rm\s+-rf', content):
+                                malicious_results.append(delete_file(file_path))  # Remove the infected file
+
+                            if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
+                                malicious_results.append("Excluded IP/Host: " + file_path)
+
+                            if is_website_infected0(content) or is_website_infected0("www." + format_url(content)) or is_website_infected0(format_url(content)):
+                                malicious_results.append(delete_file(file_path))  # Remove the infected file
+
+                            if re.search(r'mkfs\.ext4', content):
+                                malicious_results.append(delete_file(file_path))  # Remove the infected file
+
+                            if re.search(r'shutdown', content):
+                                malicious_results.append(delete_file(file_path))  # Remove the infected file
+
+                            if re.search(r'dd if=/dev/zero', content):
+                                malicious_results.append(delete_file(file_path))  # Remove the infected file
+
+                        except Exception as e:
+                            malicious_results.append("Error reading file " + file_path + ": " + str(e))
+
+                except (OSError, FileNotFoundError):
+                    pass
+
+        if malicious_results:
+            print("Malicious Results:")
+            for result in malicious_results:
+                print(result)
+        else:
+            print("No malicious content found in running files.")
+
+    except Exception as e:
+        print(f"Error scanning running files in /proc: {e}")
 def scan_running_files_with_custom_and_clamav_continuous():
     try:
         while True:
@@ -409,10 +459,12 @@ def scan_running_files_with_custom_and_clamav_continuous():
                 clamav_scan = executor.submit(scan_running_files_with_clamav)
                 custom_scan = executor.submit(scan_running_files_with_custom_method)
                 clamonacc_scan = executor.submit(run_clamonacc_with_remove)
+                malicious_content_scan = executor.submit (scan_running_files_in_proc)
                 # Wait for both scans to complete
                 clamav_scan.result()
                 custom_scan.result()
                 clamonacc_scan.result()
+                malicious_content_scan.result()
 
             print("Waiting for the next combined scan...")
 
