@@ -903,8 +903,8 @@ def scan_folder_with_malware_content_check(folder_path):
                     print("Infected file (Malicious Content - mkfs.ext4): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
-                if re.search(r'shutdown', content):
-                    print("Infected file (Malicious Content - shutdown): " + file_path)
+                if re.search(r'sudo\s+rm\s+-rf', content):
+                    print("Infected file (Malicious Content - sudo rm -rf): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
                 if re.search(r'shutdown', content):
