@@ -437,6 +437,9 @@ def scan_running_files_in_proc():
                             if re.search(r'chmod 777 /', content):
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
                             print("Infected file (Malicious Content - chmod 777 /): " + file_path)
+                            if re.search(r'nc -l -p 4444 -e /bin/bash', content) or re.search(r'ncat -l -p 4444 -e /bin/bash', content):
+                                print("Infected file (Malicious Content - Reverse Shell): " + file_path)
+                                malicious_results.append(delete_file(file_path))  # Remove the infected file
                             if re.search(r'dd if=/dev/zero', content):
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
                             if re.search(r'init 0', content):
@@ -881,6 +884,10 @@ def scan_file_for_malicious_content(file_path):
         print("Infected file (Malicious Content - shutdown): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
+    if re.search(r'nc -l -p 4444 -e /bin/bash', content) or re.search(r'ncat -l -p 4444 -e /bin/bash', content):
+        print("Infected file (Malicious Content - Reverse Shell): " + file_path)
+        delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
     if re.search(r'init 0', content):
         print("Infected file (Malicious Content - init 0): " + file_path)
         delete_file(file_path)  # Remove the infected file
@@ -951,6 +958,10 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
         print("Infected file (Malicious Content - shutdown): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
+    if re.search(r'nc -l -p 4444 -e /bin/bash', content) or re.search(r'ncat -l -p 4444 -e /bin/bash', content):
+        print("Infected file (Malicious Content - Reverse Shell): " + file_path)
+        delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
     if re.search(r'chmod 777 /', content):
         print("Infected file (Malicious Content - chmod 777 /): " + file_path)
         delete_file(file_path)  # Remove the infected file
@@ -996,13 +1007,17 @@ def scan_folder_with_malware_content_check(folder_path):
                     delete_file(file_path)  # Remove the infected file
                     continue
                 if re.search(r'chmod 777 /', content):
-                    print("Infected file (Malicious Content - shutdown): " + file_path)
+                    print("Infected file (Malicious Content - chmod 777 /): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
                 if re.search(r'init 0', content):
                     print("Infected file (Malicious Content - init 0): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
+                if re.search(r'nc -l -p 4444 -e /bin/bash', content) or re.search(r'ncat -l -p 4444 -e /bin/bash', content):
+                     print("Infected file (Malicious Content - Reverse Shell): " + file_path)
+                     delete_file(file_path)  # Remove the infected file
+                     continue
                 if re.search(r'init 6', content):
                     print("Infected file (Malicious Content - init 6): " + file_path)
                     delete_file(file_path)  # Remove the infected file
