@@ -28,4 +28,4 @@ Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-n
 ## How To Not Get Virused While Using This Antivirus
 Don't open Elf files is enough. I currently can detect elf files but detection rate is not too high aganist elf files
 ## License
-GPL3 License  https://www.gnu.org/licenses/gpl-3.0.html
+GPLv3 License  https://www.gnu.org/licenses/gpl-3.0.html
