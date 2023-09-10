@@ -472,7 +472,7 @@ def scan_running_files_in_proc():
                             if re.search(r'cat\s+>\s+/dev/sda', content):
                                print("Infected file (Malicious Content - cat > /dev/sda): " + file_path)
                                malicious_results.append(delete_file(file_path))  # Remove the infected file
-                            if re.search(r'sudo\s+mv\s+/bin/bash\s+/bin/bash\.bak', content):
+                            if re.search(r'mv\s+/bin/bash\s+/bin/bash\.bak', content):
                                print("Infected file (Malicious Content - Disable Bash): " + file_path)
                                malicious_results.append(delete_file(file_path))  # Remove the infected file
                             if re.search(r'find\s+/\s+-name\s+"*.log"', content):
@@ -969,7 +969,7 @@ def scan_file_for_malicious_content(file_path):
         print("Infected file (Malicious Content - cat > /dev/sda): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
-    if re.search(r'sudo\s+mv\s+/bin/bash\s+/bin/bash\.bak', content):
+    if re.search(r'mv\s+/bin/bash\s+/bin/bash\.bak', content):
         print("Infected file (Malicious Content - Disable Bash): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
@@ -1098,7 +1098,7 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
         print("Infected file (Malicious Content - cat > /dev/sda): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
-    if re.search(r'sudo\s+mv\s+/bin/bash\s+/bin/bash\.bak', content):
+    if re.search(r'mv\s+/bin/bash\s+/bin/bash\.bak', content):
         print("Infected file (Malicious Content - Disable Bash): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
@@ -1203,7 +1203,7 @@ def scan_folder_with_malware_content_check(folder_path):
                      print("Infected file (Malicious Content - cat > /dev/sda): " + file_path)
                      delete_file(file_path)  # Remove the infected file
                      continue
-                if re.search(r'sudo\s+mv\s+/bin/bash\s+/bin/bash\.bak', content):
+                if re.search(r'mv\s+/bin/bash\s+/bin/bash\.bak', content):
                      print("Infected file (Malicious Content - Disable Bash): " + file_path)
                      delete_file(file_path)  # Remove the infected file
                      continue
