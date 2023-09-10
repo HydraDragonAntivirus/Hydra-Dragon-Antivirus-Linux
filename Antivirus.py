@@ -122,7 +122,13 @@ def is_file_infected_sha1(sha1):
     if sha1_result and sha1_result[0]:
         connection_sha256_hashes.close()
         return True
+ # Check in the SHA256hashes database for SHA1 hashes in malshare
+    malshare_sha1_command_text = "SELECT EXISTS(SELECT 1 FROM malsharesha1 WHERE field1 = ? LIMIT 1);"
+    malshare_sha1_result = connection_sha256_hashes.execute(malshare_sha1_command_text, (sha1,)).fetchone()
 
+    if malshare_sha1_result and malshare_sha1_result[0]:
+        connection_sha256_hashes.close()
+        return True
     # If the SHA1 hash was not found in the SHA256hashes.db database,
     # Check in the abusech.db database for SHA1 hashes in SSLBL table with field2.
     database_path_abusech = "abusech.db"
