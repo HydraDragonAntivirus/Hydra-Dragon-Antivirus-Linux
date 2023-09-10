@@ -338,7 +338,7 @@ def scan_file(file_path):
             print(f"Infected file detected: {file_path}\nMD5 Hash: {md5}")
             print(delete_file(file_path))  # Automatically delete infected file
         else:
-            return f"Clean file: {file_path}"
+            return f"Clean file according to databases: {file_path}"
         
     except PermissionError:
         return f"Access denied: {file_path}"
