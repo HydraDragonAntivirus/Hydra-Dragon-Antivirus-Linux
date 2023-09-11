@@ -1409,7 +1409,7 @@ def main():
     while True:
         print("Please run program as a root") 
         print("Select an option:")
-        print("1. Perform a file scan")
+        print("1. Perform a folder scan")
         print("2. Check if a website is infected by typing the URL")
         print("3. Real-time web and file protection")
         print("4. Perform intuitive  sandbox file scan (Run on vm and do perform a file scan first)")
