@@ -1450,8 +1450,7 @@ def main():
                 future2 = executor.submit(scan_file_for_malicious_content, file_path)
                 future3 = executor.submit(real_time_web_protection0, file_path)
                 # Wait for both functions to complete
-                concurrent.futures.wait([future4,future1, future2,future3])
-                
+                concurrent.futures.wait([future4,future1, future2,future3])          
                 # Get the results from the futures (if needed)
                 result1 = future1.result()
                 result2 = future2.result()
