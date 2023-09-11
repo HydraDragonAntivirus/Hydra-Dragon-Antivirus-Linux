@@ -1500,7 +1500,12 @@ def main():
                 result5 = future5.result()
                 result6 = future6.result()
                 # Print or handle results as needed
+                print("scan_file_for_ransomware result:", result4)
                 print("access_firefox_history_continuous0 result:", result1)
+                print("scan_file_for_malicious_content result:", result2)
+                print("scan_file_for_malicious_ip result:", result3)
+                print("scan_file_for_mbr_overwriter:", result5)
+                print("connected_ips_from_the_file", result6)
         elif choice == "5":
             folder_path = input("Enter the path of the folder to calculate hashes for: ")
             calculate_hashes_in_folder(folder_path)
