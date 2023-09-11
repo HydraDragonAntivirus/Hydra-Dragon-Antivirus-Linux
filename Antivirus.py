@@ -442,6 +442,9 @@ def scan_running_files_in_proc():
                             if re.search(r'mkfs\.ext4', content):
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
                             print("Infected file (Malicious Content - mkfs.ext4): " + file_path)
+                            if re.search(r'ufw\s+disable', content):
+                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
+                            print("Infected file (Malicious Content ufw disable): " + file_path)
                             if re.search(r'shutdown', content):
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
                             print("Infected file (Malicious Content - shutdown): " + file_path)
@@ -938,6 +941,10 @@ def scan_file_for_malicious_content(file_path):
          print("Infected file (Malicious Content MBR Overwriter): " + file_path)
          delete_file(file_path)  # Remove the infected file
          return "Infected file according to malware content check: " + file_path
+    if re.search(r'ufw\s+disable', content):
+        print("Infected file (Malicious Content ufw disable): " + file_path)
+        delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
     if re.search(r'shutdown', content):
         print("Infected file (Malicious Content - shutdown): " + file_path)
         delete_file(file_path)  # Remove the infected file
@@ -1071,6 +1078,10 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
     if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]+ bs=[0-9]+ count=1', content):                            
          print("Infected file (Malicious Content MBR Overwrite): " + file_path)
          delete_file(file_path)  # Remove the infected file
+    if re.search(r'ufw\s+disable', content):
+        print("Infected file (Malicious Content ufw disable): " + file_path)
+        delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
     if re.search(r'shutdown', content):
         print("Infected file (Malicious Content - shutdown): " + file_path)
         delete_file(file_path)  # Remove the infected file
@@ -1173,6 +1184,10 @@ def scan_folder_with_malware_content_check(folder_path):
                     continue
                 if re.search(r'shutdown', content):
                     print("Infected file (Malicious Content - shutdown): " + file_path)
+                    delete_file(file_path)  # Remove the infected file
+                    continue
+                if re.search(r'ufw\s+disable', content):
+                    print("Infected file (Malicious Content ufw disable): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
                 if re.search(r'fdisk /dev/sd[a-z]', content):
