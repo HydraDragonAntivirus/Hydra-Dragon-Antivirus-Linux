@@ -505,7 +505,7 @@ def scan_running_files_in_proc():
                     pass
 
         if malicious_results:
-            print("Malicious Results:")
+            print("Malicious content Results:")
             for result in malicious_results:
                 print(result)
         else:
