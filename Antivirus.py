@@ -1405,6 +1405,21 @@ def check_website_in_blist():
     finally:
         # Close the database connection
         conn.close()
+def check_mbr_overwrite(file_path):
+ while True:
+    try:
+        with open(file_path, 'r') as file:
+            content = file.read()
+
+        if "dd if=/dev/zero of=/dev/sda bs=512 count=1" in content:
+            os.remove(file_path)
+            print("MBR overwrite detected and the infected file has been deleted.")
+        else:
+            print("MBR overwrite not detected in the file.")
+    except FileNotFoundError:
+        print(f"File not found: {file_path}")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
 def main():
     while True:
         print("Please run program as a root") 
@@ -1444,23 +1459,26 @@ def main():
             file_path = input("Enter the path of the file to intuitively scan: ")
             suspicious_file_path = input("Enter the path of potential ransomware file: ")
             #  Start two functions in parallel
-            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
                 future4 = executor.submit(start_monitoring, suspicious_file_path,file_path)
                 future1 = executor.submit(access_firefox_history_continuous0, file_path)
                 future2 = executor.submit(scan_file_for_malicious_content, file_path)
                 future3 = executor.submit(real_time_web_protection0, file_path)
+                future5 = executor.submit(check_mbr_overwrite, file_path)
                 # Wait for both functions to complete
-                concurrent.futures.wait([future4,future1, future2,future3])          
+                concurrent.futures.wait([future4,future1, future2,future3,future5])          
                 # Get the results from the futures (if needed)
                 result1 = future1.result()
                 result2 = future2.result()
                 result3 = future3.result()
                 result4 = future4.result()
+                result5 = future5.result()
                 # Print or handle results as needed
                 print("scan_file_for_ransomware result:", result4)
                 print("access_firefox_history_continuous0 result:", result1)
                 print("scan_file_for_malicious_content result:", result2)
                 print("scan_file_for_malicious_ip result:", result3)
+                print("scan_file_for_mbr_overwriter:", result5)
         elif choice == "5":
             folder_path = input("Enter the path of the folder to calculate hashes for: ")
             calculate_hashes_in_folder(folder_path)
