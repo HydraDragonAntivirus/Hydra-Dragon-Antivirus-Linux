@@ -919,7 +919,7 @@ def scan_file_for_malicious_content(file_path):
     except Exception as e:
         return "Error reading file " + file_path + ": " + str(e)
     if re.search(r'rm\s+-rf', content):
-        print ("Infected file (Malicious Content): " + file_path)
+        print ("Infected file (Malicious Content rm -rf): " + file_path)
         delete_file(file_path) # Remove the infected file
         return "Infected file according to malware content check: " + file_path
     if re.search(r'mkfs\.ext4', content):
