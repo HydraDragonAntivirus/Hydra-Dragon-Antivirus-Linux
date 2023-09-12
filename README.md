@@ -11,7 +11,7 @@
 - SHA256-SHA1-MD5 calculator
 - Big databases for free. Above the 65 million virus hashes here
 - ClamAV on Python
-
+- Rootkit scanner are united in one python script
 ## Download
 
 Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA)
