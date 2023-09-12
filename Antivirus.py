@@ -1565,7 +1565,7 @@ def scan_single_file(file_path):
         return []
 def main():
     while True:
-        print("You neeed install firejail")
+        print("You need install firejail and strace chkrootkit clamav rkhunter")
         print("You need give root access to program") 
         print("Select an option:")
         print("1. Perform a folder scan")
@@ -1575,7 +1575,8 @@ def main():
         print("5. Calculate hashes of files in a folder")
         print("6. Are someone clicking on your keyboard? Test it!")
         print("7. Check urlbl2.db for known websites. Don't add www. or http etc")
-        print("8. Exit")    
+        print("8.Rootkit scan")
+        print("9. Exit")    
         choice = input("Enter your choice: ")
         if choice == "1":
             folder_path = input("Enter the path of the folder to scan: ")
@@ -1598,9 +1599,6 @@ def main():
                 executor.submit(real_time_web_protection)
                 executor.submit(access_firefox_history_continuous)
                 executor.submit(scan_running_files_with_custom_and_clamav_continuous)
-                executor.submit(monitoring_running_processes)
-        elif choice == "9":
-            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
                 executor.submit(monitoring_running_processes)
         elif choice == "4":
             file_path = input("Enter the path of the file to intuitively scan: ")
@@ -1639,7 +1637,10 @@ def main():
             curses.wrapper(on_key_press)  
         elif choice =="7":
             check_website_in_blist()
-        elif choice == "8":
+        elif choice =="8":
+         subprocess.run(['sudo', 'chkrootkit'])
+         subprocess.run(['sudo', 'rkhunter','--check'])
+        elif choice == "9":
             print("Exiting...")
             break
         else:
