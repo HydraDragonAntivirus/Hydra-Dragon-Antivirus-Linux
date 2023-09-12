@@ -1071,7 +1071,7 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
     if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]+ bs=[0-9]+ count=1', content):                            
-         print("Infected file (Malicious Content MBR Overwrite): " + file_path)
+         print("Infected file (Malicious Content MBR Overwriter): " + file_path)
          delete_file(file_path)  # Remove the infected file
     if re.search(r'ufw\s+disable', content):
         print("Infected file (Malicious Content ufw disable): " + file_path)
@@ -1190,7 +1190,7 @@ def scan_folder_with_malware_content_check(folder_path):
                     delete_file(file_path)  # Remove the infected file
                     continue
                 if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]+ bs=[0-9]+ count=1', content):                            
-                    print("Infected file (Malicious Content MBR Overwrite): " + file_path)
+                    print("Infected file (Malicious Content MBR Overwriter): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
                 if re.search(r'chmod 777 /', content):
@@ -1415,21 +1415,6 @@ def check_website_in_blist():
     finally:
         # Close the database connection
         conn.close()
-def check_mbr_overwrite(file_path):
- while True:
-    try:
-        with open(file_path, 'r') as file:
-            content = file.read()
-
-        if "dd if=/dev/zero of=/dev/sda bs=512 count=1" in content:
-            os.remove(file_path)
-            print("MBR overwrite detected and the infected file has been deleted.")
-        else:
-            print("MBR overwrite not detected in the file.")
-    except FileNotFoundError:
-        print(f"File not found: {file_path}")
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
 def find_connected_ips(file_path):
     connected_ips = set()
 
@@ -1454,7 +1439,41 @@ def find_connected_ips(file_path):
         print(f'Error: {str(e)}')
 
     return connected_ips
+def backup_mbr(backup_dir):
+    # MBR yedeğini al
+    backup_path = os.path.join(backup_dir, "mbr_backup")
+    os.system("sudo dd if=/dev/sda of=" + backup_path + " bs=512 count=1")
+
+def restore_mbr(backup_path):
+    # Yedek MBR'yi geri yükle
+    os.system("sudo dd if=" + backup_path + " of=/dev/sda bs=512 count=1")
+def check_mbr_overwrite(file_path, backup_dir):
+    # MBR yedeğini kontrol et
+    backup_path = os.path.join(backup_dir, "mbr_backup")
+
+    if not os.path.exists(backup_path):
+        print("MBR backup not found.")
+        return
+
+    with open(file_path, 'rb') as current_file:
+        current_mbr = current_file.read(512)
+
+    with open(backup_path, 'rb') as backup_file:
+        backup_mbr = backup_file.read(512)
+
+    # MBR'lerin hash değerlerini karşılaştır
+    current_hash = hashlib.sha256(current_mbr).hexdigest()
+    backup_hash = hashlib.sha256(backup_mbr).hexdigest()
+
+    if current_hash != backup_hash:
+        print("MBR has changed. Restoring the backup MBR...")
+        restore_mbr(backup_path)
+        print("MBR has been restored.")     
+        # Dosyayı sil
+        delete_file(file_path)
 def main():
+    current_dir = os.getcwd()
+    backup_dir = os.path.join(current_dir, "Antivirus")
     while True:
         print("You neeed install firejail")
         print("You need give root access to program") 
