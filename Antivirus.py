@@ -1457,7 +1457,7 @@ def find_connected_ips(file_path):
 def main():
     while True:
         print("You neeed install firejail")
-        print("Please run program as a root") 
+        print("You need give root access to program") 
         print("Select an option:")
         print("1. Perform a folder scan")
         print("2. Check if a website is infected by typing the URL")
