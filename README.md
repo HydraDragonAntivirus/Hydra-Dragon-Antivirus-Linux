@@ -34,3 +34,5 @@ sudo chmod +s Antivirus.py
 virusdomainslistsuperbig is same as ultimatehostblacklist.
 ## Current Statics
 **65132992+** virus hashes **1648678+** virus or illegal websites IP adress list  2.5 million virus or safe website.
+## Detection Rate
+ClamAV 60% Hydra Dragon Antivirus 65%
