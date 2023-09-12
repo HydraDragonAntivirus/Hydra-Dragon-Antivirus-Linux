@@ -1443,7 +1443,6 @@ def backup_mbr(backup_dir):
     # MBR yedeğini al
     backup_path = os.path.join(backup_dir, "mbr_backup")
     os.system("sudo dd if=/dev/sda of=" + backup_path + " bs=512 count=1")
-
 def restore_mbr(backup_path):
     # Upload old MBR
     os.system("sudo dd if=" + backup_path + " of=/dev/sda bs=512 count=1")
@@ -1470,9 +1469,101 @@ def check_mbr_overwrite(file_path, backup_dir):
         print("MBR has been restored.")     
         # Delete the file
         delete_file(file_path)
+def extract_ips_from_strace(pid):
+    try:
+        strace_output = subprocess.check_output(["strace", "-f", "-p", str(pid), "-e", "connect"])
+        strace_lines = strace_output.decode("utf-8").split('\n')
+        ips = set()
+
+        for line in strace_lines:
+            if "connect(" in line:
+                parts = line.split()
+                ip = parts[parts.index("->") + 1].split(":")[0]
+                ips.add(ip)
+
+        return list(ips)
+    except Exception as e:
+        print(f"Error extracting IP addresses from strace: {e}")
+        return []
+def monitoring_running_processes():
+    while True:
+        temp_dir = tempfile.mkdtemp(prefix="running_file_scan_")
+        try:
+            running_files = []
+
+            for pid in os.listdir("/proc"):
+                if pid.isdigit():
+                    pid_dir = os.path.join("/proc", pid)
+                    exe_link = os.path.join(pid_dir, "exe")
+
+                    try:
+                        exe_path = os.readlink(exe_link)
+                        if os.path.exists(exe_path) and os.path.isfile(exe_path):
+                            running_files.append(exe_path)
+                    except (OSError, FileNotFoundError):
+                        pass
+
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                ip_addresses = list(executor.map(extract_ips_from_strace, [int(pid) for pid in os.listdir("/proc") if pid.isdigit()]))
+                malicious_results = list(executor.map(is_website_infected0, running_files))
+            print("Custom scan finished.")
+
+            # Print the results
+            print("Custom Scan Results:")
+            for i, result in enumerate(malicious_results):
+                if result:
+                    print(f"Malicious Content Detected in {running_files[i]}")
+                    # Perform action 1: Delete the file
+                    delete_file(running_files[i])
+
+            print("Malicious Content Check Results:")
+            for result in malicious_results:
+                if result:
+                    print("Malicious content detected in running file.")
+                else:
+                    print("No malicious content detected in running file.")
+
+            print("IP Addresses Detected:")
+            for ips in ip_addresses:
+                for ip in ips:
+                    disconnect_ip(ip)
+                    print(f"Disconnected IP address: {ip}")
+
+        except Exception as e:
+            print(f"Error scanning running files: {e}")
+def continuously_monitor_file(file_path):
+    while True:
+        ips_detected = scan_single_file(file_path)
+        if ips_detected:
+            for ip_detected in ips_detected:
+                print("Detected IP Addresses:")
+                print(ip_detected)        
+            # Check the content
+            content = open(file_path).read()
+            if is_website_infected0(content):
+                # If Infected take the actions
+                delete_file(file_path)
+                for ip_detected in ips_detected:
+                    disconnect_ip(ip_detected)
+def scan_single_file(file_path):
+    try:
+        # Scan the file using strace and monitor connect calls
+        strace_output = subprocess.check_output(["strace", "-e", "connect", "-o", "strace_output.log", "cat", file_path])
+
+        # Read the strace output and extract IP addresses
+        ips = set()
+        with open("strace_output.log", "r") as strace_file:
+            for line in strace_file:
+                if "connect(" in line:
+                    parts = line.split()
+                    ip = parts[parts.index("->") + 1].split(":")[0]
+                    ips.add(ip)
+                    print(f"Detected IP Address: {ip}")
+        return list(ips)  # Return the list of IP addresses
+    except Exception as e:
+        print(f"Error scanning file {file_path}: {e}")
+        return []
 def main():
-    current_dir = os.getcwd()
-    backup_dir = os.path.join(current_dir, "Antivirus")
     while True:
         print("You neeed install firejail")
         print("You need give root access to program") 
@@ -1484,8 +1575,7 @@ def main():
         print("5. Calculate hashes of files in a folder")
         print("6. Are someone clicking on your keyboard? Test it!")
         print("7. Check urlbl2.db for known websites. Don't add www. or http etc")
-        print("8. Exit")
-        
+        print("8. Exit")    
         choice = input("Enter your choice: ")
         if choice == "1":
             folder_path = input("Enter the path of the folder to scan: ")
@@ -1508,6 +1598,10 @@ def main():
                 executor.submit(real_time_web_protection)
                 executor.submit(access_firefox_history_continuous)
                 executor.submit(scan_running_files_with_custom_and_clamav_continuous)
+                executor.submit(monitoring_running_processes)
+        elif choice == "9":
+            with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
+                executor.submit(monitoring_running_processes)
         elif choice == "4":
             file_path = input("Enter the path of the file to intuitively scan: ")
             suspicious_file_path = input("Enter the path of potential ransomware file: ")
@@ -1519,6 +1613,7 @@ def main():
                 future3 = executor.submit(real_time_web_protection0, file_path)
                 future5 = executor.submit(check_mbr_overwrite, file_path)
                 future6 = executor.submit(find_connected_ips,file_path)
+                future7 = executor.submit( continuously_monitor_file(file_path))
                 # Wait for both functions to complete
                 concurrent.futures.wait([future4,future1, future2,future3,future5,future6])          
                 # Get the results from the futures (if needed)
@@ -1528,6 +1623,7 @@ def main():
                 result4 = future4.result()
                 result5 = future5.result()
                 result6 = future6.result()
+                result7 = future7.result()
                 # Print or handle results as needed
                 print("scan_file_for_ransomware result:", result4)
                 print("access_firefox_history_continuous0 result:", result1)
@@ -1535,6 +1631,7 @@ def main():
                 print("scan_file_for_malicious_ip result:", result3)
                 print("scan_file_for_mbr_overwriter:", result5)
                 print("connected_ips_from_the_file", result6)
+                print("strace_results",result7)
         elif choice == "5":
             folder_path = input("Enter the path of the folder to calculate hashes for: ")
             calculate_hashes_in_folder(folder_path)
