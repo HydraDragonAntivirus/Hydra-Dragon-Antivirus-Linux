@@ -27,6 +27,9 @@ Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-n
 ### semaemirhan555@gmail.com
 ## License
 GPLv3 License  https://www.gnu.org/licenses/gpl-3.0.html
+## How To Give Root Access To Program
+sudo chown root:root Antivirus.py
+sudo chmod +s Antivirus.py
 ## Other
 virusdomainslistsuperbig is same as ultimatehostblacklist.
 ## Current Statics
