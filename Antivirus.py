@@ -1575,7 +1575,7 @@ def main():
         print("5. Calculate hashes of files in a folder")
         print("6. Are someone clicking on your keyboard? Test it!")
         print("7. Check urlbl2.db for known websites. Don't add www. or http etc")
-        print("8.Rootkit scan")
+        print("8. Rootkit scan")
         print("9. Exit")    
         choice = input("Enter your choice: ")
         if choice == "1":
