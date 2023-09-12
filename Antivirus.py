@@ -1445,10 +1445,10 @@ def backup_mbr(backup_dir):
     os.system("sudo dd if=/dev/sda of=" + backup_path + " bs=512 count=1")
 
 def restore_mbr(backup_path):
-    # Yedek MBR'yi geri yükle
+    # Upload old MBR
     os.system("sudo dd if=" + backup_path + " of=/dev/sda bs=512 count=1")
 def check_mbr_overwrite(file_path, backup_dir):
-    # MBR yedeğini kontrol et
+    # Check MBR
     backup_path = os.path.join(backup_dir, "mbr_backup")
 
     if not os.path.exists(backup_path):
@@ -1460,8 +1460,7 @@ def check_mbr_overwrite(file_path, backup_dir):
 
     with open(backup_path, 'rb') as backup_file:
         backup_mbr = backup_file.read(512)
-
-    # MBR'lerin hash değerlerini karşılaştır
+    # Compare MBR hashes
     current_hash = hashlib.sha256(current_mbr).hexdigest()
     backup_hash = hashlib.sha256(backup_mbr).hexdigest()
 
@@ -1469,7 +1468,7 @@ def check_mbr_overwrite(file_path, backup_dir):
         print("MBR has changed. Restoring the backup MBR...")
         restore_mbr(backup_path)
         print("MBR has been restored.")     
-        # Dosyayı sil
+        # Delete the file
         delete_file(file_path)
 def main():
     current_dir = os.getcwd()
