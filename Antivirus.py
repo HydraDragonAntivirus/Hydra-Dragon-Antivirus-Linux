@@ -780,11 +780,6 @@ def is_website_infected0(content):
 
         cursor.close()
         conn.close()
-# Run command to download firejail
-firejail_install_command = "sudo apt install firejail -y"
-auditd_install_command = "sudo apt install  auditd  -y"
-subprocess.run(firejail_install_command, shell=True)
-subprocess.run(auditd_install_command , shell=True)
 def access_firefox_history_continuous():
     try:
         # Find the Firefox profile folder
@@ -1461,6 +1456,7 @@ def find_connected_ips(file_path):
     return connected_ips
 def main():
     while True:
+        print("You neeed install firejail")
         print("Please run program as a root") 
         print("Select an option:")
         print("1. Perform a folder scan")
