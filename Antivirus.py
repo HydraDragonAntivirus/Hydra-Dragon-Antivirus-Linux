@@ -12,6 +12,65 @@ import re
 import requests
 import pyinotify
 import curses
+import tlsh
+import ssdeep
+
+def calculate_tlsh(file_path):
+    with open(file_path, "rb") as file:
+        file_data = file.read()
+        tlsh_value = tlsh.hash(file_data)
+    return tlsh_value
+
+def calculate_ssdeep(file_path):
+    try:
+        with open(file_path, "rb") as file:
+            file_data = file.read()
+            ssdeep_value = ssdeep.hash(file_data)
+        return ssdeep_value
+    except ImportError:
+        print("The 'ssdeep' module is not installed. Please install it to calculate ssdeep hashes.")
+        return None
+
+def calculate_tlsf(file_path):
+    tlsh_value = calculate_tlsh(file_path)
+    return tlsh_value.encode("hex").upper()
+
+def find_similar_hashes(file_path, similarity_threshold=0.1):
+    ssdeep_value = calculate_ssdeep(file_path)
+    
+    daily_connection = sqlite3.connect("daily.db")
+    malwarebazaar_connection = sqlite3.connect("malwarebazaar.db")
+    
+    try:
+        # Check in the dailyfuzzyhashes table for similar ssdeep hashes
+        daily_command = daily_connection.execute("SELECT field4 FROM dailyfuzzyhashes;")
+        daily_records = daily_command.fetchall()
+        
+        for record in daily_records:
+            db_ssdeep = record[0]
+            ssdeep_similarity = ssdeep.compare(ssdeep_value, db_ssdeep)
+            
+            if ssdeep_similarity >= similarity_threshold:
+                return True
+
+        # Check in the malwarebazaarfuzzyhashes table for similar TLSF hashes
+        tlsf_value = calculate_tlsf(file_path)
+        malwarebazaar_command = malwarebazaar_connection.execute("SELECT field14 FROM malwarebazaarfuzzyhashes;")
+        malwarebazaar_records = malwarebazaar_command.fetchall()
+        
+        for record in malwarebazaar_records:
+            db_tlsf = record[0]
+            if db_tlsf == tlsf_value:
+                return True
+
+    except Exception as e:
+        print("Error:", str(e))
+    finally:
+        daily_connection.close()
+        malwarebazaar_connection.close()
+
+    # Return False if no similar hashes are found in both databases
+    return False
 def is_file_infected_md5(md5):
     md5_connection = sqlite3.connect("MD5basedatabase.db")
     main_connection = sqlite3.connect("main.db")
@@ -332,9 +391,10 @@ def scan_file(file_path):
         md5 = calculate_md5(file_path)
         sha1 = calculate_sha1(file_path)
         sha256 = calculate_sha256(file_path)
-        
+        ssdeep = calculate_ssdeep(file_path)
+        tlsh = calculate_tlsh(file_path)
         # Check if the file is infected using hash-based methods
-        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256):
+        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256) or find_similar_hashes(ssdeep) or find_similar_hashes(tlsh):
             print(f"Infected file detected: {file_path}\nMD5 Hash: {md5}")
             print(delete_file(file_path))  # Automatically delete infected file
         else:
