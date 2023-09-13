@@ -12,7 +12,7 @@ import re
 import requests
 import pyinotify
 import curses
-import tlsh
+import tlsh 
 import ssdeep
 
 def calculate_tlsh(file_path):
@@ -457,8 +457,9 @@ def scan_and_check_file(file_path, temp_dir):
         md5 = calculate_md5(file_path)
         sha1 = calculate_sha1(file_path)
         sha256 = calculate_sha256(file_path)
-        
-        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256):
+        ssdeep = calculate_ssdeep(file_path)
+        tlsh = calculate_tlsh(file_path)
+        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256) or find_similar_hashes(ssdeep) or find_similar_hashes(tlsh):
             print(f"Infected file detected: {file_path}")
             print(delete_file(file_path))  # Automatically delete infected file 
         else:
