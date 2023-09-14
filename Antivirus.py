@@ -15,6 +15,7 @@ import curses
 import tlsh 
 import ssdeep
 
+
 def calculate_tlsh(file_path):
     with open(file_path, "rb") as file:
         file_data = file.read()
@@ -34,23 +35,22 @@ def calculate_ssdeep(file_path):
 def calculate_tlsf(file_path):
     tlsh_value = calculate_tlsh(file_path)
     return tlsh_value.encode("hex").upper()
-import sqlite3
 
 def find_similar_hashes(file_path, similarity_threshold=0.1):
     ssdeep_value = calculate_ssdeep(file_path)
-    
+
     daily_connection = sqlite3.connect("daily.db")
     oldvirusbase_connection = sqlite3.connect("oldvirusbase.db")
-    
+
     try:
         # Check in the dailyfuzzyhashes table for similar ssdeep hashes
         daily_cursor = daily_connection.cursor()
         daily_cursor.execute("SELECT field4 FROM dailyfuzzyhashes;")
-        
+
         for record in daily_cursor.fetchall():
             db_ssdeep = record[0]
             ssdeep_similarity = ssdeep.compare(ssdeep_value, db_ssdeep)
-            
+
             if ssdeep_similarity >= similarity_threshold:
                 return True
 
@@ -58,7 +58,7 @@ def find_similar_hashes(file_path, similarity_threshold=0.1):
         tlsf_value = calculate_tlsf(file_path)
         malwarebazaar_cursor = daily_connection.cursor()
         malwarebazaar_cursor.execute("SELECT field14 FROM malwarebazaarfuzzyhashes;")
-        
+
         for record in malwarebazaar_cursor.fetchall():
             db_tlsf = record[0]
             if db_tlsf == tlsf_value:
@@ -67,29 +67,27 @@ def find_similar_hashes(file_path, similarity_threshold=0.1):
         # Check in the malshare table for similar ssdeep hashes
         malshare_cursor = daily_connection.cursor()
         malshare_cursor.execute("SELECT field4 FROM malshare;")
-        
+
         for record in malshare_cursor.fetchall():
             db_ssdeep = record[0]
             ssdeep_similarity = ssdeep.compare(ssdeep_value, db_ssdeep)
-            
+
             if ssdeep_similarity >= similarity_threshold:
                 return True
 
         # Check in the virusignfull table for similar ssdeep hashes
         oldvirusbase_cursor = oldvirusbase_connection.cursor()
         oldvirusbase_cursor.execute("SELECT field1 FROM virusignfull;")
-        
+
         for record in oldvirusbase_cursor.fetchall():
             db_ssdeep = record[0]
             ssdeep_similarity = ssdeep.compare(ssdeep_value, db_ssdeep)
-            
+
             if ssdeep_similarity >= similarity_threshold:
                 return True
-
     except Exception as e:
-        # Log the error for debugging
+        # Log the error for debugging or handle it appropriately
         print("Error:", str(e))
-
     finally:
         # Close the database connections and cursors
         daily_connection.close()
