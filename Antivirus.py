@@ -40,15 +40,14 @@ def find_similar_hashes(file_path, similarity_threshold=0.1):
     ssdeep_value = calculate_ssdeep(file_path)
     
     daily_connection = sqlite3.connect("daily.db")
-    malwarebazaar_connection = sqlite3.connect("malwarebazaar.db")
     oldvirusbase_connection = sqlite3.connect("oldvirusbase.db")
     
     try:
         # Check in the dailyfuzzyhashes table for similar ssdeep hashes
-        daily_command = daily_connection.execute("SELECT field4 FROM dailyfuzzyhashes;")
-        daily_records = daily_command.fetchall()
+        daily_cursor = daily_connection.cursor()
+        daily_cursor.execute("SELECT field4 FROM dailyfuzzyhashes;")
         
-        for record in daily_records:
+        for record in daily_cursor.fetchall():
             db_ssdeep = record[0]
             ssdeep_similarity = ssdeep.compare(ssdeep_value, db_ssdeep)
             
@@ -57,19 +56,30 @@ def find_similar_hashes(file_path, similarity_threshold=0.1):
 
         # Check in the malwarebazaarfuzzyhashes table for similar TLSF hashes
         tlsf_value = calculate_tlsf(file_path)
-        malwarebazaar_command = malwarebazaar_connection.execute("SELECT field14 FROM malwarebazaarfuzzyhashes;")
-        malwarebazaar_records = malwarebazaar_command.fetchall()
+        malwarebazaar_cursor = daily_connection.cursor()
+        malwarebazaar_cursor.execute("SELECT field14 FROM malwarebazaarfuzzyhashes;")
         
-        for record in malwarebazaar_records:
+        for record in malwarebazaar_cursor.fetchall():
             db_tlsf = record[0]
             if db_tlsf == tlsf_value:
                 return True
 
-        # Check in the virusignfull table for similar ssdeep hashes
-        oldvirusbase_command = oldvirusbase_connection.execute("SELECT field1 FROM virusignfull;")
-        oldvirusbase_records = oldvirusbase_command.fetchall()
+        # Check in the malshare table for similar ssdeep hashes
+        malshare_cursor = daily_connection.cursor()
+        malshare_cursor.execute("SELECT field4 FROM malshare;")
+        
+        for record in malshare_cursor.fetchall():
+            db_ssdeep = record[0]
+            ssdeep_similarity = ssdeep.compare(ssdeep_value, db_ssdeep)
+            
+            if ssdeep_similarity >= similarity_threshold:
+                return True
 
-        for record in oldvirusbase_records:
+        # Check in the virusignfull table for similar ssdeep hashes
+        oldvirusbase_cursor = oldvirusbase_connection.cursor()
+        oldvirusbase_cursor.execute("SELECT field1 FROM virusignfull;")
+        
+        for record in oldvirusbase_cursor.fetchall():
             db_ssdeep = record[0]
             ssdeep_similarity = ssdeep.compare(ssdeep_value, db_ssdeep)
             
@@ -77,13 +87,17 @@ def find_similar_hashes(file_path, similarity_threshold=0.1):
                 return True
 
     except Exception as e:
+        # Log the error for debugging
         print("Error:", str(e))
 
     finally:
-        # Close the database connections
+        # Close the database connections and cursors
         daily_connection.close()
-        malwarebazaar_connection.close()
         oldvirusbase_connection.close()
+        daily_cursor.close()
+        malwarebazaar_cursor.close()
+        malshare_cursor.close()
+        oldvirusbase_cursor.close()
 
     return False
 def is_file_infected_md5(md5):
