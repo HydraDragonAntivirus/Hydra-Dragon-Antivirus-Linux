@@ -406,10 +406,8 @@ def scan_file(file_path):
         md5 = calculate_md5(file_path)
         sha1 = calculate_sha1(file_path)
         sha256 = calculate_sha256(file_path)
-        ssdeep = calculate_ssdeep(file_path)
-        tlsh = calculate_tlsh(file_path)
         # Check if the file is infected using hash-based methods
-        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256) or find_similar_hashes(ssdeep) or find_similar_hashes(tlsh):
+        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256) or find_similar_hashes(file_path):
             print(f"Infected file detected: {file_path}\nMD5 Hash: {md5}")
             print(delete_file(file_path))  # Automatically delete infected file
         else:
@@ -472,9 +470,7 @@ def scan_and_check_file(file_path, temp_dir):
         md5 = calculate_md5(file_path)
         sha1 = calculate_sha1(file_path)
         sha256 = calculate_sha256(file_path)
-        ssdeep = calculate_ssdeep(file_path)
-        tlsh = calculate_tlsh(file_path)
-        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256) or find_similar_hashes(ssdeep) or find_similar_hashes(tlsh):
+        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256) or  find_similar_hashes(file_path):
             print(f"Infected file detected: {file_path}")
             print(delete_file(file_path))  # Automatically delete infected file 
         else:
