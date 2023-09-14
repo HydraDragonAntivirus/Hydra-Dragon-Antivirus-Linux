@@ -34,12 +34,14 @@ def calculate_ssdeep(file_path):
 def calculate_tlsf(file_path):
     tlsh_value = calculate_tlsh(file_path)
     return tlsh_value.encode("hex").upper()
+import sqlite3
 
 def find_similar_hashes(file_path, similarity_threshold=0.1):
     ssdeep_value = calculate_ssdeep(file_path)
     
     daily_connection = sqlite3.connect("daily.db")
     malwarebazaar_connection = sqlite3.connect("malwarebazaar.db")
+    oldvirusbase_connection = sqlite3.connect("oldvirusbase.db")
     
     try:
         # Check in the dailyfuzzyhashes table for similar ssdeep hashes
@@ -63,13 +65,26 @@ def find_similar_hashes(file_path, similarity_threshold=0.1):
             if db_tlsf == tlsf_value:
                 return True
 
+        # Check in the virusignfull table for similar ssdeep hashes
+        oldvirusbase_command = oldvirusbase_connection.execute("SELECT field1 FROM virusignfull;")
+        oldvirusbase_records = oldvirusbase_command.fetchall()
+
+        for record in oldvirusbase_records:
+            db_ssdeep = record[0]
+            ssdeep_similarity = ssdeep.compare(ssdeep_value, db_ssdeep)
+            
+            if ssdeep_similarity >= similarity_threshold:
+                return True
+
     except Exception as e:
         print("Error:", str(e))
+
     finally:
+        # Close the database connections
         daily_connection.close()
         malwarebazaar_connection.close()
+        oldvirusbase_connection.close()
 
-    # Return False if no similar hashes are found in both databases
     return False
 def is_file_infected_md5(md5):
     md5_connection = sqlite3.connect("MD5basedatabase.db")
