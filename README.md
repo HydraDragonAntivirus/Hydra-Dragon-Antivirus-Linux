@@ -37,3 +37,5 @@ I have **65141779+** normal virus hashes **647131+** virus or illegal websites I
 **4856017**
 ## Detection Rate
 ClamAV 60% Hydra Dragon Antivirus 65%
+## Collected Datas
+No data collected
