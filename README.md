@@ -39,7 +39,7 @@ I have **65141779+** normal virus hashes **647131+** virus or illegal websites I
 ClamAV 60% Hydra Dragon Antivirus 65%
 ## Collected Datas
 No data collected
-# Installation On Arch Linux For Beginners
+## Installation On Arch Linux For Beginners
 ### Please Setup Your Arch Linux At Virtual Machine Antivirus Might Be Crash Your System
 ### Tested On Cachy OS And If You Looking For Debian Tested On Kali Linux And It Worked
 sudo pacman -Sy
