@@ -73,6 +73,7 @@ Type sudo clamscan
 Installing ssdeep:
 git clone https://github.com/DinoTools/python-ssdeep.git
 cd python-ssdeep/
+sudo pacman -S python-setuptools
 python setup.py build
 sudo python setup.py install
 cd ..
