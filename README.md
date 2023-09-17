@@ -70,6 +70,12 @@ sudo cp main.cvd /var/lib/clamav/
 sudo cp daily.cvd /var/lib/clamav/
 If you got banned try in 24 hours
 Type sudo clamscan
+Installing ssdeep:
+git clone https://github.com/DinoTools/python-ssdeep.git
+cd ssdeep
+python setup bild
+sudo python setup.py install
+cd ..
 ### Download Antivirus from mega.nz link: https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA
 Save At Downloads
 unzip Antivirus.zip
@@ -79,3 +85,4 @@ Type pwd to learn your folder location
 Then go Antivirus folder by Dolphin 
 Open the terminal at this folder by Alt+Shift+F4
 Type python Antivirus.py you are done
+If you have a problem create issue topic
