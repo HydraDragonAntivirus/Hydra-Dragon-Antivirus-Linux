@@ -75,6 +75,7 @@ git clone https://github.com/DinoTools/python-ssdeep.git
 cd python-ssdeep/
 sudo pacman -S python-setuptools
 sudo pacman -S python-pip
+sudo pacman -S ssdeep
 python setup.py build
 sudo python setup.py install
 cd ..
