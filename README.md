@@ -28,8 +28,7 @@ Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-n
 ## License
 Public Domain License ![image](https://github.com/HydraDragonAntivirus/Hydra-Dragon-Antivirus-Linux/assets/142328963/c2679d99-7255-404b-aa5a-0e123d793645)
 ## How To Give Root Access To Program
-sudo chown root:root Antivirus.py
-sudo chmod +s Antivirus.py
+sudo python Antivirus.py
 ## Others
 virusdomainslistsuperbig is same as ultimatehostblacklist.
 ## Current Statics
