@@ -72,7 +72,7 @@ If you got banned try in 24 hours
 Type sudo clamscan
 Installing ssdeep:
 git clone https://github.com/DinoTools/python-ssdeep.git
-cd python-ssdeep
+cd python-ssdeep/
 python setup bild
 sudo python setup.py install
 cd ..
