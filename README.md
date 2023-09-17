@@ -88,6 +88,6 @@ Type pwd to learn your folder location
 Then go Antivirus folder by Dolphin 
 Open the terminal at this folder by Alt+Shift+F4
 Type python Antivirus.py you are done
-If you have a problem create issue topic
+If you have a problem create issue topic or try reboot
 ## How To Update Databases Manually?
 https://www.youtube.com/@hydradragonantivirus Watch my videos here. It will help you.
