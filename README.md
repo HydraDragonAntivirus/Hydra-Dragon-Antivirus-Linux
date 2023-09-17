@@ -73,7 +73,7 @@ Type sudo clamscan
 Installing ssdeep:
 git clone https://github.com/DinoTools/python-ssdeep.git
 cd python-ssdeep/
-python setup bild
+python setup.py build
 sudo python setup.py install
 cd ..
 ### Download Antivirus from mega.nz link: https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA
