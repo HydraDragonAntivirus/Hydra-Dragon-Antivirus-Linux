@@ -40,7 +40,7 @@ ClamAV 60% Hydra Dragon Antivirus 65%
 No data collected
 ## Installation On Arch Linux For Beginners
 ### Please First Test It On Virtual Machine Antivirus Might Be Crash Your System
-### Tested On Cachy OS And If You Looking For Debian Tested On Kali Linux And It Worked-
+### Tested On Cachy OS And If You Looking For Debian Tested On Kali Linux And It Worked
 - sudo pacman -Sy
 - sudo pacman -S python
 - sudo pacman -S python-tlsh
