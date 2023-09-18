@@ -1368,7 +1368,6 @@ def real_time_web_protection0(file_path):
             else:
                 print(f"The IP address {ip} is clean.")
         return infected_ips
-
 def calculate_hashes_in_folder(folder_path):
     if os.path.exists(folder_path) and os.path.isdir(folder_path):
         print(f"Calculating hashes for files in {folder_path}")
@@ -1379,10 +1378,14 @@ def calculate_hashes_in_folder(folder_path):
                 md5_hash = calculate_md5(file_path)
                 sha1_hash = calculate_sha1(file_path)
                 sha256_hash = calculate_sha256(file_path)
+                ssdeep_hash = calculate_ssdeep(file_path)
+                tlsh_hash = calculate_tlsh(file_path)
                 print(f"File: {file_path}")
                 print(f"MD5 Hash: {md5_hash}")
                 print(f"SHA-1 Hash: {sha1_hash}")
                 print(f"SHA-256 Hash: {sha256_hash}")
+                print(f"SSDEEP Hash: {ssdeep_hash}")
+                print(f"TLSH Hash: {tlsh_hash}")
                 print("-" * 40)
     else:
         print("Invalid folder path.")
