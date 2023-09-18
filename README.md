@@ -77,8 +77,8 @@ cd ..
 Save At Downloads
 unzip Antivirus.zip
 sudo passwd
-Login your root account
-Type pwd to learn your folder location then you see /home/username/Downloads
+Type pwd to learn your folder location then you see /home/yourusername/Downloads
+Login your root account but first type logout to logout your account
 Then go Antivirus folder by Dolphin 
 Open the terminal at this folder by Alt+Shift+F4
 Type python Antivirus.py you are done
