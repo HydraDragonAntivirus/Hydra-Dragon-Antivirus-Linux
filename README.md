@@ -39,46 +39,46 @@ ClamAV 60% Hydra Dragon Antivirus 65%
 ## Collected Datas
 No data collected
 ## Installation On Arch Linux For Beginners
-### Please Setup Your Arch Linux At Virtual Machine Antivirus Might Be Crash Your System
-### Tested On Cachy OS And If You Looking For Debian Tested On Kali Linux And It Worked
-sudo pacman -Sy
-sudo pacman -S python
-sudo pacman -S python-tlsh
-sudo pacman -S strace
-sudo pacman -S python-pyinotify
-sudo pacman -S rkhunter
-sudo pacman -S clamav
-sudo pacman -S firejail
+### Please First Test It On Virtual Machine Antivirus Might Be Crash Your System
+### Tested On Cachy OS And If You Looking For Debian Tested On Kali Linux And It Worked-
+- sudo pacman -Sy
+- sudo pacman -S python
+- sudo pacman -S python-tlsh
+- sudo pacman -S strace
+- sudo pacman -S python-pyinotify
+- sudo pacman -S rkhunter
+- sudo pacman -S clamav
+- sudo pacman -S firejail
 ### Download This Files
-http://database.clamav.net/main.cvd
-http://database.clamav.net/daily.cvd
-If you got banned try again in 24 hours
-Save at Downloads
-cd
-cd Downloads
-git clone https://aur.archlinux.org/chkrootkit.git
-cd chkrootkit/
-makepkg -si
-Then check installation by typing sudo chkrootkit
-cd ..
-sudo cp main.cvd /var/lib/clamav/
-sudo cp daily.cvd /var/lib/clamav/
-Type sudo clamscan to check clamscan
-Installing ssdeep:
-git clone https://github.com/DinoTools/python-ssdeep.git
-cd python-ssdeep/
-sudo pacman -S python-setuptools
-sudo pacman -S python-pip
-sudo pacman -S ssdeep
-python setup.py build
-sudo python setup.py install
-cd ..
+- http://database.clamav.net/main.cvd
+- http://database.clamav.net/daily.cvd
+- If you got banned try again in 24 hours
+- Save at Downloads
+- cd
+- cd Downloads
+- git clone https://aur.archlinux.org/chkrootkit.git
+- cd chkrootkit/
+- makepkg -si
+- Then check installation by typing sudo chkrootkit
+- cd ..
+- sudo cp main.cvd /var/lib/clamav/
+- sudo cp daily.cvd /var/lib/clamav/
+- Type sudo clamscan to check clamscan
+- Installing ssdeep:
+- git clone https://github.com/DinoTools/python-ssdeep.git
+- cd python-ssdeep/
+- sudo pacman -S python-setuptools
+- sudo pacman -S python-pip
+- sudo pacman -S ssdeep
+- python setup.py build
+- sudo python setup.py install
+- cd ..
 ### Download Antivirus from mega.nz link: https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA
-Save At Downloads
-unzip Antivirus.zip
-cd Antivirus\
-Type sudo python Antivirus.py you are done
-You can also start without root by typing python Antivirus.py
-If you have a problem create issue topic or try reboot
+- Save At Downloads
+- unzip Antivirus.zip
+- cd Antivirus\
+- Type sudo python Antivirus.py you are done
+- You can also start without root by typing python Antivirus.py
+- If you have a problem create issue topic or try reboot
 ## How To Update Databases Manually?
 https://www.youtube.com/@hydradragonantivirus Watch my videos here. It will help you.
