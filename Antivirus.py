@@ -1552,6 +1552,7 @@ def check_mbr_overwrite(file_path, backup_dir):
         print("MBR has been restored.")     
         # Delete the file
         delete_file(file_path)
+
 def extract_ips_from_strace(exe_path):
     try:
         # Check if the executable file exists
@@ -1560,7 +1561,8 @@ def extract_ips_from_strace(exe_path):
             return []
 
         # Run strace and monitor connect calls
-        strace_output = subprocess.check_output(["strace", "-e", "connect", "-o", "strace_output.log", "cat", exe_path])
+        strace_command = ["strace", "-e", "connect", "-o", "strace_output.log", "cat", exe_path]
+        strace_output = subprocess.check_output(strace_command)
 
         # Read the strace output and extract IP addresses
         ips = set()
@@ -1573,17 +1575,16 @@ def extract_ips_from_strace(exe_path):
                     print(f"Detected IP Address: {ip}")
 
                     # Check if the IP is malicious
-                    if is_website_infected0(ip):
+                    if is_website_infected(ip):
                         print(f"Malicious IP Detected: {ip}")
                         # Perform action: Delete the file
                         delete_file(exe_path)
 
         return list(ips)  # Return the list of IP addresses
     except subprocess.CalledProcessError as e:
-        print(f"Error running strace: {e}")
-        return []
-    except Exception as e:
-        print(f"An error occurred: {e}")
+        print("Error: subprocess call returned a non-zero exit status")
+        print(f"Command: {e.cmd}")
+        print(f"Output: {e.output}")
         return []
 def show_file_options(files):
     print("Running Files:")
@@ -1684,22 +1685,24 @@ def scan_single_file(file_path):
         return []
 def main():
     while True:
-        print("You need install firejail strace chkrootkit clamav and rkhunter")
-        print("You need give root access to program") 
+        print("You need to install firejail, strace, chkrootkit, clamav, and rkhunter.")
+        print("You need to give root access to the program.")
         print("Select an option:")
         print("1. Perform a folder scan")
         print("2. Check if a website is infected by typing the URL")
         print("3. Real-time web and file protection")
-        print("4. Perform intuitive  sandbox file scan (Run on vm and do perform a file scan first)")
+        print("4. Perform an intuitive sandbox file scan (Run on a VM and perform a file scan first)")
         print("5. Calculate hashes of files in a folder")
         print("6. Are someone clicking on your keyboard? Test it!")
         print("7. Check urlbl2.db for known websites. Don't add www. or http etc")
         print("8. Rootkit scan")
-        print("9. Exit")    
+        print("9. Exit")
+        
         choice = input("Enter your choice: ")
+        
         if choice == "1":
             folder_path = input("Enter the path of the folder to scan: ")
-
+            
             if os.path.exists(folder_path) and os.path.isdir(folder_path):
                 with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
                     executor.submit(scan_folder_with_clamscan, folder_path)
@@ -1707,33 +1710,40 @@ def main():
                     executor.submit(scan_folder_with_malware_content_check, folder_path)
             else:
                 print("Invalid folder path.")
+        
         elif choice == "2":
             website_url = input("Enter the website URL to check: ")
             if is_website_infected(website_url):
                 print("The website is infected.")
             else:
                 print("The website is clean.")
+        
         elif choice == "3":
             with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
                 executor.submit(real_time_web_protection)
                 executor.submit(access_firefox_history_continuous)
                 executor.submit(scan_running_files_with_custom_and_clamav_continuous)
                 executor.submit(monitoring_running_processes)
+        
         elif choice == "4":
             file_path = input("Enter the path of the file to intuitively scan: ")
-            suspicious_file_path = input("Enter the path of potential ransomware file: ")
-            #  Start two functions in parallel
+            suspicious_file_path = file_path  # Set suspicious_file_path to file_path
+            exe_path = file_path  # Set exe_path to file_path
+
+            # Start functions in parallel
             with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-                future4 = executor.submit(start_monitoring, suspicious_file_path,file_path)
+                future4 = executor.submit(start_monitoring, suspicious_file_path, file_path)
                 future1 = executor.submit(access_firefox_history_continuous0, file_path)
                 future2 = executor.submit(scan_file_for_malicious_content, file_path)
                 future3 = executor.submit(real_time_web_protection0, file_path)
                 future5 = executor.submit(check_mbr_overwrite, file_path)
-                future6 = executor.submit(find_connected_ips,file_path)
-                future7 = executor.submit( continuously_monitor_file(file_path))
-                # Wait for both functions to complete
-                concurrent.futures.wait([future4,future1, future2,future3,future5,future6])          
-                # Get the results from the futures (if needed)
+                future6 = executor.submit(find_connected_ips, file_path)
+                future7 = executor.submit(continuously_monitor_file, file_path)
+                future8 = executor.submit(extract_ips_from_strace, exe_path)
+
+                # Wait for all functions to complete
+                concurrent.futures.wait([future1, future2, future3, future4, future5, future6, future7, future8])
+                # Get the results from the futures
                 result1 = future1.result()
                 result2 = future2.result()
                 result3 = future3.result()
@@ -1741,28 +1751,38 @@ def main():
                 result5 = future5.result()
                 result6 = future6.result()
                 result7 = future7.result()
+                result8 = future8.result()
                 # Print or handle results as needed
-                print("scan_file_for_ransomware result:", result4)
                 print("access_firefox_history_continuous0 result:", result1)
                 print("scan_file_for_malicious_content result:", result2)
-                print("scan_file_for_malicious_ip result:", result3)
-                print("scan_file_for_mbr_overwriter:", result5)
-                print("connected_ips_from_the_file", result6)
-                print("strace_results",result7)
+                print("real_time_web_protection0 result:", result3)
+                print("start_monitoring result:", result4)
+                print("check_mbr_overwrite result:", result5)
+                print("find_connected_ips result:", result6)
+                print("continuously_monitor_file result:", result7)
+                print("extract_ips_from_strace result:", result8)
+        
         elif choice == "5":
             folder_path = input("Enter the path of the folder to calculate hashes for: ")
             calculate_hashes_in_folder(folder_path)
-        elif choice =="6": 
-            curses.wrapper(on_key_press)  
-        elif choice =="7":
+        
+        elif choice == "6":
+            curses.wrapper(on_key_press)
+        
+        elif choice == "7":
             check_website_in_blist()
-        elif choice =="8":
-         subprocess.run(['sudo', 'chkrootkit'])
-         subprocess.run(['sudo', 'rkhunter','--check'])
+        
+        elif choice == "8":
+            subprocess.run(['sudo', 'chkrootkit'])
+            subprocess.run(['sudo', 'rkhunter', '--check'])
+        
         elif choice == "9":
             print("Exiting...")
             break
+        
         else:
             print("Invalid choice. Please select a valid option.")
+
+
 if __name__ == "__main__":
     main()
