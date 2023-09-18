@@ -57,7 +57,7 @@ cd
 cd Downloads
 git clone https://aur.archlinux.org/chkrootkit.git
 cd chkrootkit/
-make pkg -si
+makepkg -si
 Then check installation by typing chkrootkit
 cd ..
 Then type sudo clamscan
