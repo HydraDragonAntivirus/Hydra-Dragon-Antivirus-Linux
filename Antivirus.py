@@ -15,7 +15,6 @@ import curses
 import tlsh 
 import ssdeep
 
-
 def calculate_tlsh(file_path):
     with open(file_path, "rb") as file:
         file_data = file.read()
@@ -1553,26 +1552,68 @@ def check_mbr_overwrite(file_path, backup_dir):
         print("MBR has been restored.")     
         # Delete the file
         delete_file(file_path)
-def extract_ips_from_strace(pid):
+def extract_ips_from_strace(exe_path):
     try:
-        strace_output = subprocess.check_output(["strace", "-f", "-p", str(pid), "-e", "connect"])
-        strace_lines = strace_output.decode("utf-8").split('\n')
+        # Check if the executable file exists
+        if not os.path.exists(exe_path) or not os.path.isfile(exe_path):
+            print(f"Executable file not found: {exe_path}")
+            return []
+
+        # Run strace and monitor connect calls
+        strace_output = subprocess.check_output(["strace", "-e", "connect", "-o", "strace_output.log", "cat", exe_path])
+
+        # Read the strace output and extract IP addresses
         ips = set()
+        with open("strace_output.log", "r") as strace_file:
+            for line in strace_file:
+                if "connect(" in line:
+                    parts = line.split()
+                    ip = parts[parts.index("->") + 1].split(":")[0]
+                    ips.add(ip)
+                    print(f"Detected IP Address: {ip}")
 
-        for line in strace_lines:
-            if "connect(" in line:
-                parts = line.split()
-                ip = parts[parts.index("->") + 1].split(":")[0]
-                ips.add(ip)
+                    # Check if the IP is malicious
+                    if is_website_infected0(ip):
+                        print(f"Malicious IP Detected: {ip}")
+                        # Perform action: Delete the file
+                        delete_file(exe_path)
 
-        return list(ips)
-    except Exception as e:
-        print(f"Error extracting IP addresses from strace: {e}")
+        return list(ips)  # Return the list of IP addresses
+    except subprocess.CalledProcessError as e:
+        print(f"Error running strace: {e}")
         return []
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return []
+def show_file_options(files):
+    print("Running Files:")
+    for i, file in enumerate(files):
+        print(f"{i + 1}. {file}")
+    print("q. Quit")
+
+    while True:
+        selection = input("Enter the number of the file you want to delete (q to quit): ").strip()
+        if selection.lower() == 'q':
+            return 'q'
+
+        if selection.isdigit():
+            selection = int(selection)
+            if 1 <= selection <= len(files):
+                return files[selection - 1]
+
+        print("Invalid selection. Please try again.")
+
+def delete_selected_files(files, selected_file):
+    try:
+        os.remove(selected_file)
+        print(f"{selected_file} has been deleted.")
+        files.remove(selected_file)
+    except Exception as e:
+        print(f"Error deleting {selected_file}: {e}")
 def monitoring_running_processes():
     while True:
-        temp_dir = tempfile.mkdtemp(prefix="running_file_scan_")
         try:
+            temp_dir = tempfile.mkdtemp(prefix="running_file_scan_")
             running_files = []
 
             for pid in os.listdir("/proc"):
@@ -1587,31 +1628,24 @@ def monitoring_running_processes():
                     except (OSError, FileNotFoundError):
                         pass
 
+            print("Scanning running files...")
             with concurrent.futures.ThreadPoolExecutor() as executor:
-                ip_addresses = list(executor.map(extract_ips_from_strace, [int(pid) for pid in os.listdir("/proc") if pid.isdigit()]))
-                malicious_results = list(executor.map(is_website_infected0, running_files))
+                ip_addresses = list(executor.map(extract_ips_from_strace, running_files))
+
             print("Custom scan finished.")
 
             # Print the results
             print("Custom Scan Results:")
-            for i, result in enumerate(malicious_results):
+            for i, result in enumerate(ip_addresses):
                 if result:
-                    print(f"Malicious Content Detected in {running_files[i]}")
-                    # Perform action 1: Delete the file
-                    delete_file(running_files[i])
+                    print(f"IP Addresses Detected for {running_files[i]}: {', '.join(result)}")
 
-            print("Malicious Content Check Results:")
-            for result in malicious_results:
-                if result:
-                    print("Malicious content detected in running file.")
-                else:
-                    print("No malicious content detected in running file.")
-
-            print("IP Addresses Detected:")
-            for ips in ip_addresses:
-                for ip in ips:
-                    disconnect_ip(ip)
-                    print(f"Disconnected IP address: {ip}")
+            # Show options to delete files
+            while True:
+                selected_file = show_file_options(running_files)
+                if selected_file == 'q':
+                    break
+                delete_selected_files(running_files, selected_file)
 
         except Exception as e:
             print(f"Error scanning running files: {e}")
@@ -1632,7 +1666,8 @@ def continuously_monitor_file(file_path):
 def scan_single_file(file_path):
     try:
         # Scan the file using strace and monitor connect calls
-        strace_output = subprocess.check_output(["strace", "-e", "connect", "-o", "strace_output.log", "cat", file_path])
+        with open("strace_output.log", "w") as strace_file:
+            subprocess.check_call(["strace", "-e", "connect", "-o", "strace_output.log", "cat", file_path])
 
         # Read the strace output and extract IP addresses
         ips = set()
@@ -1649,7 +1684,7 @@ def scan_single_file(file_path):
         return []
 def main():
     while True:
-        print("You need install firejail and strace chkrootkit clamav rkhunter")
+        print("You need install firejail strace chkrootkit clamav and rkhunter")
         print("You need give root access to program") 
         print("Select an option:")
         print("1. Perform a folder scan")
