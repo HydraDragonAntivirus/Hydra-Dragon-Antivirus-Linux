@@ -59,11 +59,11 @@ cd Downloads
 git clone https://aur.archlinux.org/chkrootkit.git
 cd chkrootkit/
 makepkg -si
-Then check installation by typing chkrootkit
+Then check installation by typing sudo chkrootkit
 cd ..
 sudo cp main.cvd /var/lib/clamav/
 sudo cp daily.cvd /var/lib/clamav/
-Type sudo clamscan
+Type sudo clamscan to check clamscan
 Installing ssdeep:
 git clone https://github.com/DinoTools/python-ssdeep.git
 cd python-ssdeep/
