@@ -60,10 +60,6 @@ cd chkrootkit/
 makepkg -si
 Then check installation by typing chkrootkit
 cd ..
-Then type sudo clamscan
-Then you got this error LibClamAV Error: cli_loaddbdir: No supported database files found in /var/lib/clamav
-ERROR: Can't open file or directory 
-To solve this do that:
 sudo cp main.cvd /var/lib/clamav/
 sudo cp daily.cvd /var/lib/clamav/
 If you got banned try in 24 hours
