@@ -52,6 +52,7 @@ sudo pacman -S firejail
 ### Download This Files
 http://database.clamav.net/main.cvd
 http://database.clamav.net/daily.cvd
+If you got banned try again in 24 hours
 Save at Downloads
 cd
 cd Downloads
@@ -62,7 +63,6 @@ Then check installation by typing chkrootkit
 cd ..
 sudo cp main.cvd /var/lib/clamav/
 sudo cp daily.cvd /var/lib/clamav/
-If you got banned try in 24 hours
 Type sudo clamscan
 Installing ssdeep:
 git clone https://github.com/DinoTools/python-ssdeep.git
