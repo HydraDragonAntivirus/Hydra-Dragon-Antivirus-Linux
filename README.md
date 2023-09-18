@@ -76,12 +76,9 @@ cd ..
 ### Download Antivirus from mega.nz link: https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA
 Save At Downloads
 unzip Antivirus.zip
-sudo passwd
-Type pwd to learn your folder location then you see /home/yourusername/Downloads
-Login your root account by typing Ctrl+Alt+Delete then login other account then type root then type your password
-Then go Antivirus folder by Dolphin 
-Open the terminal at this folder by Alt+Shift+F4
-Type python Antivirus.py you are done
+cd Antivirus\
+Type sudo python Antivirus.py you are done
+You can also start without root by typing python Antivirus.py
 If you have a problem create issue topic or try reboot
 ## How To Update Databases Manually?
 https://www.youtube.com/@hydradragonantivirus Watch my videos here. It will help you.
