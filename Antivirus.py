@@ -1395,7 +1395,6 @@ current_username = os.getlogin()
 directories_to_monitor = [
     f"/home/{current_username}"
 ]
-
 class FileChangeHandler(pyinotify.ProcessEvent):
     def __init__(self, suspicious_file_path):
         self.suspicious_file_path = suspicious_file_path
@@ -1404,48 +1403,47 @@ class FileChangeHandler(pyinotify.ProcessEvent):
 
     def process_IN_CLOSE_WRITE(self, event):
         if not event.dir:
-            file_path = event.pathname
+            file_path0 = event.pathname
             original_extension = os.path.splitext(self.suspicious_file_path)[1]
-            new_extension = os.path.splitext(file_path)[1]
+            new_extension = os.path.splitext(file_path0)[1]
 
             # Ignore changes to files with a .db extension
             if new_extension == '.db':
                 pass
             elif original_extension != new_extension:
-                print(f"File extension has changed: {self.suspicious_file_path} -> {file_path}")
-                new_file_hash = self.calculate_file_hash(file_path)
+                print(f"File extension has changed: {self.suspicious_file_path} -> {file_path0}")
+                new_file_hash = self.calculate_file_hash(file_path0)
 
                 if new_file_hash != self.suspicious_file_hash:
-                    print(f"File content has changed: {self.suspicious_file_path} -> {file_path}")
+                    print(f"File content has changed: {self.suspicious_file_path} -> {file_path0}")
                     delete_file(self.suspicious_file_path)  # Delete suspicious file
             else:
-                self.handle_file_change(file_path)
-
-    def handle_file_change(self, file_path):
-        try:
-            # Attempt to read the file as UTF-8
-            with open(file_path, 'r', encoding='utf-8') as file:
-                file.read()
-        except UnicodeDecodeError:
-            # File is not readable as UTF-8 (potentially encrypted)
-            print(f"File is not readable as UTF-8: {file_path}")
-            delete_file(self.suspicious_file_path)  # Delete suspicious file
-
-    def calculate_file_hash(self, file_path):
+                self.handle_file_change(file_path0)
+    def calculate_file_hash(self, file_path0):
         hasher = hashlib.sha256()
-        with open(file_path, 'rb') as file:
+        with open(file_path0, 'rb') as file:
             while True:
                 data = file.read(65536)
                 if not data:
                     break
                 hasher.update(data)
         return hasher.hexdigest()
-def start_monitoring(suspicious_file_path, file_path):
+    def handle_file_change(self, file_path0):
+        try:
+            # Attempt to read the file as UTF-8
+            with open(file_path0, 'r', encoding='utf-8') as file:
+                file.read()
+        except UnicodeDecodeError:
+            # File is not readable as UTF-8 (potentially encrypted)
+            print(f"File is not readable as UTF-8: {file_path0}")
+            delete_file(self.suspicious_file_path)  # Delete suspicious file
+
+def start_monitoring(suspicious_file_path, file_path0):
     wm = pyinotify.WatchManager()
     mask = pyinotify.IN_CLOSE_WRITE
 
     event_handler = FileChangeHandler(suspicious_file_path)
-    event_handler.file_path = file_path
+    event_handler.file_path0 = file_path0  # Store the current file path
     notifier = pyinotify.Notifier(wm, event_handler)
 
     for directory in directories_to_monitor:
@@ -1501,7 +1499,7 @@ def check_website_in_blist():
     finally:
         # Close the database connection
         conn.close()
-def find_connected_ips(file_path):
+def find_connected_ips(file_path,exe_path):
     connected_ips = set()
 
     try:
@@ -1526,7 +1524,7 @@ def find_connected_ips(file_path):
 
     return connected_ips
 def backup_mbr(backup_dir):
-    # MBR yedeğini al
+    # Get MBR
     backup_path = os.path.join(backup_dir, "mbr_backup")
     os.system("sudo dd if=/dev/sda of=" + backup_path + " bs=512 count=1")
 def restore_mbr(backup_path):
@@ -1555,21 +1553,23 @@ def check_mbr_overwrite(file_path, backup_dir):
         print("MBR has been restored.")     
         # Delete the file
         delete_file(file_path)
-
-def extract_ips_from_strace(exe_path):
+def extract_ips_from_strace(file_path,exe_path):
     try:
         # Check if the executable file exists
         if not os.path.exists(exe_path) or not os.path.isfile(exe_path):
             print(f"Executable file not found: {exe_path}")
             return []
 
+        # Get the absolute executable path
+        abs_exe_path = os.path.abspath(exe_path)
+
         # Run strace and monitor connect calls
-        strace_command = ["strace", "-e", "connect", "-o", "strace_output.log", "cat", exe_path]
-        strace_output = subprocess.check_output(strace_command)
+        strace_command = ["strace", "-e", "connect", "-f", "-o", "/path/to/strace_output.log", abs_exe_path]
+        subprocess.check_output(strace_command)
 
         # Read the strace output and extract IP addresses
         ips = set()
-        with open("strace_output.log", "r") as strace_file:
+        with open("/path/to/strace_output.log", "r") as strace_file:
             for line in strace_file:
                 if "connect(" in line:
                     parts = line.split()
@@ -1581,7 +1581,7 @@ def extract_ips_from_strace(exe_path):
                     if is_website_infected(ip):
                         print(f"Malicious IP Detected: {ip}")
                         # Perform action: Delete the file
-                        delete_file(exe_path)
+                        delete_file(abs_exe_path)
 
         return list(ips)  # Return the list of IP addresses
     except subprocess.CalledProcessError as e:
@@ -1667,11 +1667,19 @@ def continuously_monitor_file(file_path):
                 delete_file(file_path)
                 for ip_detected in ips_detected:
                     disconnect_ip(ip_detected)
-def scan_single_file(file_path):
+def scan_single_file(file_path, exe_path):
     try:
+        # Get the absolute file path
+        abs_file_path = os.path.abspath(file_path)
+
+        # Check if the file exists
+        if not os.path.exists(abs_file_path) or not os.path.isfile(abs_file_path):
+            print(f"File not found: {abs_file_path}")
+            return []
+
         # Scan the file using strace and monitor connect calls
-        with open("strace_output.log", "w") as strace_file:
-            subprocess.check_call(["strace", "-e", "connect", "-o", "strace_output.log", "cat", file_path])
+        strace_command = ["strace", "-e", "connect", "-f", "-o", "strace_output.log", exe_path, abs_file_path]
+        subprocess.check_call(strace_command)
 
         # Read the strace output and extract IP addresses
         ips = set()
@@ -1682,6 +1690,7 @@ def scan_single_file(file_path):
                     ip = parts[parts.index("->") + 1].split(":")[0]
                     ips.add(ip)
                     print(f"Detected IP Address: {ip}")
+
         return list(ips)  # Return the list of IP addresses
     except Exception as e:
         print(f"Error scanning file {file_path}: {e}")
@@ -1726,15 +1735,19 @@ def main():
                 executor.submit(real_time_web_protection)
                 executor.submit(access_firefox_history_continuous)
                 executor.submit(scan_running_files_with_custom_and_clamav_continuous)
-                executor.submit(monitoring_running_processes)
-        
+                executor.submit(monitoring_running_processes)        
         elif choice == "4":
-            file_path = input("Enter the path of the file to intuitively scan: ")
-            suspicious_file_path = file_path  # Set suspicious_file_path to file_path
-            exe_path = file_path  # Set exe_path to file_path
+            file_path = input("Enter the path of the file to intuitively scan: ").strip()            
+            # Check if the file exists before proceeding
+            if not os.path.exists(file_path):
+                print(f"File not found: {file_path}")
+                continue
+
+            suspicious_file_path = file_path
+            exe_path = file_path
 
             # Start functions in parallel
-            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
                 future4 = executor.submit(start_monitoring, suspicious_file_path, file_path)
                 future1 = executor.submit(access_firefox_history_continuous0, file_path)
                 future2 = executor.submit(scan_file_for_malicious_content, file_path)
@@ -1746,6 +1759,7 @@ def main():
 
                 # Wait for all functions to complete
                 concurrent.futures.wait([future1, future2, future3, future4, future5, future6, future7, future8])
+
                 # Get the results from the futures
                 result1 = future1.result()
                 result2 = future2.result()
@@ -1755,16 +1769,16 @@ def main():
                 result6 = future6.result()
                 result7 = future7.result()
                 result8 = future8.result()
+
                 # Print or handle results as needed
                 print("access_firefox_history_continuous0 result:", result1)
-                print("scan_file_for_malicious_content result:", result2)
+                print("scan_", result4)
+                print("check_mbr_ovfile_for_malicious_content result:", result2)
                 print("real_time_web_protection0 result:", result3)
-                print("start_monitoring result:", result4)
-                print("check_mbr_overwrite result:", result5)
+                print("start_monitoring result:erwrite result:", result5)
                 print("find_connected_ips result:", result6)
                 print("continuously_monitor_file result:", result7)
-                print("extract_ips_from_strace result:", result8)
-        
+                print("extract_ips_from_strace result:", result8)     
         elif choice == "5":
             folder_path = input("Enter the path of the folder to calculate hashes for: ")
             calculate_hashes_in_folder(folder_path)
@@ -1785,7 +1799,5 @@ def main():
         
         else:
             print("Invalid choice. Please select a valid option.")
-
-
 if __name__ == "__main__":
     main()
