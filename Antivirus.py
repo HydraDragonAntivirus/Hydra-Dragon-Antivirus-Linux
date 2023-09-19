@@ -235,7 +235,7 @@ def is_file_infected_sha256(sha256):
     database_path_fake_domain = "vxugfakedomain.db"
     database_path_sha256_hashes = "SHA256hashes.db"
     database_path_emotet_ioc = "IOC_Emotet.db"  # New database path
-    database_path_full_sha256 = "full_sha256.db"  # New database path
+    database_path_full_sha256 = "daily.db"  # New database path
     database_path_abusech = "abusech.db"  # New database path
     database_path_oldvirusbase = "oldvirusbase.db"  # New database path
      # Check in the virusign table
@@ -318,7 +318,7 @@ def is_file_infected_sha256(sha256):
     # Check in the full_sha256 database full_sha256 table
     connection_full_sha256 = sqlite3.connect(database_path_full_sha256)
 
-    full_sha256_command_text = "SELECT EXISTS(SELECT 1 FROM full_sha256 WHERE field1 = ? LIMIT 1) FROM full_sha256 WHERE field1 = ?;"
+    full_sha256_command_text = "SELECT EXISTS(SELECT 1 FROM malwarebazaarfuzzyhashes WHERE field2 = ? LIMIT 1) FROM malwarebazaarfuzzyhashes WHERE field2 = ?;"
     full_sha256_result = connection_full_sha256.execute(full_sha256_command_text, (sha256, sha256)).fetchone()
 
     connection_full_sha256.close()
