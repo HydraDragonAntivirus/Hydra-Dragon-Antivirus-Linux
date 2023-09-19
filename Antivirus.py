@@ -775,14 +775,15 @@ def open_webguard_page():
 
     # Open WebGuard.html with Firefox
     webbrowser.get('firefox').open('file://' + webguard_path)
-def find_firefox_profile(default_esr=False):
+def find_firefox_profile(home_dir=None, default_esr=False):
     try:
-        # Get the user's home directory        
-        home_dir = os.path.expanduser("~")
+        if home_dir is None:
+            # Get the user's home directory        
+            home_dir = os.path.expanduser("~")
 
         # Use glob to find Firefox profile folder
         profile_paths = glob.glob(os.path.join(home_dir, ".mozilla/firefox/*default"))
-        
+
         if default_esr:
             profile_paths = glob.glob(os.path.join(home_dir, ".mozilla/firefox/*default-esr"))
 
@@ -1553,7 +1554,15 @@ def check_mbr_overwrite(file_path, backup_dir):
         print("MBR has been restored.")     
         # Delete the file
         delete_file(file_path)
-def extract_ips_from_strace(file_path,exe_path):
+def delete_selected_files(files, selected_file):
+    try:
+        os.remove(selected_file)
+        print(f"{selected_file} has been deleted.")
+        files.remove(selected_file)
+    except Exception as e:
+        print(f"Error deleting {selected_file}: {e}")
+
+def extract_ips_from_strace(file_path, exe_path):
     try:
         # Check if the executable file exists
         if not os.path.exists(exe_path) or not os.path.isfile(exe_path):
@@ -1564,12 +1573,12 @@ def extract_ips_from_strace(file_path,exe_path):
         abs_exe_path = os.path.abspath(exe_path)
 
         # Run strace and monitor connect calls
-        strace_command = ["strace", "-e", "connect", "-f", "-o", "/path/to/strace_output.log", abs_exe_path]
+        strace_command = ["strace", "-e", "connect", "-f", "-o", file_path, abs_exe_path]
         subprocess.check_output(strace_command)
 
         # Read the strace output and extract IP addresses
         ips = set()
-        with open("/path/to/strace_output.log", "r") as strace_file:
+        with open(file_path, "r") as strace_file:
             for line in strace_file:
                 if "connect(" in line:
                     parts = line.split()
@@ -1589,70 +1598,31 @@ def extract_ips_from_strace(file_path,exe_path):
         print(f"Command: {e.cmd}")
         print(f"Output: {e.output}")
         return []
-def show_file_options(files):
-    print("Running Files:")
-    for i, file in enumerate(files):
-        print(f"{i + 1}. {file}")
-    print("q. Quit")
 
-    while True:
-        selection = input("Enter the number of the file you want to delete (q to quit): ").strip()
-        if selection.lower() == 'q':
-            return 'q'
-
-        if selection.isdigit():
-            selection = int(selection)
-            if 1 <= selection <= len(files):
-                return files[selection - 1]
-
-        print("Invalid selection. Please try again.")
-
-def delete_selected_files(files, selected_file):
-    try:
-        os.remove(selected_file)
-        print(f"{selected_file} has been deleted.")
-        files.remove(selected_file)
-    except Exception as e:
-        print(f"Error deleting {selected_file}: {e}")
 def monitoring_running_processes():
-    while True:
-        try:
-            temp_dir = tempfile.mkdtemp(prefix="running_file_scan_")
-            running_files = []
+    try:
+        temp_dir = tempfile.mkdtemp(prefix="running_file_scan_")
+        running_files = []
 
-            for pid in os.listdir("/proc"):
-                if pid.isdigit():
-                    pid_dir = os.path.join("/proc", pid)
-                    exe_link = os.path.join(pid_dir, "exe")
-
+        for root, dirs, files in os.walk("/proc"):
+            for filename in files:
+                if filename == "exe":
+                    exe_link = os.path.join(root, filename)
                     try:
                         exe_path = os.readlink(exe_link)
-                        if os.path.exists(exe_path) and os.path.isfile(exe_path):
-                            running_files.append(exe_path)
-                    except (OSError, FileNotFoundError):
+                        running_files.append(exe_path)
+                    except OSError:
                         pass
 
-            print("Scanning running files...")
-            with concurrent.futures.ThreadPoolExecutor() as executor:
-                ip_addresses = list(executor.map(extract_ips_from_strace, running_files))
+        # Print the list of running files
+        print("Running Files:")
+        for i, file in enumerate(running_files):
+            print(f"{i + 1}. {file}")
 
-            print("Custom scan finished.")
+        # Implement further actions as needed
 
-            # Print the results
-            print("Custom Scan Results:")
-            for i, result in enumerate(ip_addresses):
-                if result:
-                    print(f"IP Addresses Detected for {running_files[i]}: {', '.join(result)}")
-
-            # Show options to delete files
-            while True:
-                selected_file = show_file_options(running_files)
-                if selected_file == 'q':
-                    break
-                delete_selected_files(running_files, selected_file)
-
-        except Exception as e:
-            print(f"Error scanning running files: {e}")
+    except Exception as e:
+        print(f"Error in monitoring_running_processes: {e}")
 def continuously_monitor_file(file_path):
     while True:
         ips_detected = scan_single_file(file_path)
@@ -1728,9 +1698,10 @@ def main():
             if is_website_infected(website_url):
                 print("The website is infected.")
             else:
-                print("The website is clean.")
-        
+                print("The website is clean.")   
         elif choice == "3":
+            # Prompt the user to enter the home directory
+            home_dir = input("Enter the home directory and username for Firefox history scan (e.g., /home/yourusername If you haven't started it as sudo, leave it blank): ")
             with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
                 executor.submit(real_time_web_protection)
                 executor.submit(access_firefox_history_continuous)
