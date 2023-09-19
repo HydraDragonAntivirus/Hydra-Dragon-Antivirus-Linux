@@ -513,12 +513,20 @@ def scan_running_files_in_proc():
                             if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]+ bs=[0-9]+ count=1', content):                            
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
                             print("Infected file (Malicious Content MBR Overwriter): " + file_path)
-                            if re.search(r'rm\s+-rf', content):
+                            if re.search(r'rm\s+-rf /', content):
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
-                            print("Infected file (Malicious Content - rm -rf): " + file_path)
+                            print("Infected file (Malicious Content - rm -rf /): " + file_path)
+                            if re.search(r'chown /', content):
+                                malicious_results.append(delete_file(file_path))  # Remove the infected file
+                            print("Infected file (Malicious Content - chown /): " + file_path)
+                            if re.search(r'chmod -R ugo-rwx /', content):                                
+                                malicious_results.append(delete_file(file_path))  # Remove the infected file
+                            print("Infected file (Malicious Content - chmod -R ugo-rwx /): " + file_path)
+                            if re.search(r'chattr\s+-R\s+\+i\s+/', content):                                
+                                malicious_results.append(delete_file(file_path))  # Remove the infected file
+                            print("Infected file (Malicious Content -  chattr -R +i /): " + file_path)
                             if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
                                 malicious_results.append("Excluded IP/Host: " + file_path)
-
                             if is_website_infected0(content) or is_website_infected0("www." + format_url(content)) or is_website_infected0(format_url(content)):
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
                             print("Infected file (Malicious Website Or IP Content): " + file_path)
@@ -536,8 +544,6 @@ def scan_running_files_in_proc():
                             print("Infected file (Malicious Content - chmod 777 /): " + file_path)
                             if re.search(r'nc -l -p 4444 -e /bin/bash', content) or re.search(r'ncat -l -p 4444 -e /bin/bash', content):
                                 print("Infected file (Malicious Content - Reverse Shell): " + file_path)
-                                malicious_results.append(delete_file(file_path))  # Remove the infected file
-                            if re.search(r'dd if=/dev/zero', content):
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
                             if re.search(r'init 0', content):
                                 print("Infected file (Malicious Content - init 0): " + file_path)
@@ -1000,8 +1006,20 @@ def scan_file_for_malicious_content(file_path):
             content = file.read()
     except Exception as e:
         return "Error reading file " + file_path + ": " + str(e)
-    if re.search(r'rm\s+-rf', content):
-        print ("Infected file (Malicious Content rm -rf): " + file_path)
+    if re.search(r'rm\s+-rf /', content):
+        print ("Infected file (Malicious Content rm -rf /): " + file_path)
+        delete_file(file_path) # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
+    if re.search(r'chmod -R ugo-rwx /', content):
+        print ("Infected file (Malicious Content chmod -R ugo-rwx /): " + file_path)
+        delete_file(file_path) # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
+    if re.search(r'chattr\s+-R\s+\+i\s+/', content):
+        print ("Infected file (Malicious Content chattr -R +i /): " + file_path)
+        delete_file(file_path) # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
+    if re.search(r'chown /', content):
+        print ("Infected file (Malicious Content chown /): " + file_path)
         delete_file(file_path) # Remove the infected file
         return "Infected file according to malware content check: " + file_path
     if re.search(r'mkfs\.ext4', content):
@@ -1039,10 +1057,6 @@ def scan_file_for_malicious_content(file_path):
     if re.search(r'init 6', content):
         print("Infected file (Malicious Content - init 6): " + file_path)
         delete_file(file_path)  # Remove the infected file
-        return "Infected file according to malware content check: " + file_path
-    if re.search(r'dd if=/dev/zero', content):
-        print("Infected file (Malicious Content - dd if=/dev/zero): " + file_path)
-        delete_file(file_path)  # Remove the infected file 
         return "Infected file according to malware content check: " + file_path
     if re.search(r':\(\)\s*\{\s*:\s*\|\s*:\s*&\s*\};', content):
         print("Infected file (Malicious Content - Fork Bomb): " + file_path)
@@ -1136,9 +1150,21 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
             content = file.read()
     except Exception as e:
         return "Error reading file " + file_path + ": " + str(e)
-    if re.search(r'rm\s+-rf', content):
-        print("Infected file (Malicious Content rm -rf): " + file_path)
+    if re.search(r'rm\s+-rf /', content):
+        print("Infected file (Malicious Content rm -rf /): " + file_path)
         delete_file(file_path)  # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
+    if re.search(r'chmod -R ugo-rwx /', content):
+        print ("Infected file (Malicious Content chmod -R ugo-rwx /): " + file_path)
+        delete_file(file_path) # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
+    if re.search(r'chattr\s+-R\s+\+i\s+/', content):
+        print ("Infected file (Malicious Content chattr -R +i /): " + file_path)
+        delete_file(file_path) # Remove the infected file
+        return "Infected file according to malware content check: " + file_path
+    if re.search(r'chown /', content):
+        print ("Infected file (Malicious Content chown /): " + file_path)
+        delete_file(file_path) # Remove the infected file
         return "Infected file according to malware content check: " + file_path
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
         print("Excluded IP/Host: " + file_path)
@@ -1178,10 +1204,6 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
         delete_file(file_path)  # Remove the infected file
     if re.search(r'init 6', content):
         print("Infected file (Malicious Content - init 6): " + file_path)
-        delete_file(file_path)  # Remove the infected file
-        return "Infected file according to malware content check: " + file_path
-    if re.search(r'dd if=/dev/zero', content):
-        print("Infected file (Malicious Content - dd if=/dev/zero): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
     if re.search(r':\(\)\s*\{\s*:\s*\|\s*:\s*&\s*\};', content):
@@ -1239,121 +1261,128 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
     else:
         return "Clean file according to malware content check: " + file_path
 def scan_folder_with_malware_content_check(folder_path):
-    if os.path.exists(folder_path) and os.path.isdir(folder_path):
-        for root, _, files in os.walk(folder_path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                try:
+     if os.path.exists(folder_path) and os.path.isdir(folder_path):
+         for root, _, files in os.walk(folder_path):
+             for file in files:
+                 file_path = os.path.join(root, file)
+                 try:
                     with open(file_path, "r", encoding="utf-8") as file:
                         content = file.read()
-                except Exception as e:
-                    print("Error reading file", file_path, ":", e)
-                    continue
-
-                if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
-                    print("Excluded IP/Host:", file_path)
-                    continue
-                if re.search(r'mkfs\.ext4', content):
-                    print("Infected file (Malicious Content - mkfs.ext4): " + file_path)
-                    delete_file(file_path)  # Remove the infected file
-                    continue
-                if re.search(r'rm\s+-rf', content):
-                    print("Infected file (Malicious Content - rm -rf): " + file_path)
-                    delete_file(file_path)  # Remove the infected file
-                    continue
-                if re.search(r'shutdown', content):
+                 except Exception as e:
+                     print("Error reading file", file_path, ":", e)
+                     continue
+                 if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
+                     print("Excluded IP/Host:", file_path)
+                     continue
+                 if re.search(r'mkfs\.ext4', content):
+                     print("Infected file (Malicious Content - mkfs.ext4): " + file_path)
+                     delete_file(file_path)  # Remove the infected file
+                     continue
+                 if re.search(r'rm\s+-rf /', content):
+                     print("Infected file (Malicious Content - rm -rf /): " + file_path)
+                     delete_file(file_path)  # Remove the infected file
+                     continue
+                 if re.search(r'chmod -R ugo-rwx /', content):
+                     print ("Infected file (Malicious Content chmod -R ugo-rwx /): " + file_path)
+                     delete_file(file_path) # Remove the infected file
+                     continue
+                 if re.search(r'chattr\s+-R\s+\+i\s+/', content):
+                     print ("Infected file (Malicious Content chattr -R +i /): " + file_path)
+                     delete_file(file_path) # Remove the infected file
+                     continue
+                 if re.search(r'chown /', content):
+                     print ("Infected file (Malicious Content chown /): " + file_path)
+                     delete_file(file_path) # Remove the infected file
+                     continue
+                 if re.search(r'shutdown', content):
                     print("Infected file (Malicious Content - shutdown): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
-                if re.search(r'ufw\s+disable', content):
+                 if re.search(r'ufw\s+disable', content):
                     print("Infected file (Malicious Content ufw disable): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
-                if re.search(r'fdisk /dev/sd[a-z]', content):
+                 if re.search(r'fdisk /dev/sd[a-z]', content):
                     print("Infected file (Malicious Content Disk Overwriter): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
-                if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]+ bs=[0-9]+ count=1', content):                            
+                 if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]+ bs=[0-9]+ count=1', content):                            
                     print("Infected file (Malicious Content MBR Overwriter): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
-                if re.search(r'chmod 777 /', content):
+                 if re.search(r'chmod 777 /', content):
                     print("Infected file (Malicious Content - chmod 777 /): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
-                if re.search(r'init 0', content):
+                 if re.search(r'init 0', content):
                     print("Infected file (Malicious Content - init 0): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
-                if re.search(r'nc -l -p 4444 -e /bin/bash', content) or re.search(r'ncat -l -p 4444 -e /bin/bash', content):
+                 if re.search(r'nc -l -p 4444 -e /bin/bash', content) or re.search(r'ncat -l -p 4444 -e /bin/bash', content):
                      print("Infected file (Malicious Content - Reverse Shell): " + file_path)
                      delete_file(file_path)  # Remove the infected file
                      continue
-                if re.search(r'init 6', content):
+                 if re.search(r'init 6', content):
                     print("Infected file (Malicious Content - init 6): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
-                if re.search(r'dd if=/dev/zero', content):
-                    print("Infected file (Malicious Content - dd if=/dev/zero): " + file_path)
-                    delete_file(file_path)
-                    continue
-                if re.search(r':\(\)\s*\{\s*:\s*\|\s*:\s*&\s*\};', content):
+                 if re.search(r':\(\)\s*\{\s*:\s*\|\s*:\s*&\s*\};', content):
                     print("Infected file (Malicious Content - Fork Bomb): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
-                if re.search(r'wget\s+https://', content) and re.search(r'\s+-O\s+\w+\.\w+', content):
+                 if re.search(r'wget\s+https://', content) and re.search(r'\s+-O\s+\w+\.\w+', content):
                      print("Infected file (Malicious Content - wget with -O): " + file_path)
                      delete_file(file_path)  # Remove the infected file
                      continue
-                if re.search(r'mkfifo\s+/tmp/backpipe;\s+/bin/sh\s+0</tmp/backpipe\s+\|\s+nc\s+\d+\.\d+\.\d+\.\d+\s+\d+\s+1>/tmp/backpipe', content):
+                 if re.search(r'mkfifo\s+/tmp/backpipe;\s+/bin/sh\s+0</tmp/backpipe\s+\|\s+nc\s+\d+\.\d+\.\d+\.\d+\s+\d+\s+1>/tmp/backpipe', content):
                      print("Infected file (Malicious Content - FIFO Pipe and Netcat): " + file_path)
                      delete_file(file_path)  # Remove the infected file
                      continue
-                if re.search(r'\S+\s+/bin/sh\s+-i', content):
+                 if re.search(r'\S+\s+/bin/sh\s+-i', content):
                      print("Infected file (Malicious Content - Shell): " + file_path)
                      delete_file(file_path)
                      continue
-                if re.search(r'mkfifo\s+/tmp/fifo;\s+cat\s+/tmp/fifo\s+\|\s+/bin/sh\s+-i\s+2>&1\s+\|\s+nc\s+\d+\.\d+\.\d+\.\d+\s+\d+\s+>\s+/tmp/fifo', content):
+                 if re.search(r'mkfifo\s+/tmp/fifo;\s+cat\s+/tmp/fifo\s+\|\s+/bin/sh\s+-i\s+2>&1\s+\|\s+nc\s+\d+\.\d+\.\d+\.\d+\s+\d+\s+>\s+/tmp/fifo', content):
                      print("Infected file (Malicious Content - FIFO Pipe, Shell, and Netcat): " + file_path)
                      delete_file(file_path)  # Remove the infected file
                      continue
-                if re.search(r'openssl\s+enc\s+-aes-256-cbc', content):
+                 if re.search(r'openssl\s+enc\s+-aes-256-cbc', content):
                      print("Infected file (Malicious (Ransomware) Content - openssl enc): " + file_path)
                      delete_file(file_path)  # Remove the infected file
                      continue
-                if re.search(r'cat\s+>\s+/dev/sda', content):
+                 if re.search(r'cat\s+>\s+/dev/sda', content):
                      print("Infected file (Malicious Content - cat > /dev/sda): " + file_path)
                      delete_file(file_path)  # Remove the infected file
                      continue
-                if re.search(r'mv\s+/bin/bash\s+/bin/bash\.bak', content):
+                 if re.search(r'mv\s+/bin/bash\s+/bin/bash\.bak', content):
                      print("Infected file (Malicious Content - Disable Bash): " + file_path)
                      delete_file(file_path)  # Remove the infected file
                      continue
-                if re.search(r'find\s+/\s+-name\s+"*.log"', content):
+                 if re.search(r'find\s+/\s+-name\s+"*.log"', content):
                      print("Infected file (Malicious Content - Find log files): " + file_path)
                      delete_file(file_path)
                      continue
-                if re.search(r'-exec\s+rm\s+-f\s+{}\s+;', content):
+                 if re.search(r'-exec\s+rm\s+-f\s+{}\s+;', content):
                     print("Infected file (Malicious Content - Remove log files): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
-                if re.search(r'rm\s+-f\s+/lib/libc\.so\.6', content):
+                 if re.search(r'rm\s+-f\s+/lib/libc\.so\.6', content):
                     print("Infected file (Malicious Content - Remove libc.so.6): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
-                if re.search(r'mkfifo\s+/\w+/\w+;\s+\S+\s+/\w+/\w+\s+\|\s+\S+\s+\d+\.\d+\.\d+\.\d+\s+\d+', content):
+                 if re.search(r'mkfifo\s+/\w+/\w+;\s+\S+\s+/\w+/\w+\s+\|\s+\S+\s+\d+\.\d+\.\d+\.\d+\s+\d+', content):
                     print("Infected file (Malicious Content - FIFO): " + file_path)
                     delete_file(file_path)
                     continue
-                if re.search(r'\S+\s+\|\s+\S+', content):
+                 if re.search(r'\S+\s+\|\s+\S+', content):
                    print("Infected file (Malicious Content - Pipe): " + file_path)
                    delete_file(file_path)
                    continue
-                if is_website_infected0(content) or is_website_infected0("www."+format_url(content) or (format_url(content))):
+                 if is_website_infected0(content) or is_website_infected0("www."+format_url(content) or (format_url(content))):
                    print("Infected file (Malicious Website Content):", file_path)
                    delete_file(file_path)
                    continue
-                print("Clean file according to malware content check:", file_path)
+                 print("Clean file according to malware content check:", file_path)
 def real_time_web_protection0(file_path):
     infected_ips = []
     while True:
