@@ -32,8 +32,8 @@ sudo python Antivirus.py
 ## Others
 virusdomainslistsuperbig is same as ultimatehostblacklist.
 ## Current Statics
-I have **65141779+** normal virus hashes **647131+** virus or illegal websites IP address list  **2.5 million** virus or safe website. Total fuzzy hashes
-**4856017**
+I have **65167844+** normal virus hashes **1618883+** virus or illegal websites and IP address list  **2.5 million** virus or safe website. Total fuzzy hashes
+**4882073**+
 ## Detection Rate
 ClamAV 60% Hydra Dragon Antivirus 65%
 ## Collected Datas
