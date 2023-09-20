@@ -43,6 +43,7 @@ No data collected
 ### Tested On Cachy OS And If You Looking For Debian Tested On Kali Linux And It Worked
 - sudo pacman -Sy
 - sudo pacman -S python
+- sudo pacman -S python-appdirs
 - sudo pacman -S python-tlsh
 - sudo pacman -S strace
 - sudo pacman -S python-pyinotify
