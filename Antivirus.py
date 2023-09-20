@@ -14,6 +14,7 @@ import pyinotify
 import curses
 import tlsh 
 import ssdeep
+import appdirs
 
 def calculate_tlsh(file_path):
     with open(file_path, "rb") as file:
@@ -1420,10 +1421,17 @@ def calculate_hashes_in_folder(folder_path):
     else:
         print("Invalid folder path.")
 # Get the current username
-current_username = os.getlogin()
+current_username = getpass.getuser()
 
+# Function to filter out hidden directories
+def is_hidden(directory):
+    return not directory.startswith('.')
+
+# Get directories in /home/{current_username}, excluding hidden directories
 directories_to_monitor = [
-    f"/home/{current_username}"
+    f"/home/{current_username}/{d}" 
+    for d in os.listdir(f"/home/{current_username}") 
+    if os.path.isdir(f"/home/{current_username}/{d}") and is_hidden(d)
 ]
 class FileChangeHandler(pyinotify.ProcessEvent):
     def __init__(self, suspicious_file_path):
