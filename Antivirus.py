@@ -666,7 +666,7 @@ def scan_running_files_with_clamav():
         # Clean up temporary directory
         shutil.rmtree(temp_dir, ignore_errors=True)
 def is_website_infected(url):
-    databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
+    databases = ['viruswebsites.db', 'viruswebsite.db','virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
     formatted_url = format_url(url)  # Format the URL
     ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
     zero_url = "0.0.0.0" # URL with 0.0.0.0 prefixed
