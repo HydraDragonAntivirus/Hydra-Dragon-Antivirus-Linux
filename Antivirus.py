@@ -15,6 +15,7 @@ import curses
 import tlsh 
 import ssdeep
 import appdirs
+import getpass 
 
 def calculate_tlsh(file_path):
     with open(file_path, "rb") as file:
