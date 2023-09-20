@@ -1428,11 +1428,14 @@ current_username = getpass.getuser()
 def is_hidden(directory):
     return not directory.startswith('.')
 
-# Get directories in /home/{current_username}, excluding hidden directories
+# Get the user's home directory
+home_directory = os.path.expanduser(f"~{current_username}")
+
+# Get directories in the user's home directory, excluding hidden directories
 directories_to_monitor = [
-    f"/home/{current_username}/{d}" 
-    for d in os.listdir(f"/home/{current_username}") 
-    if os.path.isdir(f"/home/{current_username}/{d}") and is_hidden(d)
+    os.path.join(home_directory, d)
+    for d in os.listdir(home_directory)
+    if os.path.isdir(os.path.join(home_directory, d)) and is_hidden(d)
 ]
 class FileChangeHandler(pyinotify.ProcessEvent):
     def __init__(self, suspicious_file_path):
