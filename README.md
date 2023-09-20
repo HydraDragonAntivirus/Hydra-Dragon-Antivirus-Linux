@@ -5,7 +5,7 @@
 </p>
 
 ## Notice
--You need use Firefox as your browser
+You need use Firefox as your browser
 ## Feautres
 
 - Real-time protection
