@@ -31,8 +31,6 @@ Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-n
 Public Domain License ![image](https://github.com/HydraDragonAntivirus/Hydra-Dragon-Antivirus-Linux/assets/142328963/c2679d99-7255-404b-aa5a-0e123d793645)
 ## How To Give Root Access To Program
 sudo python Antivirus.py
-## Others
-virusdomainslistsuperbig is same as ultimatehostblacklist.
 ## Current Statics
 I have **65167844+** normal virus hashes **1618883+** virus or illegal websites and IP address list  **2.5 million** virus or safe website. Total fuzzy hashes
 **4882073**+
