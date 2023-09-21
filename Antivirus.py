@@ -489,7 +489,7 @@ def scan_running_files_with_custom_method():
             print(f"Error scanning running files: {e}")
 def scan_and_check_file(file_path, temp_dir):
     try:
-    file_size = os.path.getsize(file_path)
+        file_size = os.path.getsize(file_path)
         
         # Skip empty files
         if file_size == 0:
@@ -499,7 +499,7 @@ def scan_and_check_file(file_path, temp_dir):
         sha256 = calculate_sha256(file_path)
         ssdeep = calculate_ssdeep(file_path)
         tlsh = calculate_tlsh(file_path)
-        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256) or is_file_infected_ssdeep(ssdeep) is_file_infected_tlsh(tlsh):
+        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256) or is_file_infected_ssdeep(ssdeep) or is_file_infected_tlsh(tlsh):
             print(f"Infected file detected: {file_path}")
             print(delete_file(file_path))  # Automatically delete infected file 
         else:
@@ -547,6 +547,9 @@ def scan_running_files_in_proc():
                             if is_website_infected0(content) or is_website_infected0("www." + format_url(content)) or is_website_infected0(format_url(content)):
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
                             print("Infected file (Malicious Website Or IP Content): " + file_path)
+                            if is_phishing_website0(content) or is_phishing_website0("www." + format_url(content)) or is_phishing_website0(format_url(content)):
+                                malicious_results.append(delete_file(file_path))  # Remove the infected file
+                            print("Phishing file (Phishing Website Or IP Content): " + file_path)
                             if re.search(r'mkfs\.ext4', content):
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
                             print("Infected file (Malicious Content - mkfs.ext4): " + file_path)
@@ -682,6 +685,55 @@ def scan_running_files_with_clamav():
     finally:
         # Clean up temporary directory
         shutil.rmtree(temp_dir, ignore_errors=True)
+
+def is_phishing_website(url):
+    # Format the URL
+    formatted_url = format_url(url)
+    ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0
+    zero_url = "0.0.0.0"  # URL with 0.0.0.0 prefix
+
+    # Database and table information
+    db_path = 'viruswebsites.db'
+    table_name = 'allphishingdomainsandlinks'
+    field_name = 'field1'  # Assuming 'field1' is the field containing the URLs
+    is_phishing_field = 'is_phishing_website'  # Assuming 'is_phishing_website' is the field indicating phishing
+
+    # SQL queries to check if the URL is a phishing website
+    queries = [
+        f"SELECT * FROM {table_name} WHERE {field_name} = ? AND {is_phishing_field} = 1",
+        f"SELECT * FROM {table_name} WHERE {field_name} = ?",
+    ]
+
+    for query in queries:
+        try:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            result = cursor.execute(query, (formatted_url,)).fetchone()
+
+            if result:
+                cursor.close()
+                conn.close()
+                return True
+
+            result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
+            if result_ip:
+                cursor.close()
+                conn.close()
+                return True
+
+            result_zero = cursor.execute(query, (zero_url,)).fetchone()
+            if result_zero:
+                cursor.close()
+                conn.close()
+                return True
+
+        except sqlite3.OperationalError:
+            pass  # Table is not found, ignore it.
+        finally:
+            cursor.close()
+            conn.close()
+
+    return False
 def is_website_infected(url):
     databases = ['viruswebsites.db', 'viruswebsite.db','virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
     formatted_url = format_url(url)  # Format the URL
@@ -778,6 +830,11 @@ def real_time_web_protection():
                 infected_ips.append(ip)
                 disconnect_ip(ip)
                 open_webguard_page()
+            elif is_phishing_website(ip):
+                print(f"The IP address {ip} is phishing.")
+                infected_ips.append(ip)
+                disconnect_ip(ip)
+                open_phishing_alert_page()
             else:
                 print(f"The IP address {ip} is clean.")
         return infected_ips
@@ -794,6 +851,15 @@ def open_webguard_page():
 
     # WebGuard.html path
     webguard_path = os.path.join(current_directory, 'WebGuard.html')
+
+    # Open WebGuard.html with Firefox
+    webbrowser.get('firefox').open('file://' + webguard_path)
+def open_phishing_alert_page():
+    # Path to current directory
+    current_directory = os.getcwd()
+
+    # WebGuard.html path
+    webguard_path = os.path.join(current_directory, 'phishing.html')
 
     # Open WebGuard.html with Firefox
     webbrowser.get('firefox').open('file://' + webguard_path)
@@ -831,6 +897,54 @@ def run_clamonacc_with_remove():
         print("clamonacc successfully executed with --remove argument.")
     except subprocess.CalledProcessError as e:
         print("Error executing clamonacc:", e)
+def is_phishing_website0(content):
+    # Format the URL
+    formatted_url = format_url(url)
+    ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0
+    zero_url = "0.0.0.0"  # URL with 0.0.0.0 prefix
+
+    # Database and table information
+    db_path = 'viruswebsites.db'
+    table_name = 'allphishingdomainsandlinks'
+    field_name = 'field1'  # Assuming 'field1' is the field containing the URLs
+    is_phishing_field = 'is_phishing_website'  # Assuming 'is_phishing_website' is the field indicating phishing
+
+    # SQL queries to check if the URL is a phishing website
+    queries = [
+        f"SELECT * FROM {table_name} WHERE {field_name} = ? AND {is_phishing_field} = 1",
+        f"SELECT * FROM {table_name} WHERE {field_name} = ?",
+    ]
+
+    for query in queries:
+        try:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            result = cursor.execute(query, (formatted_url,)).fetchone()
+
+            if result:
+                cursor.close()
+                conn.close()
+                return True
+
+            result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
+            if result_ip:
+                cursor.close()
+                conn.close()
+                return True
+
+            result_zero = cursor.execute(query, (zero_url,)).fetchone()
+            if result_zero:
+                cursor.close()
+                conn.close()
+                return True
+
+        except sqlite3.OperationalError:
+            pass  # Table is not found, ignore it.
+        finally:
+            cursor.close()
+            conn.close()
+
+    return False
 def is_website_infected0(content):
     databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
     formatted_url = format_url(content)  # Format URL
@@ -919,17 +1033,23 @@ def access_firefox_history_continuous():
             # Connect with the copied database
             connection = sqlite3.connect(copied_db_path)
             cursor = connection.cursor()
-
-            # Get visited sites with query
+ # Get visited sites with query
             query = "SELECT title, url FROM moz_places ORDER BY id DESC LIMIT 5;"
             cursor.execute(query)
             results = cursor.fetchall()
 
-           # Scan visited websites and show results
+            # Scan visited websites and show results
             for row in results:
                 title, url = row
                 print(f"Scanning URL: {url}")
-                if is_website_infected(url):
+
+                # Check if the URL is infected
+                is_infected = is_website_infected(url)
+
+                # Check if the URL is a phishing website
+                is_phishing = is_phishing_website(url)
+
+                if is_infected:
                     ip_address = extract_ip_from_url(url)
                     if ip_address:
                         print(f"The website is infected: {url}")
@@ -938,6 +1058,13 @@ def access_firefox_history_continuous():
                         if last_visited_websites:
                             last_visited_websites.pop()  # Remove the last visited website
                             open_webguard_page()  # Open the webguard.html file
+                elif is_phishing:
+                    print(f"The website is phishing: {url}")
+                    print(f"Phishing IP address: {ip_address}")
+                    disconnect_ip(ip_address)  # Disconnect the phishing IP address
+                    if last_visited_websites:
+                        last_visited_websites.pop()  # Remove the last visited website
+                        open_phishing_alert_page()  # Open the phishing.html file
                 else:
                     print(f"The website is clean: {url}")
 
@@ -1129,9 +1256,13 @@ def scan_file_for_malicious_content(file_path):
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
         print( "Excluded IP/Host: " + file_path)
     if is_website_infected0(content) or is_website_infected0("www."+format_url(content) or (format_url(content))):
-        print("Infected file (Malicious Website Content): " + file_path)
+        print("Infected file (Malicious Website Or IP Content): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
+    if is_phishing_website0(content) or is_phishing_website0("www." + format_url(content)) or is_phishing_website0(format_url(content)):
+        print("Phishing file (Phishing Website Or IP Content): " + file_path)
+        delete_file(file_path)  # Remove the infected file
+        return "Phishing file according to malware content check: " + file_path
     else:
         print("Clean file according to malicious content check:" + file_path )
     sandbox_command = f"firejail --noprofile python {file_path}"
@@ -1149,6 +1280,9 @@ def scan_file_for_malicious_content(file_path):
             if is_website_infected(response.content):
                 print("Infected website found in sandbox output")
                 delete_file(file_path)
+            elif is_phishing_website(response.content):
+                print("Phishing website found in sandbox output")
+                delete_file(file_path)  
         ip_addresses = re.findall(r'\b(?:\d{1,3}\.){3}\d{1,3}\b', sandbox_output)
         for ip in ip_addresses:
             try:
@@ -1186,6 +1320,10 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
         print("Excluded IP/Host: " + file_path)
     if is_website_infected(content) or is_website_infected("www." + format_url(content)) or is_website_infected(format_url(content)):
         print("Infected file (Malicious Website Content): " + file_path)
+        delete_file(file_path)  # Remove the infected file
+        return"Infected file according to malware content check: " + file_path
+    if is_phishing_website(content) or is_phishing_website("www." + format_url(content)) or is_phishing_website(format_url(content)):
+        print("Phishing file (Phishing Website Content): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return"Infected file according to malware content check: " + file_path
     if re.search(r'mkfs\.ext4', content):
@@ -1394,6 +1532,10 @@ def scan_folder_with_malware_content_check(folder_path):
                    print("Infected file (Malicious Content - Pipe): " + file_path)
                    delete_file(file_path)
                    continue
+                 if is_phishing_website0(content) or is_phishing_website0("www." + format_url(content)) or is_phishing_website0(format_url(content)):
+                   print("Phishing file (Phishing Website Content): " + file_path)
+                   delete_file(file_path)  # Remove the infected file
+                   continue
                  if is_website_infected0(content) or is_website_infected0("www."+format_url(content) or (format_url(content))):
                    print("Infected file (Malicious Website Content):", file_path)
                    delete_file(file_path)
@@ -1410,6 +1552,12 @@ def real_time_web_protection0(file_path):
                 infected_ips.append(ip)
                 disconnect_ip(ip)
                 open_webguard_page()
+                delete_file(file_path)
+            elif is_phishing_website(ip):
+                print(f"The IP address {ip} is phishing.")
+                infected_ips.append(ip)
+                disconnect_ip(ip)
+                open_phishing_alert_page()
                 delete_file(file_path)
             else:
                 print(f"The IP address {ip} is clean.")
@@ -1646,7 +1794,11 @@ def extract_ips_from_strace(file_path, exe_path):
                         print(f"Malicious IP Detected: {ip}")
                         # Perform action: Delete the file
                         delete_file(abs_exe_path)
-
+                    # Check if the IP is phishing
+                    elif is_phshing_website(ip):
+                        print(f"Phishing IP Detected: {ip}")
+                        # Perform action: Delete the file
+                        delete_file(abs_exe_path)  
         return list(ips)  # Return the list of IP addresses
     except subprocess.CalledProcessError as e:
         print("Error: subprocess call returned a non-zero exit status")
@@ -1680,18 +1832,29 @@ def monitoring_running_processes():
         print(f"Error in monitoring_running_processes: {e}")
 def continuously_monitor_file(file_path):
     while True:
+        # Scan the file for IP addresses
         ips_detected = scan_single_file(file_path)
         if ips_detected:
+            print("Detected IP Addresses:")
             for ip_detected in ips_detected:
-                print("Detected IP Addresses:")
-                print(ip_detected)        
-            # Check the content
-            content = open(file_path).read()
-            if is_website_infected0(content):
-                # If Infected take the actions
-                delete_file(file_path)
-                for ip_detected in ips_detected:
-                    disconnect_ip(ip_detected)
+                print(ip_detected)
+
+        # Check the content
+        content = open(file_path).read()
+        if is_website_infected0(content):
+            # If infected, take actions for malicious content
+            delete_file(file_path)
+            for ip_detected in ips_detected:
+                disconnect_ip(ip_detected)
+                open_webguard_page() # Open the WebGuard.html file
+        elif is_phishing_website0(content):
+            # If phishing, take actions for phishing content
+            delete_file(file_path)
+            for ip_detected in ips_detected:
+                disconnect_ip(ip_detected)
+                open_phishing_alert_page()  # Open the phishing.html file
+        else:
+            print("The file is clean.")
 def scan_single_file(file_path, exe_path):
     try:
         # Get the absolute file path
@@ -1752,6 +1915,8 @@ def main():
             website_url = input("Enter the website URL to check: ")
             if is_website_infected(website_url):
                 print("The website is infected.")
+            elif is_phishing_website(website_url):
+                print("The website is phishing.")
             else:
                 print("The website is clean.")   
         elif choice == "3":
