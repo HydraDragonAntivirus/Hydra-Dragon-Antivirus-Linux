@@ -32,11 +32,6 @@ def calculate_ssdeep(file_path):
     except ImportError:
         print("The 'ssdeep' module is not installed. Please install it to calculate ssdeep hashes.")
         return None
-
-def calculate_tlsf(file_path):
-    tlsh_value = calculate_tlsh(file_path)
-    return tlsh_value.encode("hex").upper()
-
 def find_similar_hashes(file_path, similarity_threshold=0.1):
     ssdeep_value = calculate_ssdeep(file_path)
 
@@ -55,14 +50,14 @@ def find_similar_hashes(file_path, similarity_threshold=0.1):
             if ssdeep_similarity >= similarity_threshold:
                 return True
 
-        # Check in the malwarebazaarfuzzyhashes table for similar TLSF hashes
-        tlsf_value = calculate_tlsf(file_path)
+        # Check in the malwarebazaarfuzzyhashes table for similar TLSH hashes
+        tlsh_value = calculate_tlsh(file_path)
         malwarebazaar_cursor = daily_connection.cursor()
         malwarebazaar_cursor.execute("SELECT field14 FROM malwarebazaarfuzzyhashes;")
 
         for record in malwarebazaar_cursor.fetchall():
-            db_tlsf = record[0]
-            if db_tlsf == tlsf_value:
+            db_tlsh = record[0]
+            if db_tlsh == tlsh_value:
                 return True
 
         # Check in the malshare table for similar ssdeep hashes
