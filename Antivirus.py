@@ -16,13 +16,11 @@ import tlsh
 import ssdeep
 import appdirs
 import getpass 
-
 def calculate_tlsh(file_path):
     with open(file_path, "rb") as file:
         file_data = file.read()
         tlsh_value = tlsh.hash(file_data)
     return tlsh_value
-
 def calculate_ssdeep(file_path):
     try:
         with open(file_path, "rb") as file:
@@ -32,66 +30,80 @@ def calculate_ssdeep(file_path):
     except ImportError:
         print("The 'ssdeep' module is not installed. Please install it to calculate ssdeep hashes.")
         return None
-def find_similar_hashes(file_path, similarity_threshold=0.1):
+def is_file_infected_ssdeep(file_path, similarity_threshold=0.8):
+    # Calculate SSDeep for the input file
     ssdeep_value = calculate_ssdeep(file_path)
 
+    # Connect to the daily and oldvirusbase databases
     daily_connection = sqlite3.connect("daily.db")
     oldvirusbase_connection = sqlite3.connect("oldvirusbase.db")
 
     try:
-        # Check in the dailyfuzzyhashes table for similar ssdeep hashes
+        # Create cursors to execute SQL queries
         daily_cursor = daily_connection.cursor()
-        daily_cursor.execute("SELECT field4 FROM dailyfuzzyhashes;")
+        oldvirusbase_cursor = oldvirusbase_connection.cursor()
 
+        # Retrieve SSDeep hashes from dailyfuzzyhashes table
+        daily_cursor.execute("SELECT field4 FROM dailyfuzzyhashes;")
         for record in daily_cursor.fetchall():
             db_ssdeep = record[0]
-            ssdeep_similarity = ssdeep.compare(ssdeep_value, db_ssdeep)
 
-            if ssdeep_similarity >= similarity_threshold:
+            # Compare SSDeep hashes and check for similarity based on the provided threshold
+            if ssdeep_value == db_ssdeep or ssdeep.compare(ssdeep_value, db_ssdeep) >= similarity_threshold:
                 return True
 
-        # Check in the malwarebazaarfuzzyhashes table for similar TLSH hashes
-        tlsh_value = calculate_tlsh(file_path)
-        malwarebazaar_cursor = daily_connection.cursor()
-        malwarebazaar_cursor.execute("SELECT field14 FROM malwarebazaarfuzzyhashes;")
+        # Retrieve SSDeep hashes from virusignfull table
+        oldvirusbase_cursor.execute("SELECT field1 FROM virusignfull;")
+        for record in oldvirusbase_cursor.fetchall():
+            db_ssdeep = record[0]
 
-        for record in malwarebazaar_cursor.fetchall():
+            # Compare SSDeep hashes and check for similarity based on the provided threshold
+            if ssdeep_value == db_ssdeep or ssdeep.compare(ssdeep_value, db_ssdeep) >= similarity_threshold:
+                return True
+
+        # Retrieve SSDeep hashes from virusign table
+        oldvirusbase_cursor.execute("SELECT field1 FROM virusign;")
+        for record in oldvirusbase_cursor.fetchall():
+            db_ssdeep = record[0]
+
+            # Compare SSDeep hashes and check for similarity based on the provided threshold
+            if ssdeep_value == db_ssdeep or ssdeep.compare(ssdeep_value, db_ssdeep) >= similarity_threshold:
+                return True
+
+    except Exception as e:
+        print("Error:", str(e))
+    finally:
+        # Close the cursors and the database connections
+        daily_cursor.close()
+        oldvirusbase_cursor.close()
+        daily_connection.close()
+        oldvirusbase_connection.close()
+
+    return False
+def is_file_infected_tlsh(tlsh_value, similarity_threshold=0.8):
+    # Connect to the daily database
+    daily_connection = sqlite3.connect("daily.db")
+    try:
+        # Create a cursor to execute SQL queries
+        daily_cursor = daily_connection.cursor()
+
+        # Retrieve TLSH hashes from the malwarebazaarfuzzyhashes table
+        daily_cursor.execute("SELECT field14 FROM malwarebazaarfuzzyhashes;")
+
+        # Compare the TLSH hashes and check for similarity
+        for record in daily_cursor.fetchall():
             db_tlsh = record[0]
+
+            # Compare TLSH hashes and check for similarity based on the provided threshold
             if db_tlsh == tlsh_value:
                 return True
 
-        # Check in the malshare table for similar ssdeep hashes
-        malshare_cursor = daily_connection.cursor()
-        malshare_cursor.execute("SELECT field4 FROM malshare;")
-
-        for record in malshare_cursor.fetchall():
-            db_ssdeep = record[0]
-            ssdeep_similarity = ssdeep.compare(ssdeep_value, db_ssdeep)
-
-            if ssdeep_similarity >= similarity_threshold:
-                return True
-
-        # Check in the virusignfull table for similar ssdeep hashes
-        oldvirusbase_cursor = oldvirusbase_connection.cursor()
-        oldvirusbase_cursor.execute("SELECT field1 FROM virusignfull;")
-
-        for record in oldvirusbase_cursor.fetchall():
-            db_ssdeep = record[0]
-            ssdeep_similarity = ssdeep.compare(ssdeep_value, db_ssdeep)
-
-            if ssdeep_similarity >= similarity_threshold:
-                return True
     except Exception as e:
-        # Log the error for debugging or handle it appropriately
         print("Error:", str(e))
     finally:
-        # Close the database connections and cursors
-        daily_connection.close()
-        oldvirusbase_connection.close()
+        # Close the cursor and the database connection
         daily_cursor.close()
-        malwarebazaar_cursor.close()
-        malshare_cursor.close()
-        oldvirusbase_cursor.close()
+        daily_connection.close()
 
     return False
 def is_file_infected_md5(md5):
@@ -414,8 +426,10 @@ def scan_file(file_path):
         md5 = calculate_md5(file_path)
         sha1 = calculate_sha1(file_path)
         sha256 = calculate_sha256(file_path)
+        ssdeep = calculate_ssdeep(file_path)
+        tlsh = calculate_tlsh(file_path)
         # Check if the file is infected using hash-based methods
-        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256) or find_similar_hashes(file_path):
+        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256) or is_file_infected_ssdeep(ssdeep) or is_file_infected_tlsh(tlsh):
             print(f"Infected file detected: {file_path}\nMD5 Hash: {md5}")
             print(delete_file(file_path))  # Automatically delete infected file
         else:
@@ -475,10 +489,17 @@ def scan_running_files_with_custom_method():
             print(f"Error scanning running files: {e}")
 def scan_and_check_file(file_path, temp_dir):
     try:
+    file_size = os.path.getsize(file_path)
+        
+        # Skip empty files
+        if file_size == 0:
+            return f"Clean file: {file_path}"
         md5 = calculate_md5(file_path)
         sha1 = calculate_sha1(file_path)
         sha256 = calculate_sha256(file_path)
-        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256) or  find_similar_hashes(file_path):
+        ssdeep = calculate_ssdeep(file_path)
+        tlsh = calculate_tlsh(file_path)
+        if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256) or is_file_infected_ssdeep(ssdeep) is_file_infected_tlsh(tlsh):
             print(f"Infected file detected: {file_path}")
             print(delete_file(file_path))  # Automatically delete infected file 
         else:
@@ -487,7 +508,6 @@ def scan_and_check_file(file_path, temp_dir):
         shutil.copy2(file_path, temp_dir)
     except Exception as e:
         print(f"Error scanning file {file_path}: {e}")
-
 def scan_running_files_in_proc():
  while True:
     try:
@@ -683,7 +703,6 @@ def is_website_infected(url):
             "SELECT * FROM inactive WHERE field1 = ?",
             "SELECT * FROM malwarebazaar WHERE field1 = ?",
             "SELECT * FROM ultimatehostblacklist WHERE field2 = ?",
-            "SELECT * FROM continue WHERE field1 = ?",
             "SELECT * FROM virusip WHERE field1 = ?"
             "SELECT * FROM mcafee WHERE field1 = ?",
             "SELECT * FROM full_urls WHERE field3 = ?",
