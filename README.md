@@ -17,9 +17,8 @@ You need use Firefox as your browser
 ## Download
 
 Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA)
-
+- Phising Database: https://github.com/mitchellkrogza/Phishing.Database
 ### Read before using
-
 - Don't forget give permission access.
 - It really disconnect infected ip address and it deletes file so be careful!
 - Don't forget to use clamonacc
