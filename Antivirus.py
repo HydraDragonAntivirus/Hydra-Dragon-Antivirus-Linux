@@ -527,9 +527,9 @@ def scan_running_files_in_proc():
                             if re.search(r'fdisk /dev/sd[a-z]', content):
                              malicious_results.append(delete_file(file_path))  # Remove the infected file
                             print("Infected file (Malicious Content Disk Overwriter): " + file_path)
-                            if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]+ bs=[0-9]+ count=1', content):                            
+                            if re.search(r'dd if=/dev/zero of=/dev/sd[a-z], content):                            
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
-                            print("Infected file (Malicious Content MBR Overwriter): " + file_path)
+                            print("Infected file (Malicious Content dd Disk Overwriter): " + file_path)
                             if re.search(r'rm\s+-rf /', content):
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
                             print("Infected file (Malicious Content - rm -rf /): " + file_path)
@@ -1177,8 +1177,8 @@ def scan_file_for_malicious_content(file_path):
         print("Infected file (Malicious Content Disk Overwriter): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
-    if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]+ bs=[0-9]+ count=1', content):                            
-         print("Infected file (Malicious Content MBR Overwriter): " + file_path)
+    if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]', content):                            
+         print("Infected file (Malicious Content dd Disk Overwriter): " + file_path)
          delete_file(file_path)  # Remove the infected file
          return "Infected file according to malware content check: " + file_path
     if re.search(r'ufw\s+disable', content):
@@ -1334,8 +1334,8 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
         print("Infected file (Malicious Content Disk Overwriter): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
-    if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]+ bs=[0-9]+ count=1', content):                            
-         print("Infected file (Malicious Content MBR Overwriter): " + file_path)
+    if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]', content):                            
+         print("Infected file (Malicious Content dd Disk Overwriter): " + file_path)
          delete_file(file_path)  # Remove the infected file
     if re.search(r'ufw\s+disable', content):
         print("Infected file (Malicious Content ufw disable): " + file_path)
@@ -1460,8 +1460,8 @@ def scan_folder_with_malware_content_check(folder_path):
                     print("Infected file (Malicious Content Disk Overwriter): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
-                 if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]+ bs=[0-9]+ count=1', content):                            
-                    print("Infected file (Malicious Content MBR Overwriter): " + file_path)
+                 if re.search(r'dd if=/dev/zero of=/dev/sd[a-z ]', content):                            
+                    print("Infected file (Malicious Content dd Disk Overwriter): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
                  if re.search(r'chmod 777 /', content):
