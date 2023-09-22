@@ -32,8 +32,8 @@ Public Domain License ![image](https://github.com/HydraDragonAntivirus/Hydra-Dra
 ## How To Give Root Access To Program
 sudo python Antivirus.py
 ## Current Statics
-I have **65167844+** normal virus hashes except secureinfo.com and other unoffical clamav database signatures **1618883+** virus or illegal websites and IP address list  **2.5 million** virus or safe website. Total fuzzy hashes
-**4882073**+ Phisihng **1042529** and **4.000.00+** secureinfo.com signatures. **50.000** other unoffical free clamav database signatures
+I have **65173574+** normal virus hashes **1584777+** virus or illegal websites and IP address list  **2.5 million** virus or safe website. Total fuzzy hashes
+**4882073+** Phishing **1043221** and **4.000.00+** secureinfo.com signatures. **50.000** other unoffical free clamav database signatures
 ## Detection Rate
 ClamAV 60% Hydra Dragon Antivirus 65%
 ## Collected Datas
