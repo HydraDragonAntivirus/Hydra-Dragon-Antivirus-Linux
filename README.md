@@ -93,4 +93,8 @@ Then Ctrl+S then Ctrl+X then sudo freshclam
 - You can also start without root by typing python Antivirus.py
 - If you have a problem create issue topic or try reboot
 ## How To Update Databases Manually?
-https://www.youtube.com/@hydradragonantivirus Watch my videos here. It will help you.
+https://www.youtube.com/@hydradragonantivirus Watch my videos here. It will help you or look this: 
+Hydra Dragon Antivirus  active sources: virusshare.com FossAV BatchAntivirus Abusech Steven Black Ultimatehostblacklist github https://vxug.fakedoma.in/samples/ https://www.usom.gov.tr/ malwares.com clamav.net  https://www.reddit.com/r/netsec/comments/gp1rm/list_of_malicious_domains_and_ip_blocklists/  https://winhelp2002.mvps.org/ future plans: https://www.iblocklist.com/subscribe virussign.com heuristics: https://bazaar.abuse.ch/browse.php?search=file_type%3Abat and Hypatia database maybe waiting for 10k pdf malwares.com still waiting for access https://www.youtube.com/watch?v=4U_AAtMel94 https://www.vx-underground.org/ I should add Linux malware database. non-active source example: https://justdomains.github.io/blocklists/ so big https://www.reddit.com/r/Malware/comments/7fabu5/sites_to_download_malware/ plans: I realized that I can improve my self at open source  virus detection
+and reverse engineering Currently my antivirus right now is the best open source antivirus in the world
+and  I should unite my project with clamav and improve his heuristics and I need api
+and also need check are system files deleted also use rootkit hunter also auditd detect init 0 etc. should be added is shutdown etc. runnied  realize them new active source: https://malshare.com/daily/?C=M;O=A https://github.com/phpMussel/Signatures https://github.com/mitchellkrogza/Phishing.Database/tree/master sudo freshclam with updated securiteinfo
