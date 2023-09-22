@@ -11,7 +11,7 @@ You need use Firefox as your browser
 - Real-time protection
 - Web protection
 - SHA256-SHA1-MD5-SSDEEP-TLSH calculator
-- Big databases for free. Above the 65 million virus hashes here
+- Big databases for free. Above the 69 million virus hashes here
 - ClamAV on Python
 - Rootkit scanner are united in one python script
 ## Download
