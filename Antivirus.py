@@ -150,6 +150,12 @@ def is_file_infected_md5(md5):
     if daily_result > 0:
      daily_connection.close()
      return True
+    # Check in the daily table at field2 or field1
+    dailyx_command = daily_connection.execute("SELECT COUNT(*) FROM securiteinfo WHERE field1 = ? OR field1 = ?;", (md5, md5))
+    dailyx_result = dailyx_command.fetchone()[0]
+    if dailyx_result > 0:
+     daily_connection.close()
+     return True
     # Check in the targetedthreats table
     old_virus_base4_command = old_virus_base_connection.execute("SELECT COUNT(*) FROM targetedthreats WHERE MD5 = ?;", (md5,))
     old_virus_base4_result = old_virus_base4_command.fetchone()[0]
@@ -324,7 +330,7 @@ def is_file_infected_sha256(sha256):
     if abusech_result and abusech_result[0]:
         return True
 
-    # Check in the full_sha256 database full_sha256 table
+    # Check in the daily database malwarebazaarfuzzyhashes table
     connection_full_sha256 = sqlite3.connect(database_path_full_sha256)
 
     full_sha256_command_text = "SELECT EXISTS(SELECT 1 FROM malwarebazaarfuzzyhashes WHERE field2 = ? LIMIT 1) FROM malwarebazaarfuzzyhashes WHERE field2 = ?;"
@@ -335,6 +341,16 @@ def is_file_infected_sha256(sha256):
     if full_sha256_result and full_sha256_result[0]:
         return True
 
+    # Check in the daily database malshare table
+    connection_full_sha256 = sqlite3.connect(database_path_full_sha256)
+
+    full_sha256x_command_text = "SELECT EXISTS(SELECT 1 FROM malshare WHERE sha256 = ? LIMIT 1) FROM malshare WHERE sha256 = ?;"
+    full_sha256x_result = connection_full_sha256.execute(full_sha256x_command_text, (sha256, sha256)).fetchone()
+
+    connection_full_sha256.close()
+
+    if full_sha256x_result and full_sha256x_result[0]:
+        return True
     # Check in the SHA256 database
     connection_sha256 = sqlite3.connect(database_path_sha256)
 
@@ -527,7 +543,7 @@ def scan_running_files_in_proc():
                             if re.search(r'fdisk /dev/sd[a-z]', content):
                              malicious_results.append(delete_file(file_path))  # Remove the infected file
                             print("Infected file (Malicious Content Disk Overwriter): " + file_path)
-                            if re.search(r'dd if=/dev/zero of=/dev/sd[a-z], content):                            
+                            if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]', content):                            
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
                             print("Infected file (Malicious Content dd Disk Overwriter): " + file_path)
                             if re.search(r'rm\s+-rf /', content):
