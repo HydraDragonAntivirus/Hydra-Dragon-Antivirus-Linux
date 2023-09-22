@@ -14,6 +14,7 @@ You need use Firefox as your browser
 - Big databases for free. Above the 69 million virus hashes here
 - ClamAV on Python
 - Rootkit scanner are united in one python script
+- Average daily 1k new virus hashes and 700+ new virus websites
 ## Download
 
 Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA)
