@@ -28,7 +28,7 @@ Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-n
 <a href="https://discord.gg/W2N27aF5"><img src="https://img.shields.io/discord/72895893221067986?style=flat-square&logo=appveyor"></a>
 ### semaemirhan555@gmail.com
 ## License
-Public Domain License ![image](https://github.com/HydraDragonAntivirus/Hydra-Dragon-Antivirus-Linux/assets/142328963/c2679d99-7255-404b-aa5a-0e123d793645)
+Do What The F*ck You Want To Public License ![foto](https://github.com/HydraDragonAntivirus/Hydra-Dragon-Antivirus-Linux/assets/142328963/d680ca0c-6d13-41f0-91b8-d8b32e85a95a)
 ## How To Give Root Access To Program
 sudo python Antivirus.py
 ## Current Statics
