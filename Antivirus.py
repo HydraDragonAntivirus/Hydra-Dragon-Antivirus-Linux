@@ -150,7 +150,7 @@ def is_file_infected_md5(md5):
     if daily_result > 0:
      daily_connection.close()
      return True
-    # Check in the daily table at field2 or field1
+    # Check in the securiteinfo table at field1
     dailyx_command = daily_connection.execute("SELECT COUNT(*) FROM securiteinfo WHERE field1 = ? OR field1 = ?;", (md5, md5))
     dailyx_result = dailyx_command.fetchone()[0]
     if dailyx_result > 0:
