@@ -156,6 +156,12 @@ def is_file_infected_md5(md5):
     if dailyx_result > 0:
      daily_connection.close()
      return True
+    # Check in the others table at field1
+    dailyo_command = daily_connection.execute("SELECT COUNT(*) FROM others WHERE field1 = ? OR field1 = ?;", (md5, md5))
+    dailyo_result = dailyo_command.fetchone()[0]
+    if dailyo_result > 0:
+     daily_connection.close()
+     return True
     # Check in the targetedthreats table
     old_virus_base4_command = old_virus_base_connection.execute("SELECT COUNT(*) FROM targetedthreats WHERE MD5 = ?;", (md5,))
     old_virus_base4_result = old_virus_base4_command.fetchone()[0]
