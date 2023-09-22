@@ -85,6 +85,7 @@ DatabaseCustomURL https://www.securiteinfo.com/get/signatures/9e46fcf748515c2e27
 DatabaseCustomURL https://www.securiteinfo.com/get/signatures/9e46fcf748515c2e273120875878728d48c4aa222679a44eb5bbddbcd59914f4dc15ae118bd3e47a0b1e6129009ee1f31860406710c2581773be718f70f515ae/securiteinfoold.hdb
 DatabaseCustomURL https://www.securiteinfo.com/get/signatures/9e46fcf748515c2e273120875878728d48c4aa222679a44eb5bbddbcd59914f4dc15ae118bd3e47a0b1e6129009ee1f31860406710c2581773be718f70f515ae/securiteinfopdf.hdb
 Then Ctrl+S then Ctrl+X then sudo freshclam
+https://blog.frehi.be/2021/01/25/using-fangfrisch-to-improve-malware-e-mail-detection-with-clamav/ then do that then do sudo freshclam
 ### Download Antivirus from mega.nz link: https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA
 - Save At Downloads
 - unzip Antivirus.zip
