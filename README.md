@@ -105,4 +105,4 @@ https://blog.frehi.be/2021/01/25/using-fangfrisch-to-improve-malware-e-mail-dete
 - daily: daily.hdb daily.sfp daily.msu daily.hdu daily.fp daily.mdu daily.mdb
 - dailyz: daily.msb daily.hsu daily.hsb
 - dailyfuzzyhashes: daily.ldb
-- to remove: daily.cdb daily.cfg daily.ftm daily.idb daily.ign daily.ign2 daily.info daily.ldu daily.ndb daily.ndu daily.pdb daily.wdb
+- to remove: daily.cdb daily.cfg daily.crb daily.ftm daily.idb daily.ign daily.ign2 daily.info daily.ldu daily.ndb daily.ndu daily.pdb daily.wdb
