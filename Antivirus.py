@@ -781,7 +781,6 @@ def is_website_infected(url):
             "SELECT * FROM mcafee WHERE field1 = ?",
             "SELECT * FROM full_urls WHERE field3 = ?",
             "SELECT * FROM full_domains WHERE field3 = ?",
-            "SELECT * FROM paloaltofirewall WHERE field1 = ?",
             "SELECT * FROM SSBLIP WHERE field2 = ?",
             "SELECT * FROM \"full_ip-port\" WHERE field3 = ?"
         ]
