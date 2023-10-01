@@ -32,8 +32,8 @@ Do What The F*ck You Want To Public License ![foto](https://github.com/HydraDrag
 ## How To Give Root Access To Program
 sudo python Antivirus.py
 ## Current Statics
-I have **65247054+** normal virus hashes **1596191+** virus or illegal websites and IP address list exceptother phishing databases  **2.5 million** virus, phishing or safe website. Total fuzzy hashes
-**4893048+ (800k≈ Malwarebazaar+ClamAV)** Phishing Database github **1050851** TR Phishing Database github **922180** and **4.000.00+** secureinfo.com signatures. **50.000** other unoffical free clamav database signatures
+I have **65247054+** normal virus hashes **1596191+** virus or illegal websites and IP address list except other phishing databases and KADhosts  **2.5 million** virus, phishing or safe website. Total fuzzy hashes
+**4893048+ (800k≈ Malwarebazaar+ClamAV)** Phishing Database github **1050851** TR Phishing Database github **922180** and **4.000.00+** secureinfo.com signatures. **50.000** other unoffical free clamav database signatures and KADhosts 98083
 ## Detection Rate
 ClamAV 60% Hydra Dragon Antivirus 65%
 ## Collected Datas
@@ -99,7 +99,7 @@ https://blog.frehi.be/2021/01/25/using-fangfrisch-to-improve-malware-e-mail-dete
 - Hydra Dragon Antivirus  active sources: virusshare.com FossAV BatchAntivirus Abusech Steven Black Ultimatehostblacklist github https://vxug.fakedoma.in/samples/ https://www.usom.gov.tr/ malwares.com clamav.net  https://www.reddit.com/r/netsec/comments/gp1rm/list_of_malicious_domains_and_ip_blocklists/  https://winhelp2002.mvps.org/ future plans: https://www.iblocklist.com/subscribe virussign.com heuristics: https://bazaar.abuse.ch/browse.php?search=file_type%3Abat and Hypatia database maybe waiting for 10k pdf malwares.com still waiting for access https://www.youtube.com/watch?v=4U_AAtMel94 https://www.vx-underground.org/ I should add Linux malware database. non-active source example: https://justdomains.github.io/blocklists/ so big https://www.reddit.com/r/Malware/comments/7fabu5/sites_to_download_malware/ plans: I realized that I can improve my self at open source  virus detection
 - and reverse engineering Currently my antivirus right now is the best open source antivirus in the world
 - and  I should unite my project with clamav and improve his heuristics and I need api
-- and also need check are system files deleted also use rootkit hunter also auditd detect init 0 etc. should be added is shutdown etc. runnied  realize them new active source: https://malshare.com/daily/?C=M;O=A https://github.com/phpMussel/Signatures https://github.com/mitchellkrogza/Phishing.Database/tree/master sudo freshclam with updated securiteinfo and fangfrisch https://github.com/HorusTeknoloji/TR-PhishingList archived
+- and also need check are system files deleted also use rootkit hunter also auditd detect init 0 etc. should be added is shutdown etc. runnied  realize them new active source: https://malshare.com/daily/?C=M;O=A https://github.com/phpMussel/Signatures https://github.com/mitchellkrogza/Phishing.Database/tree/master sudo freshclam with updated securiteinfo and fangfrisch https://github.com/HorusTeknoloji/TR-PhishingList archived https://github.com/FiltersHeroes/KADhosts
 - dd if=daily.cvd of=daily.tar.gz skip=1 bs=512
 - chmod -R +rw daily/
 - daily: daily.hdb daily.sfp daily.msu daily.hdu daily.fp daily.mdu daily.mdb
