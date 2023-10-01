@@ -106,3 +106,10 @@ https://blog.frehi.be/2021/01/25/using-fangfrisch-to-improve-malware-e-mail-dete
 - dailyz: daily.msb daily.hsu daily.hsb
 - dailyfuzzyhashes: daily.ldb
 - to remove: daily.cdb daily.cfg daily.crb daily.ftm daily.idb daily.ign daily.ign2 daily.info daily.ldu daily.ndb daily.ndu daily.pdb daily.wdb
+  # Database Comprasion
+  -Kaspersky have 2 billion databases
+  -Virussign 600 million
+  -Virusshare 70 million but didn't shared all of them
+  -Me 70 million
+  -Phishingtank 8 million
+  -Me 3.5 million
