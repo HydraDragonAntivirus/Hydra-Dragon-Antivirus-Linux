@@ -121,3 +121,5 @@ https://blog.frehi.be/2021/01/25/using-fangfrisch-to-improve-malware-e-mail-dete
   -Me 70 million
   -phishtank 8.5 million
   -Me 4.5 million
+## TODO 
+Create requirements.txt
