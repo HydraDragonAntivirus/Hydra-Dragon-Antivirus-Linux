@@ -111,5 +111,5 @@ https://blog.frehi.be/2021/01/25/using-fangfrisch-to-improve-malware-e-mail-dete
   -Virussign 600 million
   -Virusshare 70 million but didn't shared all of them
   -Me 70 million
-  -Phishingtank 8 million
+  -phishtank 8 million
   -Me 3.5 million
