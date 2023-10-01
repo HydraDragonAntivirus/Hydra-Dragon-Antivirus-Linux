@@ -884,6 +884,24 @@ def open_phishing_alert_page():
 
     # Open WebGuard.html with Firefox
     webbrowser.get('firefox').open('file://' + webguard_path)
+def open_malicios_tracking_cookie_page():
+    # Path to current directory
+    current_directory = os.getcwd()
+
+    # WebGuard.html path
+    webguard_path = os.path.join(current_directory, 'trackingcookie.html')
+
+    # Open WebGuard.html with Firefox
+    webbrowser.get('firefox').open('file://' + webguard_path)
+def open_phishing_tracking_cookie_page():
+    # Path to current directory
+    current_directory = os.getcwd()
+
+    # WebGuard.html path
+    webguard_path = os.path.join(current_directory, 'phishingtrackingcookie.html')
+
+    # Open WebGuard.html with Firefox
+    webbrowser.get('firefox').open('file://' + webguard_path)
 def find_firefox_profile(home_dir=None, default_esr=False):
     try:
         if home_dir is None:
@@ -894,12 +912,32 @@ def find_firefox_profile(home_dir=None, default_esr=False):
         profile_paths = glob.glob(os.path.join(home_dir, ".mozilla/firefox/*default"))
 
         if default_esr:
-            profile_paths = glob.glob(os.path.join(home_dir, ".mozilla/firefox/*default-esr"))
+            profile_paths.extend(glob.glob(os.path.join(home_dir, ".mozilla/firefox/*default-esr")))
+
+        # Check if .default-release exists and add it to the list if found
+        default_release_path = os.path.join(home_dir, ".mozilla/firefox/*default-release")
+        if glob.glob(default_release_path):
+            profile_paths.extend(glob.glob(default_release_path))
 
         if profile_paths:
-            return profile_paths[0]
-        else:
-            return None
+            profile_path = profile_paths[0]
+            # Check if places.sqlite exists within the profile directory
+            places_db_path = os.path.join(profile_path, "places.sqlite")
+            if os.path.exists(places_db_path):
+                return profile_path
+
+        # If no profiles found in standard locations or places.sqlite not found, check default-release or default-esr
+        fallback_path = os.path.join(home_dir, ".mozilla/firefox/*default-release" if not default_esr else "*default-esr")
+        fallback_profiles = glob.glob(fallback_path)
+        if fallback_profiles:
+            fallback_profile_path = fallback_profiles[0]
+            # Check if places.sqlite exists within the fallback profile directory
+            fallback_places_db_path = os.path.join(fallback_profile_path, "places.sqlite")
+            if os.path.exists(fallback_places_db_path):
+                return fallback_profile_path
+
+        return None
+
     except Exception as e:
         print(f"Error finding Firefox profile: {e}")
         return None
@@ -1021,10 +1059,23 @@ def is_website_infected0(content):
 
         cursor.close()
         conn.close()
+def check_tracking_cookies(url, cursor):
+    try:
+        # Remove the preceding dot from the domain if present
+        domain = url.lstrip(".")
+
+        # Check for cookies associated with a different domain (potential tracking cookies)
+        query = "SELECT name FROM moz_cookies WHERE host != ?;"
+        cursor.execute(query, (domain,))
+        potential_tracking_cookies = cursor.fetchall()
+
+        return len(potential_tracking_cookies) > 0
+    except Exception as e:
+        print(f"Error checking potential tracking cookies: {e}")
+        return False
 def access_firefox_history_continuous():
     try:
         # Find the Firefox profile folder
-
         profile_path = find_firefox_profile()
 
         if profile_path is None:
@@ -1033,31 +1084,36 @@ def access_firefox_history_continuous():
 
         # Create the path to the Firefox history database
         firefox_db_path = os.path.join(profile_path, "places.sqlite")
+        cookies_db_path = os.path.join(profile_path, "cookies.sqlite")
 
-        if not os.path.exists(firefox_db_path):
-            # If the database doesn't exist in the default folder, try default-esr folder
-            profile_path_esr = find_firefox_profile(default_esr=True)
-            if profile_path_esr:
-                firefox_db_path = os.path.join(profile_path_esr, "places.sqlite")
-            else:
-                print("Firefox history database not found.")
-                return
+        if not os.path.exists(firefox_db_path) or not os.path.exists(cookies_db_path):
+            print("Firefox history or cookies database not found.")
+            return
 
         last_visited_websites = []  # To keep track of the last visited websites
 
         while True:
             # Copy the Firefox history database to a temporary folder
             temp_dir = tempfile.mkdtemp(prefix="firefox_history_")
-            copied_db_path = os.path.join(temp_dir, "places.sqlite")
-            shutil.copy2(firefox_db_path, copied_db_path)
+            copied_places_db_path = os.path.join(temp_dir, "places.sqlite")
+            shutil.copy2(firefox_db_path, copied_places_db_path)
 
-            # Connect with the copied database
-            connection = sqlite3.connect(copied_db_path)
-            cursor = connection.cursor()
- # Get visited sites with query
+            # Connect with the copied places database
+            connection_places = sqlite3.connect(copied_places_db_path)
+            cursor_places = connection_places.cursor()
+
+            # Copy the Firefox cookies database to a temporary folder
+            copied_cookies_db_path = os.path.join(temp_dir, "cookies.sqlite")
+            shutil.copy2(cookies_db_path, copied_cookies_db_path)
+
+            # Connect with the copied cookies database
+            connection_cookies = sqlite3.connect(copied_cookies_db_path)
+            cursor_cookies = connection_cookies.cursor()
+
+            # Get visited sites with query
             query = "SELECT title, url FROM moz_places ORDER BY id DESC LIMIT 5;"
-            cursor.execute(query)
-            results = cursor.fetchall()
+            cursor_places.execute(query)
+            results = cursor_places.fetchall()
 
             # Scan visited websites and show results
             for row in results:
@@ -1070,39 +1126,62 @@ def access_firefox_history_continuous():
                 # Check if the URL is a phishing website
                 is_phishing = is_phishing_website(url)
 
-                if is_infected:
+                # Check if tracking cookies are found
+                tracking_cookies_found = check_tracking_cookies(url, cursor_cookies)
+
+                if tracking_cookies_found:
+                    if is_infected:
+                        print("Malicious tracking cookie found on an infected website.")
+                        open_malicious_tracking_cookie_page()
+                    elif is_phishing:
+                        print("Phishing tracking cookie found on a phishing website.")
+                        open_phishing_tracking_cookie_page()
+                    else:
+                        print("Tracking cookie found on the website.")
+
+                    ip_address = extract_ip_from_url(url)  # Adjust this as needed
+                    if ip_address:
+                        print(f"Tracking cookie IP address: {ip_address}")
+                        disconnect_ip(ip_address)  # Disconnect the IP address
+                        if last_visited_websites:
+                            last_visited_websites.pop()  # Remove the last visited website
+                            open_tracking_cookie_alert_page()  # Open the tracking_cookie.html file
+
+                elif is_infected:
+                    print("The website is infected.")
                     ip_address = extract_ip_from_url(url)
                     if ip_address:
-                        print(f"The website is infected: {url}")
                         print(f"Infected IP address: {ip_address}")
                         disconnect_ip(ip_address)  # Disconnect the infected IP address
                         if last_visited_websites:
                             last_visited_websites.pop()  # Remove the last visited website
                             open_webguard_page()  # Open the webguard.html file
                 elif is_phishing:
-                    print(f"The website is phishing: {url}")
-                    print(f"Phishing IP address: {ip_address}")
-                    disconnect_ip(ip_address)  # Disconnect the phishing IP address
-                    if last_visited_websites:
-                        last_visited_websites.pop()  # Remove the last visited website
-                        open_phishing_alert_page()  # Open the phishing.html file
+                    print("The website is phishing.")
+                    ip_address = extract_ip_from_url(url)
+                    if ip_address:
+                        print(f"Phishing IP address: {ip_address}")
+                        disconnect_ip(ip_address)  # Disconnect the phishing IP address
+                        if last_visited_websites:
+                            last_visited_websites.pop()  # Remove the last visited website
+                            open_phishing_alert_page()  # Open the phishing.html file
                 else:
-                    print(f"The website is clean: {url}")
+                    print("The website is clean.")
 
                 if len(last_visited_websites) >= 5:
                     last_visited_websites.pop(0)  # Remove the oldest visited website
                 last_visited_websites.append(url)
-            # Close the connection and clean the temporary folder
 
-            connection.close()
+            # Close the connections and clean the temporary folder
+            connection_places.close()
+            connection_cookies.close()
             shutil.rmtree(temp_dir, ignore_errors=True)
 
     except Exception as e:
         print(f"Error accessing Firefox history: {e}")
-def access_firefox_history_continuous0(file_path):
+def access_firefox_history_continuous0(file_Path):
     try:
         # Find the Firefox profile folder
-
         profile_path = find_firefox_profile()
 
         if profile_path is None:
@@ -1111,55 +1190,99 @@ def access_firefox_history_continuous0(file_path):
 
         # Create the path to the Firefox history database
         firefox_db_path = os.path.join(profile_path, "places.sqlite")
+        cookies_db_path = os.path.join(profile_path, "cookies.sqlite")
 
-        if not os.path.exists(firefox_db_path):
-            # If the database doesn't exist in the default folder, try default-esr folder
-            profile_path_esr = find_firefox_profile(default_esr=True)
-            if profile_path_esr:
-                firefox_db_path = os.path.join(profile_path_esr, "places.sqlite")
-            else:
-                print("Firefox history database not found.")
-                return
+        if not os.path.exists(firefox_db_path) or not os.path.exists(cookies_db_path):
+            print("Firefox history or cookies database not found.")
+            return
 
         last_visited_websites = []  # To keep track of the last visited websites
 
         while True:
-            # Copy the Firefox history and access_firefox_history_continuous0 database to a temporary folder
+            # Copy the Firefox history database to a temporary folder
             temp_dir = tempfile.mkdtemp(prefix="firefox_history_")
-            copied_db_path = os.path.join(temp_dir, "places.sqlite")
-            shutil.copy2(firefox_db_path, copied_db_path)
+            copied_places_db_path = os.path.join(temp_dir, "places.sqlite")
+            shutil.copy2(firefox_db_path, copied_places_db_path)
 
-            # Connect with the copied database
-            connection = sqlite3.connect(copied_db_path)
-            cursor = connection.cursor()
+            # Connect with the copied places database
+            connection_places = sqlite3.connect(copied_places_db_path)
+            cursor_places = connection_places.cursor()
+
+            # Copy the Firefox cookies database to a temporary folder
+            copied_cookies_db_path = os.path.join(temp_dir, "cookies.sqlite")
+            shutil.copy2(cookies_db_path, copied_cookies_db_path)
+
+            # Connect with the copied cookies database
+            connection_cookies = sqlite3.connect(copied_cookies_db_path)
+            cursor_cookies = connection_cookies.cursor()
 
             # Get visited sites with query
             query = "SELECT title, url FROM moz_places ORDER BY id DESC LIMIT 5;"
-            cursor.execute(query)
-            results = cursor.fetchall()
+            cursor_places.execute(query)
+            results = cursor_places.fetchall()
 
-           # Scan visited sites and show results
+            # Scan visited websites and show results
             for row in results:
                 title, url = row
                 print(f"Scanning URL: {url}")
-                if is_website_infected(url):
+
+                # Check if the URL is infected
+                is_infected = is_website_infected(url)
+
+                # Check if the URL is a phishing website
+                is_phishing = is_phishing_website(url)
+
+                # Check if tracking cookies are found
+                tracking_cookies_found = check_tracking_cookies(url, cursor_cookies)
+
+                if tracking_cookies_found:
+                    if is_infected:
+                        print("Malicious tracking cookie found on an infected website.")
+                        open_malicious_tracking_cookie_page()
+                    elif is_phishing:
+                        print("Phishing tracking cookie found on a phishing website.")
+                        open_phishing_tracking_cookie_page()
+                    else:
+                        print("Tracking cookie found on the website.")
+
+                    ip_address = extract_ip_from_url(url)  # Adjust this as needed
+                    if ip_address:
+                        print(f"Tracking cookie IP address: {ip_address}")
+                        disconnect_ip(ip_address)  # Disconnect the IP address
+                        if last_visited_websites:
+                            last_visited_websites.pop()  # Remove the last visited website
+                            open_tracking_cookie_alert_page()  # Open the tracking_cookie.html file
+                            delete_file(file_path)
+                elif is_infected:
+                    print("The website is infected.")
                     ip_address = extract_ip_from_url(url)
                     if ip_address:
-                        print(f"The website is infected: {url}")
                         print(f"Infected IP address: {ip_address}")
                         disconnect_ip(ip_address)  # Disconnect the infected IP address
                         if last_visited_websites:
                             last_visited_websites.pop()  # Remove the last visited website
                             open_webguard_page()  # Open the webguard.html file
                             delete_file(file_path)
+                elif is_phishing:
+                    print("The website is phishing.")
+                    ip_address = extract_ip_from_url(url)
+                    if ip_address:
+                        print(f"Phishing IP address: {ip_address}")
+                        disconnect_ip(ip_address)  # Disconnect the phishing IP address
+                        if last_visited_websites:
+                            last_visited_websites.pop()  # Remove the last visited website
+                            open_phishing_alert_page()  # Open the phishing.html file
+                            delete_file(file_path)
                 else:
-                    print(f"The website is clean: {url}")
+                    print("The website is clean.")
 
                 if len(last_visited_websites) >= 5:
                     last_visited_websites.pop(0)  # Remove the oldest visited website
                 last_visited_websites.append(url)
-            # Close the connection and clean the temporary folder
-            connection.close()
+
+            # Close the connections and clean the temporary folder
+            connection_places.close()
+            connection_cookies.close()
             shutil.rmtree(temp_dir, ignore_errors=True)
 
     except Exception as e:
@@ -1917,7 +2040,8 @@ def main():
         print("6. Are someone clicking on your keyboard? Test it!")
         print("7. Check urlbl2.db for known websites. Don't add www. or http etc")
         print("8. Rootkit scan")
-        print("9. Exit")
+        print("9.Check Firefox profile")
+        print("10. Exit")
         
         choice = input("Enter your choice: ")
         
@@ -2006,11 +2130,16 @@ def main():
         elif choice == "8":
             subprocess.run(['sudo', 'chkrootkit'])
             subprocess.run(['sudo', 'rkhunter', '--check'])
-        
         elif choice == "9":
+            home_dir = input("Enter the home directory and username (e.g., /home/yourusername If you haven't started it as sudo, leave it blank):  ").strip()
+            profile_path = find_firefox_profile(home_dir)
+            if profile_path:
+                print(f"Found Firefox profile at: {profile_path}")
+            else:
+                print("No Firefox profile found.")
+        elif choice == "10":
             print("Exiting...")
             break
-        
         else:
             print("Invalid choice. Please select a valid option.")
 if __name__ == "__main__":
