@@ -801,7 +801,7 @@ def is_website_infected(url):
                     cursor.close()
                     conn.close()
                     return True
-          result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
+                result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
                 if result_ip:
                     cursor.close()
                     conn.close()
@@ -809,7 +809,7 @@ def is_website_infected(url):
 
                 result_zero = cursor.execute(query, (zero_url,)).fetchone()
                 if result_zero:
-                result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()
+                 result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()
                 if result_iblocklist:
                     cursor.close()
                     conn.close()
