@@ -768,7 +768,8 @@ def is_website_infected(url):
     databases = ['viruswebsites.db', 'viruswebsite.db', 'virusip.db', 'viruswebsitessmall.db', 'abusech.db', 'oldvirusbase.db']
     formatted_url = format_url(url)  # Format the URL
     iblocklist_query = get_iblocklist_query()  # Get the iblocklist query
-
+    ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
+    zero_url = "0.0.0.0" # URL with 0.0.0.0 prefixed
     for database in databases:
         conn = sqlite3.connect(database)
         cursor = conn.cursor()
@@ -800,7 +801,14 @@ def is_website_infected(url):
                     cursor.close()
                     conn.close()
                     return True
+          result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
+                if result_ip:
+                    cursor.close()
+                    conn.close()
+                    return True
 
+                result_zero = cursor.execute(query, (zero_url,)).fetchone()
+                if result_zero:
                 result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()
                 if result_iblocklist:
                     cursor.close()
