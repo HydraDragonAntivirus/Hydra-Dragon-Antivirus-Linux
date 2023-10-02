@@ -907,6 +907,15 @@ def open_malicious_tracking_cookie_page():
 
     # Open WebGuard.html with Firefox
     webbrowser.get('firefox').open('file://' + webguard_path)
+def open_tracking_cookie_page():
+    # Path to current directory
+    current_directory = os.getcwd()
+
+    # WebGuard.html path
+    webguard_path = os.path.join(current_directory, 'trackingcookiealert.html')
+
+    # Open WebGuard.html with Firefox
+    webbrowser.get('firefox').open('file://' + webguard_path)
 def open_phishing_tracking_cookie_page():
     # Path to current directory
     current_directory = os.getcwd()
