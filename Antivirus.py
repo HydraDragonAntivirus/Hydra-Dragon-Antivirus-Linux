@@ -756,7 +756,6 @@ def is_phishing_website(url):
             conn.close()
 
     return False
-
 def get_iblocklist_query(url):
     # "-" işaretini kullanarak sütunu böler ve sadece ikinci kısmı alır
     parts = url.split('-')
@@ -767,7 +766,7 @@ def get_iblocklist_query(url):
 def is_website_infected(url):
     databases = ['viruswebsites.db', 'viruswebsite.db', 'virusip.db', 'viruswebsitessmall.db', 'abusech.db', 'oldvirusbase.db']
     formatted_url = format_url(url)  # Format the URL
-    iblocklist_query = get_iblocklist_query()  # Get the iblocklist query
+    iblocklist_query = get_iblocklist_query(url)  # Get the iblocklist query
     ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
     zero_url = "0.0.0.0" # URL with 0.0.0.0 prefixed
     for database in databases:
@@ -1020,7 +1019,7 @@ def is_phishing_website0(content):
 def is_website_infected0(content):
     databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
     formatted_url = format_url(content)  # Format URL
-    iblocklist_query = get_iblocklist_query()  # Get the iblocklist query
+    iblocklist_query = get_iblocklist_query(url)  # Get the iblocklist query
     ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
     zero_url = "0.0.0.0" # URL with 0.0.0.0 prefixed
 
