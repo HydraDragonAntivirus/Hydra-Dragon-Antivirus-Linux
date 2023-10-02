@@ -756,18 +756,25 @@ def is_phishing_website(url):
             conn.close()
 
     return False
+
+def get_iblocklist_query(url):
+    # "-" işaretini kullanarak sütunu böler ve sadece ikinci kısmı alır
+    parts = url.split('-')
+    if len(parts) > 1:
+        # İkinci kısmı temizle ve başında ve sonundaki boşlukları sil
+        return parts[1].strip()
+    return url
 def is_website_infected(url):
-    databases = ['viruswebsites.db', 'viruswebsite.db','virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
+    databases = ['viruswebsites.db', 'viruswebsite.db', 'virusip.db', 'viruswebsitessmall.db', 'abusech.db', 'oldvirusbase.db']
     formatted_url = format_url(url)  # Format the URL
-    ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
-    zero_url = "0.0.0.0" # URL with 0.0.0.0 prefixed
+    iblocklist_query = get_iblocklist_query()  # Get the iblocklist query
 
     for database in databases:
         conn = sqlite3.connect(database)
         cursor = conn.cursor()
 
         queries = [
-             "SELECT * FROM targetedthreatsurl WHERE ioc = ?",
+            "SELECT * FROM targetedthreatsurl WHERE ioc = ?",
             "SELECT * FROM ipsamnestytech WHERE field1 = ?",
             "SELECT * FROM hostsstalkware WHERE field1 = ?",
             "SELECT * FROM networkstalkware WHERE indicator = ?",
@@ -777,12 +784,13 @@ def is_website_infected(url):
             "SELECT * FROM inactive WHERE field1 = ?",
             "SELECT * FROM malwarebazaar WHERE field1 = ?",
             "SELECT * FROM ultimatehostblacklist WHERE field2 = ?",
-            "SELECT * FROM virusip WHERE field1 = ?"
+            "SELECT * FROM virusip WHERE field1 = ?",
             "SELECT * FROM mcafee WHERE field1 = ?",
             "SELECT * FROM full_urls WHERE field3 = ?",
             "SELECT * FROM full_domains WHERE field3 = ?",
             "SELECT * FROM SSBLIP WHERE field2 = ?",
             "SELECT * FROM \"full_ip-port\" WHERE field3 = ?"
+            "SELECT * FROM iblocklist WHERE field2 = ?",
         ]
 
         for query in queries:
@@ -793,14 +801,8 @@ def is_website_infected(url):
                     conn.close()
                     return True
 
-                result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
-                if result_ip:
-                    cursor.close()
-                    conn.close()
-                    return True
-
-                result_zero = cursor.execute(query, (zero_url,)).fetchone()
-                if result_zero:
+                result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()
+                if result_iblocklist:
                     cursor.close()
                     conn.close()
                     return True
@@ -809,6 +811,8 @@ def is_website_infected(url):
 
         cursor.close()
         conn.close()
+    
+    return False  # Return False if no match is found in any database
 def format_url(url):
     if url:
         formatted_url = url.strip().lower()
@@ -1004,9 +1008,11 @@ def is_phishing_website0(content):
             conn.close()
 
     return False
+
 def is_website_infected0(content):
     databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
     formatted_url = format_url(content)  # Format URL
+    iblocklist_query = get_iblocklist_query()  # Get the iblocklist query
     ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
     zero_url = "0.0.0.0" # URL with 0.0.0.0 prefixed
 
@@ -1026,13 +1032,14 @@ def is_website_infected0(content):
             "SELECT * FROM malwarebazaar WHERE field1 = ?",
             "SELECT * FROM ultimatehostblacklist WHERE field2 = ?",
             "SELECT * FROM continue WHERE field1 = ?",
-            "SELECT * FROM virusip WHERE field1 = ?"
+            "SELECT * FROM virusip WHERE field1 = ?",
             "SELECT * FROM mcafee WHERE field1 = ?",
             "SELECT * FROM full_urls WHERE field3 = ?",
             "SELECT * FROM full_domains WHERE field3 = ?",
             "SELECT * FROM paloaltofirewall WHERE field1 = ?",
             "SELECT * FROM SSBLIP WHERE field2 = ?",
-            "SELECT * FROM \"full_ip-port\" WHERE field3 = ?"
+            "SELECT * FROM \"full_ip-port\" WHERE field3 = ?",
+            "SELECT * FROM iblocklist WHERE field2 = ?"
         ]
 
         for query in queries:
@@ -1054,11 +1061,20 @@ def is_website_infected0(content):
                     cursor.close()
                     conn.close()
                     return True
+                
+                # Check with iblocklist query
+                result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()
+                if result_iblocklist:
+                    cursor.close()
+                    conn.close()
+                    return True
             except sqlite3.OperationalError:
                 pass  # Ignore the table is not found error.
 
         cursor.close()
         conn.close()
+    
+    return False  # Return False if no match is found in any database
 def check_tracking_cookies(url, cursor):
     try:
         # Remove the preceding dot from the domain if present
