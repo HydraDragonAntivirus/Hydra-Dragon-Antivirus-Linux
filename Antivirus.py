@@ -768,7 +768,8 @@ def is_website_infected(url):
     formatted_url = format_url(url)  # Format the URL
     iblocklist_query = get_iblocklist_query(url)  # Get the iblocklist query
     ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
-    zero_url = "0.0.0.0" # URL with 0.0.0.0 prefixed
+    zero_url = "0.0.0.0"  # URL with 0.0.0.0 prefixed
+    
     for database in databases:
         conn = sqlite3.connect(database)
         cursor = conn.cursor()
@@ -789,8 +790,8 @@ def is_website_infected(url):
             "SELECT * FROM full_urls WHERE field3 = ?",
             "SELECT * FROM full_domains WHERE field3 = ?",
             "SELECT * FROM SSBLIP WHERE field2 = ?",
-            "SELECT * FROM \"full_ip-port\" WHERE field3 = ?"
-            "SELECT * FROM iblocklist WHERE field2 = ?",
+            "SELECT * FROM \"full_ip-port\" WHERE field3 = ?",
+            "SELECT * FROM iblocklist WHERE field2 = ?"
         ]
 
         for query in queries:
@@ -800,25 +801,27 @@ def is_website_infected(url):
                     cursor.close()
                     conn.close()
                     return True
+                
                 result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
                 if result_ip:
                     cursor.close()
                     conn.close()
                     return True
-
+                
                 result_zero = cursor.execute(query, (zero_url,)).fetchone()
                 if result_zero:
-                 result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()
-                if result_iblocklist:
-                    cursor.close()
-                    conn.close()
-                    return True
+                    result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()
+                    if result_iblocklist:
+                        cursor.close()
+                        conn.close()
+                        return True
+                
             except sqlite3.OperationalError:
                 pass  # Table is not found, ignore it.
 
         cursor.close()
         conn.close()
-    
+
     return False  # Return False if no match is found in any database
 def format_url(url):
     if url:
@@ -895,7 +898,7 @@ def open_phishing_alert_page():
 
     # Open WebGuard.html with Firefox
     webbrowser.get('firefox').open('file://' + webguard_path)
-def open_malicios_tracking_cookie_page():
+def open_malicious_tracking_cookie_page():
     # Path to current directory
     current_directory = os.getcwd()
 
@@ -1048,7 +1051,6 @@ def is_website_infected0(content):
             "SELECT * FROM \"full_ip-port\" WHERE field3 = ?",
             "SELECT * FROM iblocklist WHERE field2 = ?"
         ]
-
         for query in queries:
             try:
                 result = cursor.execute(query, (formatted_url,)).fetchone()
@@ -1056,7 +1058,6 @@ def is_website_infected0(content):
                     cursor.close()
                     conn.close()
                     return True
-
                 result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
                 if result_ip:
                     cursor.close()
@@ -1065,22 +1066,16 @@ def is_website_infected0(content):
 
                 result_zero = cursor.execute(query, (zero_url,)).fetchone()
                 if result_zero:
-                    cursor.close()
-                    conn.close()
-                    return True
-                
-                # Check with iblocklist query
-                result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()
-                if result_iblocklist:
-                    cursor.close()
-                    conn.close()
-                    return True
+                    result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()  # Assign a value to result_iblocklist
+                    if result_iblocklist:
+                        cursor.close()
+                        conn.close()
+                        return True
             except sqlite3.OperationalError:
-                pass  # Ignore the table is not found error.
+                pass  # Table is not found, ignore it.
 
         cursor.close()
-        conn.close()
-    
+        conn.close()    
     return False  # Return False if no match is found in any database
 def check_tracking_cookies(url, cursor):
     try:
@@ -1154,13 +1149,13 @@ def access_firefox_history_continuous():
 
                 if tracking_cookies_found:
                     if is_infected:
-                        print("Malicious tracking cookie found on an infected website.")
-                        open_malicious_tracking_cookie_page()
+                     print("Malicious tracking cookie found on an infected website. URL:", url)                        
+                     open_malicious_tracking_cookie_page()
                     elif is_phishing:
-                        print("Phishing tracking cookie found on a phishing website.")
-                        open_phishing_tracking_cookie_page()
+                     print("Phishing tracking cookie found on an infected website. URL:", url)
+                     open_phishing_tracking_cookie_page()
                     else:
-                        print("Tracking cookie found on the website.")
+                        print("Tracking cookie found on the website. URL:", url)
 
                     ip_address = extract_ip_from_url(url)  # Adjust this as needed
                     if ip_address:
@@ -2096,7 +2091,7 @@ def main():
                 executor.submit(scan_running_files_with_custom_and_clamav_continuous)
                 executor.submit(monitoring_running_processes)        
         elif choice == "4":
-            file_path = input("Enter the path of the file to intuitively scan: ").strip()            
+            file_path = input("Enter the path of the file to intuitively scan: ").strip("'")
             # Prompt the user to enter the home directory
             home_dir = input("Enter the home directory and username for Firefox history scan (e.g., /home/yourusername If you haven't started it as sudo, leave it blank): ")
             # Check if the file exists before proceeding
