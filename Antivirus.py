@@ -1066,6 +1066,10 @@ def is_website_infected0(content):
 
                 result_zero = cursor.execute(query, (zero_url,)).fetchone()
                 if result_zero:
+                    cursor.close()
+                    conn.close()
+                    return True
+                    # Check with iblocklist query
                     result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()  # Assign a value to result_iblocklist
                     if result_iblocklist:
                         cursor.close()
@@ -1254,17 +1258,16 @@ def access_firefox_history_continuous0(file_Path):
                 tracking_cookies_found = check_tracking_cookies(url, cursor_cookies)
 
                 if tracking_cookies_found:
-                    if is_infected:
-                        print("Malicious tracking cookie found on an infected website.")
-                        open_malicious_tracking_cookie_page()
-                    elif is_phishing:
-                        print("Phishing tracking cookie found on a phishing website.")
-                        open_phishing_tracking_cookie_page()
-                    else:
-                        print("Tracking cookie found on the website.")
+                     print("Malicious tracking cookie found on an infected website. URL:", url)                        
+                     open_malicious_tracking_cookie_page()
+                elif is_phishing:
+                     print("Phishing tracking cookie found on an infected website. URL:", url)
+                     open_phishing_tracking_cookie_page()
+                else:
+                        print("Tracking cookie found on the website. URL:", url)
 
-                    ip_address = extract_ip_from_url(url)  # Adjust this as needed
-                    if ip_address:
+                ip_address = extract_ip_from_url(url)  # Adjust this as needed
+                if ip_address:
                         print(f"Tracking cookie IP address: {ip_address}")
                         disconnect_ip(ip_address)  # Disconnect the IP address
                         if last_visited_websites:
@@ -2098,6 +2101,10 @@ def main():
             if not os.path.exists(file_path):
                 print(f"File not found: {file_path}")
                 continue
+            # Check if the file is empty (0-byte size)
+            if os.path.getsize(file_path) == 0:
+               print("File is empty (0-byte size), rejecting.")
+               return
 
             suspicious_file_path = file_path
             exe_path = file_path
