@@ -2095,9 +2095,7 @@ def main():
                 executor.submit(monitoring_running_processes)        
         elif choice == "4":
             file_path = input("Enter the path of the file to intuitively scan: ").strip("'")
-            # Prompt the user to enter the home directory
-            home_dir = input("Enter the home directory and username for Firefox history scan (e.g., /home/yourusername If you haven't started it as sudo, leave it blank): ")
-            # Check if the file exists before proceeding
+                 # Check if the file exists before proceeding
             if not os.path.exists(file_path):
                 print(f"File not found: {file_path}")
                 continue
@@ -2105,6 +2103,8 @@ def main():
             if os.path.getsize(file_path) == 0:
                print("File is empty (0-byte size), rejecting.")
                return
+            # Prompt the user to enter the home directory
+            home_dir = input("Enter the home directory and username for Firefox history scan (e.g., /home/yourusername If you haven't started it as sudo, leave it blank): ")
 
             suspicious_file_path = file_path
             exe_path = file_path
