@@ -893,37 +893,28 @@ def open_phishing_alert_page():
     # Path to current directory
     current_directory = os.getcwd()
 
-    # WebGuard.html path
+    # phishing.html path
     webguard_path = os.path.join(current_directory, 'phishing.html')
 
-    # Open WebGuard.html with Firefox
+    # Open phishing.html with Firefox
     webbrowser.get('firefox').open('file://' + webguard_path)
 def open_malicious_tracking_cookie_page():
     # Path to current directory
     current_directory = os.getcwd()
 
-    # WebGuard.html path
+    # trackingcookie.html path
     webguard_path = os.path.join(current_directory, 'trackingcookie.html')
 
-    # Open WebGuard.html with Firefox
-    webbrowser.get('firefox').open('file://' + webguard_path)
-def open_tracking_cookie_page():
-    # Path to current directory
-    current_directory = os.getcwd()
-
-    # WebGuard.html path
-    webguard_path = os.path.join(current_directory, 'trackingcookiealert.html')
-
-    # Open WebGuard.html with Firefox
+    # Open trackingcookie.html with Firefox
     webbrowser.get('firefox').open('file://' + webguard_path)
 def open_phishing_tracking_cookie_page():
     # Path to current directory
     current_directory = os.getcwd()
 
-    # WebGuard.html path
+    # phishingttrackingcookie.html path
     webguard_path = os.path.join(current_directory, 'phishingtrackingcookie.html')
 
-    # Open WebGuard.html with Firefox
+    # Open phishingtrackingcookie.html with Firefox
     webbrowser.get('firefox').open('file://' + webguard_path)
 def find_firefox_profile(home_dir=None, default_esr=False):
     try:
@@ -1162,21 +1153,23 @@ def access_firefox_history_continuous():
 
                 if tracking_cookies_found:
                     if is_infected:
-                     print("Malicious tracking cookie found on an infected website. URL:", url)                        
+                     print("Malicious tracking cookie found on an infected website. URL:", url)
+                     print(f"Malicious tracking cookie IP address: {ip_address}")  
+                     disconnect_ip(ip_address)  # Disconnect the IP address                      
                      open_malicious_tracking_cookie_page()
                     elif is_phishing:
                      print("Phishing tracking cookie found on an infected website. URL:", url)
+                     print(f"Phishing tracking cookie IP address: {ip_address}")
+                     disconnect_ip(ip_address)  # Disconnect the IP address
                      open_phishing_tracking_cookie_page()
                     else:
-                        print("Tracking cookie found on the website. URL:", url)
+                        print("Tracking cookie  not found on the website. URL:", url)
 
                     ip_address = extract_ip_from_url(url)  # Adjust this as needed
                     if ip_address:
-                        print(f"Tracking cookie IP address: {ip_address}")
-                        disconnect_ip(ip_address)  # Disconnect the IP address
+                        print(f"Cookie IP address: {ip_address}")
                         if last_visited_websites:
                             last_visited_websites.pop()  # Remove the last visited website
-                            open_tracking_cookie_alert_page()  # Open the tracking_cookie.html file
 
                 elif is_infected:
                     print("The website is infected.")
@@ -1281,7 +1274,6 @@ def access_firefox_history_continuous0(file_Path):
                         disconnect_ip(ip_address)  # Disconnect the IP address
                         if last_visited_websites:
                             last_visited_websites.pop()  # Remove the last visited website
-                            open_tracking_cookie_alert_page()  # Open the tracking_cookie.html file
                             delete_file(file_path)
                 elif is_infected:
                     print("The website is infected.")
