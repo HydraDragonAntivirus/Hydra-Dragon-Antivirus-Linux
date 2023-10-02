@@ -1095,6 +1095,7 @@ def check_tracking_cookies(url, cursor):
     except Exception as e:
         print(f"Error checking potential tracking cookies: {e}")
         return False
+
 def access_firefox_history_continuous():
     try:
         # Find the Firefox profile folder
@@ -1132,7 +1133,7 @@ def access_firefox_history_continuous():
             connection_cookies = sqlite3.connect(copied_cookies_db_path)
             cursor_cookies = connection_cookies.cursor()
 
-            # Get visited sites with query
+            # Get visited sites with a query
             query = "SELECT title, url FROM moz_places ORDER BY id DESC LIMIT 5;"
             cursor_places.execute(query)
             results = cursor_places.fetchall()
@@ -1151,35 +1152,28 @@ def access_firefox_history_continuous():
                 # Check if tracking cookies are found
                 tracking_cookies_found = check_tracking_cookies(url, cursor_cookies)
 
+                # Extract IP address from the URL
+                ip_address = extract_ip_from_url(url)
+
                 if tracking_cookies_found:
                     if is_infected:
-                     print("Malicious tracking cookie found on an infected website. URL:", url)
-                     print(f"Malicious tracking cookie IP address: {ip_address}")  
-                     disconnect_ip(ip_address)  # Disconnect the IP address                      
-                     open_malicious_tracking_cookie_page()
+                        print("Malicious tracking cookie found on an infected website. URL:", url)
+                        print(f"Malicious tracking cookie IP address: {ip_address}")
+                        disconnect_ip(ip_address)  # Disconnect the IP address
+                        open_malicious_tracking_cookie_page()
                     elif is_phishing:
-                     print("Phishing tracking cookie found on an infected website. URL:", url)
-                     print(f"Phishing tracking cookie IP address: {ip_address}")
-                     disconnect_ip(ip_address)  # Disconnect the IP address
-                     open_phishing_tracking_cookie_page()
+                        print("Phishing tracking cookie found on an infected website. URL:", url)
+                        print(f"Phishing tracking cookie IP address: {ip_address}")
+                        disconnect_ip(ip_address)  # Disconnect the IP address
+                        open_phishing_tracking_cookie_page()
                     else:
-                        print("Tracking cookie  not found on the website. URL:", url)
+                        print("Tracking cookie not found on the website. URL:", url)
 
-                    ip_address = extract_ip_from_url(url)  # Adjust this as needed
                     if ip_address:
                         print(f"Cookie IP address: {ip_address}")
-                        if last_visited_websites:
-                            last_visited_websites.pop()  # Remove the last visited website
+                    else:
+                        print("No IP address found for the given URL:", url)
 
-                elif is_infected:
-                    print("The website is infected.")
-                    ip_address = extract_ip_from_url(url)
-                    if ip_address:
-                        print(f"Infected IP address: {ip_address}")
-                        disconnect_ip(ip_address)  # Disconnect the infected IP address
-                        if last_visited_websites:
-                            last_visited_websites.pop()  # Remove the last visited website
-                            open_webguard_page()  # Open the webguard.html file
                 elif is_phishing:
                     print("The website is phishing.")
                     ip_address = extract_ip_from_url(url)
