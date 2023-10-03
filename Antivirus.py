@@ -717,11 +717,9 @@ def is_phishing_website(url):
     db_path = 'viruswebsites.db'
     table_name = 'allphishingdomainsandlinks'
     field_name = 'field1'  # Assuming 'field1' is the field containing the URLs
-    is_phishing_field = 'is_phishing_website'  # Assuming 'is_phishing_website' is the field indicating phishing
-
     # SQL queries to check if the URL is a phishing website
     queries = [
-        f"SELECT * FROM {table_name} WHERE {field_name} = ? AND {is_phishing_field} = 1",
+        f"SELECT * FROM {table_name} WHERE {field_name} = ?",
         f"SELECT * FROM {table_name} WHERE {field_name} = ?",
     ]
 
