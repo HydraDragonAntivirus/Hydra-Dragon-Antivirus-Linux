@@ -18,6 +18,7 @@ import appdirs
 import getpass 
 import tkinter as tk
 from tkinter import messagebox, filedialog, simpledialog
+import threading
 def calculate_tlsh(file_path):
     with open(file_path, "rb") as file:
         file_data = file.read()
@@ -2102,48 +2103,40 @@ def check_website_infection():
             messagebox.showinfo("Website Status", "The website is phishing.")
         else:
             messagebox.showinfo("Website Status", "The website is clean.")
-# Replace with your actual implementation
-def is_phishing_website(website_url):
     return False
 class AntivirusGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Antivirus Program")
-        
+
         # Create the menu
         self.create_menu()
-    def run_chkrootkit(self):
-        try:
-            subprocess.run(['sudo', 'chkrootkit'])
-            messagebox.showinfo("Scan Complete", "chkrootkit scan completed successfully.")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error running chkrootkit: {e}")
 
-    def run_rkhunter(self):
-        try:
-            subprocess.run(['sudo', 'rkhunter', '--check'])
-            messagebox.showinfo("Scan Complete", "rkhunter scan completed successfully.")
-        except Exception as e:
-            messagebox.showerror("Error", f"Error running rkhunter: {e}")
-
+        # Create a Listbox to display scan results
+        self.result_listbox = tk.Listbox(self.root)
+        self.result_listbox.pack(expand=True, fill=tk.BOTH)
     def create_menu(self):
         menu = tk.Menu(self.root)
         self.root.config(menu=menu)
 
         file_menu = tk.Menu(menu, tearoff=0)
-        menu.add_cascade(label="Menu", menu=file_menu)
-        file_menu.add_command(label="Perform a folder scan", command=self.perform_folder_scan)
-        file_menu.add_command(label="Check Firefox Profile", command=self.check_firefox_profile)
-        file_menu.add_separator()
-        file_menu.add_command(label="Run chkrootkit", command=self.run_chkrootkit)
-        file_menu.add_command(label="Run rkhunter", command=self.run_rkhunter)
-        file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self.root.quit)
+        menu.add_cascade(label="File", menu=file_menu)
+        file_menu.add_command(label="Perform a folder scan", command=self.perform_folder_scan0)
+
+        rootkit_menu = tk.Menu(menu, tearoff=0)
+        menu.add_cascade(label="Rootkit", menu=rootkit_menu)
+        rootkit_menu.add_command(label="Run chkrootkit", command=self.run_chkrootkit)
+        rootkit_menu.add_command(label="Run rkhunter", command=self.run_rkhunter)
 
         website_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Website", menu=website_menu)
-        website_menu.add_command(label="Check if a website is infected", command=self.check_website_infection)
-    def perform_folder_scan(self):
+        website_menu.add_command(label="Check Website in Blist", command=self.check_website_in_blist0)
+
+        firefox_menu = tk.Menu(menu, tearoff=0)
+        menu.add_cascade(label="Firefox", menu=firefox_menu)
+        firefox_menu.add_command(label="Check Firefox Profile", command=self.check_firefox_profile)
+
+    def perform_folder_scan0(self):
         folder_path = filedialog.askdirectory()
         if folder_path:
             with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
@@ -2159,29 +2152,91 @@ class AntivirusGUI:
                 result_parallel = future_parallel.result()
                 result_malware_content = future_malware_content.result()
 
-                # Display the results
-                messagebox.showinfo("Scan Results", f"Clamscan Result: {result_clamscan}\n"
-                                                     f"Parallel Scan Result: {result_parallel}\n"
-                                                     f"Malware Content Check Result: {result_malware_content}")
+                # Update labels to show results
+                self.update_results_label(f"Clamscan Result: {result_clamscan}\n"
+                                          f"Parallel Scan Result: {result_parallel}\n"
+                                          f"Malware Content Check Result: {result_malware_content}")
 
-    def check_website_infection(self):
-        website_url = simpledialog.askstring("Website URL", "Enter the website URL to check:")
-        if website_url:
-            if is_website_infected(website_url):
-                messagebox.showinfo("Website Status", "The website is infected.")
-            elif is_phishing_website(website_url):
-                messagebox.showinfo("Website Status", "The website is phishing.")
+    def check_website_in_blist0(self):
+        website_url = simpledialog.askstring("Check Website in Blist", "Enter the website URL to check:")
+        if not website_url:
+            return  # User cancelled or entered an empty URL
+
+        try:
+            conn = sqlite3.connect("urlbl2.db")
+            cursor = conn.cursor()
+
+            cursor.execute("SELECT * FROM blist WHERE url=?", (website_url,))
+            result = cursor.fetchone()
+
+            if result:
+                self.update_results_label(f"{website_url} found in the blist table. This website is known.")
             else:
-                messagebox.showinfo("Website Status", "The website is clean.")
+                self.update_results_label(f"{website_url} not found in the blist table. This site is not known. Maybe it's a clean website. Check with other databases.")
 
+        except sqlite3.Error as e:
+            self.update_results_label(f"Database error: {e}")
+
+        finally:
+            conn.close()
+    def run_rkhunter(self):
+        try:
+            # Function to read and display stdout
+            def read_stdout():
+                for line in iter(process.stdout.readline, b''):
+                    self.result_listbox.insert(tk.END, line.strip())
+                    self.result_listbox.see(tk.END)
+                    self.result_listbox.update_idletasks()
+
+            # Start rkhunter process
+            process = subprocess.Popen(['sudo', 'rkhunter', '--check'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1, universal_newlines=True)
+
+            # Create a thread to read and display stdout
+            stdout_thread = threading.Thread(target=read_stdout)
+            stdout_thread.start()
+
+            # Wait for the process to finish and display any remaining stderr
+            for line in iter(process.stderr.readline, b''):
+                self.result_listbox.insert(tk.END, line.strip())
+                self.result_listbox.see(tk.END)
+                self.result_listbox.update_idletasks()
+
+            # Wait for the stdout thread to finish
+            stdout_thread.join()
+
+        except Exception as e:
+            self.result_listbox.insert(tk.END, f"Error running rkhunter: {e}")
+    def run_chkrootkit(self):
+        try:
+            result = subprocess.run(['sudo', 'chkrootkit'], capture_output=True, text=True)
+            self.result_listbox.insert(tk.END, "=== chkrootkit Scan Results ===")
+            for line in result.stdout.split('\n'):
+                self.result_listbox.insert(tk.END, line)
+        except Exception as e:
+            self.result_listbox.insert(tk.END, f"Error running chkrootkit: {e}")
+    def update_results(self):
+        while True:
+            # Get the result from the queue and insert it into the Listbox
+            result = self.result_queue.get()
+            self.result_listbox.insert(tk.END, result)
     def check_firefox_profile(self):
-        home_dir = simpledialog.askstring("Home Directory", "Enter the home directory and username (e.g., /home/yourusername If you haven't started it as sudo, leave it blank):")
+        home_dir = filedialog.askdirectory(title="Select Firefox Profile Directory", initialdir=os.path.expanduser("~"))
         if home_dir:
-            profile_path = self.find_firefox_profile(home_dir)
+            profile_path = find_firefox_profile(home_dir)
             if profile_path:
-                messagebox.showinfo("Firefox Profile", f"Found Firefox profile at: {profile_path}")
+                self.update_results_label(f"Found Firefox profile at: {profile_path}")
             else:
-                messagebox.showinfo("Firefox Profile", "No Firefox profile found.")
+                self.update_results_label("No Firefox profile found.")
+
+    # Add a method to update the results label
+    def update_results_label(self, text):
+        # Destroy previous label
+        for widget in self.root.winfo_children():
+            widget.destroy()
+
+        # Create and display the new label
+        result_label = tk.Label(self.root, text=text)
+        result_label.pack()
 def main():
     while True:
         print("You need to install firejail, strace, chkrootkit, clamav and rkhunter.")
