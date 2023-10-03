@@ -1,13 +1,10 @@
 # Hydra Dragon Anti-virus For Linux
-
 <p align="center">
 <img src="assets/logo.png" width= 200px>
 </p>
-
 ## Notice
 You need use Firefox as your browser
 ## Feautres
-
 - Real-time protection
 - Web protection
 - SHA256-SHA1-MD5-SSDEEP-TLSH calculator
@@ -16,12 +13,12 @@ You need use Firefox as your browser
 - Rootkit scanner are united in one python script
 - Average daily 1k new virus hashes and 700+ new virus or phsihing websites
 ## Download
-
 Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA)
 - Phising Database: https://github.com/mitchellkrogza/Phishing.Database
 ### Read before using
 - Don't forget give permission access.
 - It really disconnect infected ip address and it deletes file so be careful!
+- It deletes files there no quarantine option yet. I didn't added yet but in future I'm going to add them.
 - Don't forget to use clamonacc
 - Test the suspicous file in home folder
 ## Contact
