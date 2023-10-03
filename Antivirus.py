@@ -737,6 +737,15 @@ def is_phishing_website(url):
             except sqlite3.OperationalError:
                 pass  # Table is not found, ignore it.
 
+        # Check ip_prefixed_url and zero_url for phishing
+        result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
+        if result_ip:
+            return True
+
+        result_zero = cursor.execute(query, (zero_url,)).fetchone()
+        if result_zero:
+            return True
+
     finally:
         if cursor:
             cursor.close()
