@@ -17,7 +17,7 @@ import ssdeep
 import appdirs
 import getpass 
 import tkinter as tk
-from tkinter import messagebox, filedialog
+from tkinter import messagebox, filedialog, simpledialog
 def calculate_tlsh(file_path):
     with open(file_path, "rb") as file:
         file_data = file.read()
@@ -2085,6 +2085,103 @@ def scan_single_file(file_path, exe_path):
     except Exception as e:
         print(f"Error scanning file {file_path}: {e}")
         return []
+def perform_folder_scan():
+    folder_path = filedialog.askdirectory()
+    if folder_path:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            executor.submit(scan_folder_with_clamscan, folder_path)
+            executor.submit(scan_folder_parallel, folder_path)
+            executor.submit(scan_folder_with_malware_content_check, folder_path)
+
+def check_website_infection():
+    website_url = simpledialog.askstring("Website URL", "Enter the website URL to check:")
+    if website_url:
+        if is_website_infected(website_url):
+            messagebox.showinfo("Website Status", "The website is infected.")
+        elif is_phishing_website(website_url):
+            messagebox.showinfo("Website Status", "The website is phishing.")
+        else:
+            messagebox.showinfo("Website Status", "The website is clean.")
+# Replace with your actual implementation
+def is_phishing_website(website_url):
+    return False
+class AntivirusGUI:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Antivirus Program")
+        
+        # Create the menu
+        self.create_menu()
+    def run_chkrootkit(self):
+        try:
+            subprocess.run(['sudo', 'chkrootkit'])
+            messagebox.showinfo("Scan Complete", "chkrootkit scan completed successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Error running chkrootkit: {e}")
+
+    def run_rkhunter(self):
+        try:
+            subprocess.run(['sudo', 'rkhunter', '--check'])
+            messagebox.showinfo("Scan Complete", "rkhunter scan completed successfully.")
+        except Exception as e:
+            messagebox.showerror("Error", f"Error running rkhunter: {e}")
+
+    def create_menu(self):
+        menu = tk.Menu(self.root)
+        self.root.config(menu=menu)
+
+        file_menu = tk.Menu(menu, tearoff=0)
+        menu.add_cascade(label="Menu", menu=file_menu)
+        file_menu.add_command(label="Perform a folder scan", command=self.perform_folder_scan)
+        file_menu.add_command(label="Check Firefox Profile", command=self.check_firefox_profile)
+        file_menu.add_separator()
+        file_menu.add_command(label="Run chkrootkit", command=self.run_chkrootkit)
+        file_menu.add_command(label="Run rkhunter", command=self.run_rkhunter)
+        file_menu.add_separator()
+        file_menu.add_command(label="Exit", command=self.root.quit)
+
+        website_menu = tk.Menu(menu, tearoff=0)
+        menu.add_cascade(label="Website", menu=website_menu)
+        website_menu.add_command(label="Check if a website is infected", command=self.check_website_infection)
+    def perform_folder_scan(self):
+        folder_path = filedialog.askdirectory()
+        if folder_path:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+                future_clamscan = executor.submit(scan_folder_with_clamscan, folder_path)
+                future_parallel = executor.submit(scan_folder_parallel, folder_path)
+                future_malware_content = executor.submit(scan_folder_with_malware_content_check, folder_path)
+
+                # Wait for all threads to complete
+                concurrent.futures.wait([future_clamscan, future_parallel, future_malware_content])
+
+                # Get the results from the futures
+                result_clamscan = future_clamscan.result()
+                result_parallel = future_parallel.result()
+                result_malware_content = future_malware_content.result()
+
+                # Display the results
+                messagebox.showinfo("Scan Results", f"Clamscan Result: {result_clamscan}\n"
+                                                     f"Parallel Scan Result: {result_parallel}\n"
+                                                     f"Malware Content Check Result: {result_malware_content}")
+
+    def check_website_infection(self):
+        website_url = simpledialog.askstring("Website URL", "Enter the website URL to check:")
+        if website_url:
+            if is_website_infected(website_url):
+                messagebox.showinfo("Website Status", "The website is infected.")
+            elif is_phishing_website(website_url):
+                messagebox.showinfo("Website Status", "The website is phishing.")
+            else:
+                messagebox.showinfo("Website Status", "The website is clean.")
+
+    def check_firefox_profile(self):
+        home_dir = simpledialog.askstring("Home Directory", "Enter the home directory and username (e.g., /home/yourusername If you haven't started it as sudo, leave it blank):")
+        if home_dir:
+            profile_path = self.find_firefox_profile(home_dir)
+            if profile_path:
+                messagebox.showinfo("Firefox Profile", f"Found Firefox profile at: {profile_path}")
+            else:
+                messagebox.showinfo("Firefox Profile", "No Firefox profile found.")
 def main():
     while True:
         print("You need to install firejail, strace, chkrootkit, clamav and rkhunter.")
@@ -2202,6 +2299,9 @@ def main():
                 print("No Firefox profile found.")
         elif choice == "10":
             print("UI Mode Enabled")
+            root = tk.Tk()
+            gui = AntivirusGUI(root)
+            root.mainloop()
         elif choice == "11":
             print("Exiting...")
             break
