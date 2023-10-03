@@ -16,6 +16,8 @@ import tlsh
 import ssdeep
 import appdirs
 import getpass 
+import tkinter as tk
+from tkinter import messagebox, filedialog
 def calculate_tlsh(file_path):
     with open(file_path, "rb") as file:
         file_data = file.read()
@@ -2097,7 +2099,8 @@ def main():
         print("7. Check urlbl2.db for known websites. Don't add www. or http etc")
         print("8. Rootkit scan")
         print("9.Check Firefox profile")
-        print("10. Exit")
+        print("10.User Interface Mode")
+        print("11. Exit")
         
         choice = input("Enter your choice: ")
         
@@ -2198,6 +2201,8 @@ def main():
             else:
                 print("No Firefox profile found.")
         elif choice == "10":
+            print("UI Mode Enabled")
+        elif choice == "11":
             print("Exiting...")
             break
         else:
