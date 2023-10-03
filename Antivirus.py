@@ -717,11 +717,8 @@ def is_phishing_website(url):
     db_path = 'viruswebsites.db'
     table_name = 'allphishingdomainsandlinks'
     field_name = 'field1'  # Assuming 'field1' is the field containing the URLs
-    # SQL queries to check if the URL is a phishing website
-    queries = [
-        f"SELECT * FROM {table_name} WHERE {field_name} = ?",
-        f"SELECT * FROM {table_name} WHERE {field_name} = ?",
-    ]
+    # SQL query to check if the URL is a phishing website
+    query = f"SELECT * FROM {table_name} WHERE {field_name} = ?"
 
     conn = None
     cursor = None
@@ -730,19 +727,11 @@ def is_phishing_website(url):
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        for query in queries:
+        for url_to_check in [formatted_url, ip_prefixed_url, zero_url]:
             try:
-                result = cursor.execute(query, (formatted_url,)).fetchone()
+                result = cursor.execute(query, (url_to_check,)).fetchone()
 
                 if result:
-                    return True
-
-                result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
-                if result_ip:
-                    return True
-
-                result_zero = cursor.execute(query, (zero_url,)).fetchone()
-                if result_zero:
                     return True
 
             except sqlite3.OperationalError:
