@@ -707,11 +707,17 @@ def scan_running_files_with_clamav():
     finally:
         # Clean up temporary directory
         shutil.rmtree(temp_dir, ignore_errors=True)
+checked_websites = set()  # Set to store checked websites
+
 def is_phishing_website(url):
     # Format the URL
     formatted_url = format_url(url)
     ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0
     zero_url = "0.0.0.0"  # URL with 0.0.0.0 prefix
+
+    # Check if the URL or its variants have already been checked
+    if formatted_url in checked_websites or ip_prefixed_url in checked_websites or zero_url in checked_websites:
+        return True  # Website has already been checked
 
     # Database and table information
     db_path = 'viruswebsites.db'
@@ -732,19 +738,11 @@ def is_phishing_website(url):
                 result = cursor.execute(query, (url_to_check,)).fetchone()
 
                 if result:
+                    checked_websites.add(url_to_check)
                     return True
 
             except sqlite3.OperationalError:
                 pass  # Table is not found, ignore it.
-
-        # Check ip_prefixed_url and zero_url for phishing
-        result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
-        if result_ip:
-            return True
-
-        result_zero = cursor.execute(query, (zero_url,)).fetchone()
-        if result_zero:
-            return True
 
     finally:
         if cursor:
@@ -967,55 +965,50 @@ def run_clamonacc_with_remove():
         print("clamonacc successfully executed with --remove argument.")
     except subprocess.CalledProcessError as e:
         print("Error executing clamonacc:", e)
+checked_websites = set()  # Set to store checked websites
+
 def is_phishing_website0(content):
     # Format the URL
-    formatted_url = format_url(url)
+    formatted_url = format_url(content)
     ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0
     zero_url = "0.0.0.0"  # URL with 0.0.0.0 prefix
+
+    # Check if the URL or its variants have already been checked
+    if formatted_url in checked_websites or ip_prefixed_url in checked_websites or zero_url in checked_websites:
+        return True  # Website has already been checked
 
     # Database and table information
     db_path = 'viruswebsites.db'
     table_name = 'allphishingdomainsandlinks'
     field_name = 'field1'  # Assuming 'field1' is the field containing the URLs
-    is_phishing_field = 'is_phishing_website'  # Assuming 'is_phishing_website' is the field indicating phishing
+    # SQL query to check if the URL is a phishing website
+    query = f"SELECT * FROM {table_name} WHERE {field_name} = ?"
 
-    # SQL queries to check if the URL is a phishing website
-    queries = [
-        f"SELECT * FROM {table_name} WHERE {field_name} = ? AND {is_phishing_field} = 1",
-        f"SELECT * FROM {table_name} WHERE {field_name} = ?",
-    ]
+    conn = None
+    cursor = None
 
-    for query in queries:
-        try:
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            result = cursor.execute(query, (formatted_url,)).fetchone()
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
 
-            if result:
-                cursor.close()
-                conn.close()
-                return True
+        for url_to_check in [formatted_url, ip_prefixed_url, zero_url]:
+            try:
+                result = cursor.execute(query, (url_to_check,)).fetchone()
 
-            result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
-            if result_ip:
-                cursor.close()
-                conn.close()
-                return True
+                if result:
+                    checked_websites.add(url_to_check)
+                    return True
 
-            result_zero = cursor.execute(query, (zero_url,)).fetchone()
-            if result_zero:
-                cursor.close()
-                conn.close()
-                return True
+            except sqlite3.OperationalError:
+                pass  # Table is not found, ignore it.
 
-        except sqlite3.OperationalError:
-            pass  # Table is not found, ignore it.
-        finally:
+    finally:
+        if cursor:
             cursor.close()
+        if conn:
             conn.close()
 
     return False
-
 def is_website_infected0(content):
     databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
     formatted_url = format_url(content)  # Format URL
@@ -1492,11 +1485,11 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
         return "Infected file according to malware content check: " + file_path
     if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
         print("Excluded IP/Host: " + file_path)
-    if is_website_infected(content) or is_website_infected("www." + format_url(content)) or is_website_infected(format_url(content)):
+    if is_website_infected0(content) or is_website_infected("www." + format_url(content)) or is_website_infected(format_url(content)):
         print("Infected file (Malicious Website Content): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return"Infected file according to malware content check: " + file_path
-    if is_phishing_website(content) or is_phishing_website("www." + format_url(content)) or is_phishing_website(format_url(content)):
+    if is_phishing_website0(content) or is_phishing_website("www." + format_url(content)) or is_phishing_website(format_url(content)):
         print("Phishing file (Phishing Website Content): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return"Infected file according to malware content check: " + file_path
