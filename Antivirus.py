@@ -708,6 +708,9 @@ def scan_running_files_with_clamav():
         # Clean up temporary directory
         shutil.rmtree(temp_dir, ignore_errors=True)
 checked_websites = set()  # Set to store checked websites
+# Define a function to display a warning
+def display_warning(website):
+    print(f"Warning: Website '{website}' has already been checked.")
 def is_phishing_website(url):
     # Format the URL
     formatted_url = format_url(url)
@@ -980,7 +983,16 @@ def is_phishing_website0(content):
     zero_url = "0.0.0.0"  # URL with 0.0.0.0 prefix
 
     # Check if the URL or its variants have already been checked
-    if formatted_url in checked_websites or ip_prefixed_url in checked_websites or zero_url in checked_websites:
+    if formatted_url in checked_websites:
+        display_warning(formatted_url)
+        return True  # Website has already been checked
+
+    if ip_prefixed_url in checked_websites:
+        display_warning(ip_prefixed_url)
+        return True  # Website has already been checked
+
+    if zero_url in checked_websites:
+        display_warning(zero_url)
         return True  # Website has already been checked
 
     # Database and table information
@@ -1008,15 +1020,6 @@ def is_phishing_website0(content):
             except sqlite3.OperationalError:
                 pass  # Table is not found, ignore it.
 
-        # Check ip_prefixed_url and zero_url for phishing
-        result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
-        if result_ip:
-            return True
-
-        result_zero = cursor.execute(query, (zero_url,)).fetchone()
-        if result_zero:
-            return True
-
     finally:
         if cursor:
             cursor.close()
@@ -1025,11 +1028,24 @@ def is_phishing_website0(content):
 
     return False
 def is_website_infected0(content):
-    databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
+    databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db', 'abusech.db', 'oldvirusbase.db']
     formatted_url = format_url(content)  # Format URL
     iblocklist_query = get_iblocklist_query(content)  # Get the iblocklist query
     ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
     zero_url = "0.0.0.0" # URL with 0.0.0.0 prefixed
+
+    # Check if the URL or its variants have already been checked
+    if formatted_url in checked_websites:
+        display_warning(formatted_url)
+        return True  # Website has already been checked
+
+    if ip_prefixed_url in checked_websites:
+        display_warning(ip_prefixed_url)
+        return True  # Website has already been checked
+
+    if zero_url in checked_websites:
+        display_warning(zero_url)
+        return True  # Website has already been checked
 
     for database in databases:
         conn = sqlite3.connect(database)
@@ -1062,30 +1078,37 @@ def is_website_infected0(content):
                 if result:
                     cursor.close()
                     conn.close()
+                    checked_websites.add(formatted_url)
                     return True
+
                 result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
                 if result_ip:
                     cursor.close()
                     conn.close()
+                    checked_websites.add(ip_prefixed_url)
                     return True
 
                 result_zero = cursor.execute(query, (zero_url,)).fetchone()
                 if result_zero:
                     cursor.close()
                     conn.close()
+                    checked_websites.add(zero_url)
                     return True
-                    # Check with iblocklist query
-                    result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()  # Assign a value to result_iblocklist
-                    if result_iblocklist:
-                        cursor.close()
-                        conn.close()
-                        return True
+
+                # Check with iblocklist query
+                result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()  # Assign a value to result_iblocklist
+                if result_iblocklist:
+                    cursor.close()
+                    conn.close()
+                    checked_websites.add(formatted_url)
+                    return True
             except sqlite3.OperationalError:
                 pass  # Table is not found, ignore it.
 
         cursor.close()
-        conn.close()    
-    return False  # Return False if no match is found in any database
+        conn.close()
+
+    return False  # Return False if no match is found in any database  
 def check_tracking_cookies(url, cursor):
     try:
         # Remove the preceding dot from the domain if present
