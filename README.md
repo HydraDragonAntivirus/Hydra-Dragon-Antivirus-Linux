@@ -90,10 +90,6 @@ No data collected
 - sudo freshclam
 - sudo systemctl
 - start clamav-daemon
-- git clone https://aur.archlinux.org/python-cursor.git
-- cd python-cursor
-- makepkg si
-- -cd ..
 ### Download Antivirus from mega.nz link: https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA
 - Save At Downloads
 - unzip Antivirus.zip
