@@ -90,7 +90,6 @@ No data collected
 - sudo freshclam
 - sudo systemctl
 - start clamav-daemon
-- pip install tk --break-system-packages 
 ### Download Antivirus from mega.nz link: https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA
 - Save At Downloads
 - unzip Antivirus.zip
