@@ -2112,9 +2112,14 @@ class AntivirusGUI:
         # Create the menu
         self.create_menu()
 
-        # Create a Listbox to display scan results
-        self.result_listbox = tk.Listbox(self.root)
-        self.result_listbox.pack(expand=True, fill=tk.BOTH)
+        # Create a Text widget to simulate console
+        self.console_text = tk.Text(self.root, wrap="word", height=20, width=80)
+        self.console_text.pack(expand=True, fill=tk.BOTH)
+        # Add a button to press Enter
+        self.enter_button = tk.Button(self.root, text="Press Enter", command=self.press_enter)
+        self.enter_button.pack()
+        # Initialize rkhunter_process
+        self.rkhunter_process = None
     def create_menu(self):
         menu = tk.Menu(self.root)
         self.root.config(menu=menu)
@@ -2135,7 +2140,6 @@ class AntivirusGUI:
         firefox_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Firefox", menu=firefox_menu)
         firefox_menu.add_command(label="Check Firefox Profile", command=self.check_firefox_profile)
-
     def perform_folder_scan0(self):
         folder_path = filedialog.askdirectory()
         if folder_path:
@@ -2156,7 +2160,6 @@ class AntivirusGUI:
                 self.update_results_label(f"Clamscan Result: {result_clamscan}\n"
                                           f"Parallel Scan Result: {result_parallel}\n"
                                           f"Malware Content Check Result: {result_malware_content}")
-
     def check_website_in_blist0(self):
         website_url = simpledialog.askstring("Check Website in Blist", "Enter the website URL to check:")
         if not website_url:
@@ -2170,50 +2173,84 @@ class AntivirusGUI:
             result = cursor.fetchone()
 
             if result:
-                self.update_results_label(f"{website_url} found in the blist table. This website is known.")
+                result_text = f"{website_url} found in the blist table. This website is known."
             else:
-                self.update_results_label(f"{website_url} not found in the blist table. This site is not known. Maybe it's a clean website. Check with other databases.")
+                result_text = f"{website_url} not found in the blist table. This site is not known. Maybe it's a clean website. Check with other databases."
+
+            self.update_console(result_text)
 
         except sqlite3.Error as e:
-            self.update_results_label(f"Database error: {e}")
+            self.update_console(f"Database error: {e}")
 
         finally:
             conn.close()
+
+    def update_console(self, text):
+        # Append the text to the console
+        self.console_text.insert(tk.END, text + '\n')
+        # Scroll to the end
+        self.console_text.see(tk.END)
+    def press_enter(self):
+        # Simulate pressing Enter by writing a newline character to the process
+        if self.rkhunter_process:
+            self.rkhunter_process.stdin.write('\n')
+            self.rkhunter_process.stdin.flush()
+    def press_enter(self):
+        # Simulate pressing Enter by writing a newline character to the process
+        if self.rkhunter_process:
+            self.rkhunter_process.stdin.write('\n')
+            self.rkhunter_process.stdin.flush()
     def run_rkhunter(self):
         try:
-            # Function to read and display stdout
-            def read_stdout():
-                for line in iter(process.stdout.readline, b''):
-                    self.result_listbox.insert(tk.END, line.strip())
-                    self.result_listbox.see(tk.END)
-                    self.result_listbox.update_idletasks()
+            # Run rkhunter with sudo
+            command = ['sudo', 'rkhunter', '--check']
 
-            # Start rkhunter process
-            process = subprocess.Popen(['sudo', 'rkhunter', '--check'], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1, universal_newlines=True)
+            # Create a new window for the console
+            console_window = tk.Toplevel(self.root)
+            console_window.title("rkhunter Console")
 
-            # Create a thread to read and display stdout
-            stdout_thread = threading.Thread(target=read_stdout)
-            stdout_thread.start()
+            # Create a text widget to display the output
+            console_text = tk.Text(console_window, wrap=tk.WORD)
+            console_text.pack(expand=True, fill=tk.BOTH)
 
-            # Wait for the process to finish and display any remaining stderr
-            for line in iter(process.stderr.readline, b''):
-                self.result_listbox.insert(tk.END, line.strip())
-                self.result_listbox.see(tk.END)
-                self.result_listbox.update_idletasks()
+            # Function to read and display stdout and stderr
+            def read_output():
+                while True:
+                    line = self.rkhunter_process.stdout.readline()
+                    if not line and self.rkhunter_process.poll() is not None:
+                        break
 
-            # Wait for the stdout thread to finish
-            stdout_thread.join()
+                    console_text.insert(tk.END, line)
+                    console_text.see(tk.END)
+                    console_window.update()
+
+            # Start the process and display the output in the console
+            self.rkhunter_process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, stdin=subprocess.PIPE, text=True, bufsize=1, universal_newlines=True)
+
+            # Start a thread to read and display stdout and stderr
+            output_thread = threading.Thread(target=read_output)
+            output_thread.start()
 
         except Exception as e:
-            self.result_listbox.insert(tk.END, f"Error running rkhunter: {e}")
+            self.update_results_label(f"Error running rkhunter: {e}")
+    def update_console(self, text):
+        # Append the text to the console
+        self.console_text.insert(tk.END, text + '\n')
+        # Scroll to the end
+        self.console_text.see(tk.END)
     def run_chkrootkit(self):
         try:
             result = subprocess.run(['sudo', 'chkrootkit'], capture_output=True, text=True)
-            self.result_listbox.insert(tk.END, "=== chkrootkit Scan Results ===")
+            self.update_console("=== chkrootkit Scan Results ===")
             for line in result.stdout.split('\n'):
-                self.result_listbox.insert(tk.END, line)
+                self.update_console(line)
         except Exception as e:
-            self.result_listbox.insert(tk.END, f"Error running chkrootkit: {e}")
+            self.update_console(f"Error running chkrootkit: {e}")
+    def update_console(self, text):
+        # Append the text to the console
+        self.console_text.insert(tk.END, text + '\n')
+        # Scroll to the end
+        self.console_text.see(tk.END)
     def update_results(self):
         while True:
             # Get the result from the queue and insert it into the Listbox
