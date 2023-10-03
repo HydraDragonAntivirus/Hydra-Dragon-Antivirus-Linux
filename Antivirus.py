@@ -2155,7 +2155,7 @@ def main():
                 print("start_monitoring result:", result4)
                 print("check_mbr_ovfile_for_malicious_content result:", result2)
                 print("real_time_web_protection0 result:", result3)
-                print("start_monitoring result:erwrite result:", result5)
+                print("check_mbr_overwrite result:", result5)
                 print("find_connected_ips result:", result6)
                 print("continuously_monitor_file result:", result7)
                 print("extract_ips_from_strace result:", result8)     
