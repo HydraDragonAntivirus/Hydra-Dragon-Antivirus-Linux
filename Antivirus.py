@@ -2152,7 +2152,7 @@ def main():
 
                 # Print or handle results as needed
                 print("access_firefox_history_continuous0 result:", result1)
-                print("scan_", result4)
+                print("start_monitoring result:", result4)
                 print("check_mbr_ovfile_for_malicious_content result:", result2)
                 print("real_time_web_protection0 result:", result3)
                 print("start_monitoring result:erwrite result:", result5)
