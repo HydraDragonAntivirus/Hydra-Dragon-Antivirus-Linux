@@ -126,3 +126,4 @@ Create requirements.txt
 ## How To Test Antivirus?
 - You can use virusshare.com but have some false positives be careful or look this:
 - https://tracker.h3x.eu/download/5000
+- https://www.reddit.com/r/Malware/comments/7fabu5/sites_to_download_malware/
