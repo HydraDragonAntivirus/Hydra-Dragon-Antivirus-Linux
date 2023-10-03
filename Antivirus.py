@@ -438,7 +438,6 @@ def delete_file(file_path):
         return f"Infected file deleted: {file_path}"
     except Exception as e:
         return f"Error deleting {file_path}: {e}"
-
 def scan_file(file_path):
     try:
         file_size = os.path.getsize(file_path)
@@ -629,9 +628,6 @@ def scan_running_files_in_proc():
                             if re.search(r'mkfifo\s+/\w+/\w+;\s+\S+\s+/\w+/\w+\s+\|\s+\S+\s+\d+\.\d+\.\d+\.\d+\s+\d+', content):
                                print("Infected file (Malicious Content - FIFO): " + file_path)
                                malicious_results.append(delete_file(file_path))  # Remove the infected file
-                            if re.search(r'\S+\s+\|\s+\S+', content):
-                                print("Infected file (Malicious Content - Pipe): " + file_path)
-                                malicious_results.append(delete_file(file_path))  # Remove the infected file
                             if re.search(r'\S+\s+/bin/sh\s+-i', content):
                                 print("Infected file (Malicious Content - Shell): " + file_path)
                                 malicious_results.append(delete_file(file_path))  # Remove the infected file
@@ -1448,10 +1444,6 @@ def scan_file_for_malicious_content(file_path):
         print("Infected file (Malicious Content - FIFO): " + file_path)
         delete_file(file_path)
         return "Infected file according to malware content check: " + file_path
-    if re.search(r'\S+\s+\|\s+\S+', content):
-        print("Infected file (Malicious Content - Pipe): " + file_path)
-        delete_file(file_path)
-        return "Infected file according to malware content check: " + file_path
     if re.search(r'\S+\s+/bin/sh\s+-i', content):
         print("Infected file (Malicious Content - Shell): " + file_path)
         delete_file(file_path)
@@ -1607,10 +1599,6 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
         print("Infected file (Malicious Content - FIFO): " + file_path)
         delete_file(file_path)
         return "Infected file according to malware content check: " + file_path
-    if re.search(r'\S+\s+\|\s+\S+', content):
-        print("Infected file (Malicious Content - Pipe): " + file_path)
-        delete_file(file_path)
-        return "Infected file according to malware content check: " + file_path
     if re.search(r'\S+\s+/bin/sh\s+-i', content):
         print("Infected file (Malicious Content - Shell): " + file_path)
         delete_file(file_path)
@@ -1731,10 +1719,6 @@ def scan_folder_with_malware_content_check(folder_path):
                     print("Infected file (Malicious Content - FIFO): " + file_path)
                     delete_file(file_path)
                     continue
-                 if re.search(r'\S+\s+\|\s+\S+', content):
-                   print("Infected file (Malicious Content - Pipe): " + file_path)
-                   delete_file(file_path)
-                   continue
                  if is_phishing_website0(content) or is_phishing_website0("www." + format_url(content)) or is_phishing_website0(format_url(content)):
                    print("Phishing file (Phishing Website Content): " + file_path)
                    delete_file(file_path)  # Remove the infected file
@@ -2008,7 +1992,6 @@ def extract_ips_from_strace(file_path, exe_path):
         print(f"Command: {e.cmd}")
         print(f"Output: {e.output}")
         return []
-
 def monitoring_running_processes():
     try:
         temp_dir = tempfile.mkdtemp(prefix="running_file_scan_")
@@ -2120,6 +2103,12 @@ class AntivirusGUI:
         self.enter_button.pack()
         # Initialize rkhunter_process
         self.rkhunter_process = None
+        # Create a progress bar
+        self.progress_label = tk.Label(self.root, text="Progress: 0%")
+        self.progress_label.pack()
+        # Initialize file counters
+        self.infected_files_count = 0
+        self.clean_files_count = 0
     def create_menu(self):
         menu = tk.Menu(self.root)
         self.root.config(menu=menu)
@@ -2143,23 +2132,25 @@ class AntivirusGUI:
     def perform_folder_scan0(self):
         folder_path = filedialog.askdirectory()
         if folder_path:
+            # Reset file counters
+            self.infected_files_count = 0
+            self.clean_files_count = 0
+
+            # Execute scans in parallel using ThreadPoolExecutor
             with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
                 future_clamscan = executor.submit(scan_folder_with_clamscan, folder_path)
                 future_parallel = executor.submit(scan_folder_parallel, folder_path)
                 future_malware_content = executor.submit(scan_folder_with_malware_content_check, folder_path)
 
-                # Wait for all threads to complete
-                concurrent.futures.wait([future_clamscan, future_parallel, future_malware_content])
+                # Update progress label as the scans progress
+                while not all(future.done() for future in [future_clamscan, future_parallel, future_malware_content]):
+                    progress = sum(future.done() for future in [future_clamscan, future_parallel, future_malware_content]) / 3 * 100
+                    self.progress_label.config(text=f"Progress: {progress:.2f}%")
+                    self.root.update_idletasks()
 
-                # Get the results from the futures
-                result_clamscan = future_clamscan.result()
-                result_parallel = future_parallel.result()
-                result_malware_content = future_malware_content.result()
-
-                # Update labels to show results
-                self.update_results_label(f"Clamscan Result: {result_clamscan}\n"
-                                          f"Parallel Scan Result: {result_parallel}\n"
-                                          f"Malware Content Check Result: {result_malware_content}")
+                # Display the number of infected and clean files
+                self.update_results_label(f"Infected files: {self.infected_files_count}\n"
+                                          f"Clean files: {self.clean_files_count}")
     def check_website_in_blist0(self):
         website_url = simpledialog.askstring("Check Website in Blist", "Enter the website URL to check:")
         if not website_url:
