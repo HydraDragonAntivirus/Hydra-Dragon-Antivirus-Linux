@@ -2280,14 +2280,11 @@ def main():
                 print("extract_ips_from_strace result:", result8)     
         elif choice == "5":
             folder_path = input("Enter the path of the folder to calculate hashes for: ")
-            calculate_hashes_in_folder(folder_path)
-        
+            calculate_hashes_in_folder(folder_path)      
         elif choice == "6":
-            curses.wrapper(on_key_press)
-        
+            curses.wrapper(on_key_press)     
         elif choice == "7":
             check_website_in_blist()
-        
         elif choice == "8":
             subprocess.run(['sudo', 'chkrootkit'])
         elif choice == "9":
