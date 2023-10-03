@@ -123,3 +123,6 @@ No data collected
   -Me 4.7 million
 ## TODO 
 Create requirements.txt
+## How To Test Antivirus?
+- You can use virusshare.com but have some false positives be careful or look this:
+- https://tracker.h3x.eu/download/5000
