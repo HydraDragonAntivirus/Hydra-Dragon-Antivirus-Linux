@@ -708,7 +708,6 @@ def scan_running_files_with_clamav():
         # Clean up temporary directory
         shutil.rmtree(temp_dir, ignore_errors=True)
 checked_websites = set()  # Set to store checked websites
-
 def is_phishing_website(url):
     # Format the URL
     formatted_url = format_url(url)
@@ -743,6 +742,15 @@ def is_phishing_website(url):
 
             except sqlite3.OperationalError:
                 pass  # Table is not found, ignore it.
+
+        # Check ip_prefixed_url and zero_url for phishing
+        result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
+        if result_ip:
+            return True
+
+        result_zero = cursor.execute(query, (zero_url,)).fetchone()
+        if result_zero:
+            return True
 
     finally:
         if cursor:
@@ -965,8 +973,6 @@ def run_clamonacc_with_remove():
         print("clamonacc successfully executed with --remove argument.")
     except subprocess.CalledProcessError as e:
         print("Error executing clamonacc:", e)
-checked_websites = set()  # Set to store checked websites
-
 def is_phishing_website0(content):
     # Format the URL
     formatted_url = format_url(content)
@@ -1002,6 +1008,15 @@ def is_phishing_website0(content):
             except sqlite3.OperationalError:
                 pass  # Table is not found, ignore it.
 
+        # Check ip_prefixed_url and zero_url for phishing
+        result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
+        if result_ip:
+            return True
+
+        result_zero = cursor.execute(query, (zero_url,)).fetchone()
+        if result_zero:
+            return True
+
     finally:
         if cursor:
             cursor.close()
@@ -1012,7 +1027,7 @@ def is_phishing_website0(content):
 def is_website_infected0(content):
     databases = ['viruswebsites.db', 'viruswebsite.db', 'viruswebsitesbig.db', 'virusip.db', 'viruswebsitessmall.db','abusech.db','oldvirusbase.db']
     formatted_url = format_url(content)  # Format URL
-    iblocklist_query = get_iblocklist_query(url)  # Get the iblocklist query
+    iblocklist_query = get_iblocklist_query(content)  # Get the iblocklist query
     ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
     zero_url = "0.0.0.0" # URL with 0.0.0.0 prefixed
 
@@ -1134,7 +1149,7 @@ def access_firefox_history_continuous():
                 print(f"Scanning URL: {url}")
 
                 # Check if the URL is infected
-                is_infected = is_website_infected(url)
+                is_infected = is_website_infected(content)
 
                 # Check if the URL is a phishing website
                 is_phishing = is_phishing_website(url)
