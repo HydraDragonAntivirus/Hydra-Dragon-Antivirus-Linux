@@ -717,48 +717,46 @@ def is_phishing_website(url):
     ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0
     zero_url = "0.0.0.0"  # URL with 0.0.0.0 prefix
 
-    # Check if the URL or its variants have already been checked
-    if formatted_url in checked_websites or ip_prefixed_url in checked_websites or zero_url in checked_websites:
-        return True  # Website has already been checked
-
     # Database and table information
     db_path = 'viruswebsites.db'
     table_name = 'allphishingdomainsandlinks'
     field_name = 'field1'  # Assuming 'field1' is the field containing the URLs
-    # SQL query to check if the URL is a phishing website
-    query = f"SELECT * FROM {table_name} WHERE {field_name} = ?"
+    is_phishing_field = 'is_phishing_website'  # Assuming 'is_phishing_website' is the field indicating phishing
 
-    conn = None
-    cursor = None
+    # SQL queries to check if the URL is a phishing website
+    queries = [
+        f"SELECT * FROM {table_name} WHERE {field_name} = ? AND {is_phishing_field} = 1",
+        f"SELECT * FROM {table_name} WHERE {field_name} = ?",
+    ]
 
-    try:
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+    for query in queries:
+        try:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            result = cursor.execute(query, (formatted_url,)).fetchone()
 
-        for url_to_check in [formatted_url, ip_prefixed_url, zero_url]:
-            try:
-                result = cursor.execute(query, (url_to_check,)).fetchone()
+            if result:
+                cursor.close()
+                conn.close()
+                return True
 
-                if result:
-                    checked_websites.add(url_to_check)
-                    return True
+            # Check ip_prefixed_url and zero_url for phishing
+            result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
+            if result_ip:
+                cursor.close()
+                conn.close()
+                return True
 
-            except sqlite3.OperationalError:
-                pass  # Table is not found, ignore it.
+            result_zero = cursor.execute(query, (zero_url,)).fetchone()
+            if result_zero:
+                cursor.close()
+                conn.close()
+                return True
 
-        # Check ip_prefixed_url and zero_url for phishing
-        result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
-        if result_ip:
-            return True
-
-        result_zero = cursor.execute(query, (zero_url,)).fetchone()
-        if result_zero:
-            return True
-
-    finally:
-        if cursor:
+        except sqlite3.OperationalError:
+            pass  # Table is not found, ignore it.
+        finally:
             cursor.close()
-        if conn:
             conn.close()
 
     return False
@@ -982,48 +980,44 @@ def is_phishing_website0(content):
     ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0
     zero_url = "0.0.0.0"  # URL with 0.0.0.0 prefix
 
-    # Check if the URL or its variants have already been checked
-    if formatted_url in checked_websites:
-        display_warning(formatted_url)
-        return True  # Website has already been checked
-
-    if ip_prefixed_url in checked_websites:
-        display_warning(ip_prefixed_url)
-        return True  # Website has already been checked
-
-    if zero_url in checked_websites:
-        display_warning(zero_url)
-        return True  # Website has already been checked
-
     # Database and table information
     db_path = 'viruswebsites.db'
     table_name = 'allphishingdomainsandlinks'
     field_name = 'field1'  # Assuming 'field1' is the field containing the URLs
-    # SQL query to check if the URL is a phishing website
-    query = f"SELECT * FROM {table_name} WHERE {field_name} = ?"
+    # SQL queries to check if the URL is a phishing website
+    queries = [
+        f"SELECT * FROM {table_name} WHERE {field_name} = ?",
+        f"SELECT * FROM {table_name} WHERE {field_name} = ?",
+    ]
 
-    conn = None
-    cursor = None
+    for query in queries:
+        try:
+            conn = sqlite3.connect(db_path)
+            cursor = conn.cursor()
+            result = cursor.execute(query, (formatted_url,)).fetchone()
 
-    try:
-        conn = sqlite3.connect(db_path)
-        cursor = conn.cursor()
+            if result:
+                cursor.close()
+                conn.close()
+                return True
 
-        for url_to_check in [formatted_url, ip_prefixed_url, zero_url]:
-            try:
-                result = cursor.execute(query, (url_to_check,)).fetchone()
+            # Check ip_prefixed_url and zero_url for phishing
+            result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
+            if result_ip:
+                cursor.close()
+                conn.close()
+                return True
 
-                if result:
-                    checked_websites.add(url_to_check)
-                    return True
+            result_zero = cursor.execute(query, (zero_url,)).fetchone()
+            if result_zero:
+                cursor.close()
+                conn.close()
+                return True
 
-            except sqlite3.OperationalError:
-                pass  # Table is not found, ignore it.
-
-    finally:
-        if cursor:
+        except sqlite3.OperationalError:
+            pass  # Table is not found, ignore it.
+        finally:
             cursor.close()
-        if conn:
             conn.close()
 
     return False
@@ -1081,6 +1075,7 @@ def is_website_infected0(content):
                     checked_websites.add(formatted_url)
                     return True
 
+                # Check ip_prefixed_url and zero_url for phishing
                 result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
                 if result_ip:
                     cursor.close()
@@ -1172,7 +1167,7 @@ def access_firefox_history_continuous():
                 print(f"Scanning URL: {url}")
 
                 # Check if the URL is infected
-                is_infected = is_website_infected(content)
+                is_infected = is_website_infected(url)
 
                 # Check if the URL is a phishing website
                 is_phishing = is_phishing_website(url)
