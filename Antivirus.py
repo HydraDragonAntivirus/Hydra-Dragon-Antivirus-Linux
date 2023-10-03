@@ -2085,7 +2085,7 @@ def scan_single_file(file_path, exe_path):
         return []
 def main():
     while True:
-        print("You need to install firejail, strace, chkrootkit, clamav, and rkhunter.")
+        print("You need to install firejail, strace, chkrootkit, clamav and rkhunter.")
         print("You need to give root access to the program.")
         print("Select an option:")
         print("1. Perform a folder scan")
