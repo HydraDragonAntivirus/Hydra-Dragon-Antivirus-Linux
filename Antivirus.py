@@ -2194,10 +2194,11 @@ def main():
         print("5. Calculate hashes of files in a folder")
         print("6. Are someone clicking on your keyboard? Test it!")
         print("7. Check urlbl2.db for known websites. Don't add www. or http etc")
-        print("8. Rootkit scan")
-        print("9.Check Firefox profile")
-        print("10.User Interface Mode")
-        print("11. Exit")
+        print("8. Rootkit scan with chkrootkit")
+        print("9. Rootkit scan with rkhunter")
+        print("10.Check Firefox profile")
+        print("11.User Interface Mode")
+        print("12. Exit")
         
         choice = input("Enter your choice: ")
         
@@ -2289,20 +2290,21 @@ def main():
         
         elif choice == "8":
             subprocess.run(['sudo', 'chkrootkit'])
-            subprocess.run(['sudo', 'rkhunter', '--check'])
         elif choice == "9":
+            subprocess.run(['sudo', 'rkhunter', '--check'])
+        elif choice == "10":
             home_dir = input("Enter the home directory and username (e.g., /home/yourusername If you haven't started it as sudo, leave it blank):  ").strip()
             profile_path = find_firefox_profile(home_dir)
             if profile_path:
                 print(f"Found Firefox profile at: {profile_path}")
             else:
                 print("No Firefox profile found.")
-        elif choice == "10":
+        elif choice == "11":
             print("UI Mode Enabled")
             root = tk.Tk()
             gui = AntivirusGUI(root)
             root.mainloop()
-        elif choice == "11":
+        elif choice == "12":
             print("Exiting...")
             break
         else:
