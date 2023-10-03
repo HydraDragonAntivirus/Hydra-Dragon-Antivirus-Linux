@@ -2135,7 +2135,7 @@ class AntivirusGUI:
 
         website_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Website", menu=website_menu)
-        website_menu.add_command(label="Check Website in Blist", command=self.check_website_in_blist0)
+        website_menu.add_command(label="Check Website in blist", command=self.check_website_in_blist0)
 
         firefox_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Firefox", menu=firefox_menu)
