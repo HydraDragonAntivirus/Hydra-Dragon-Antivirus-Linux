@@ -707,7 +707,6 @@ def scan_running_files_with_clamav():
     finally:
         # Clean up temporary directory
         shutil.rmtree(temp_dir, ignore_errors=True)
-
 def is_phishing_website(url):
     # Format the URL
     formatted_url = format_url(url)
@@ -726,33 +725,35 @@ def is_phishing_website(url):
         f"SELECT * FROM {table_name} WHERE {field_name} = ?",
     ]
 
-    for query in queries:
-        try:
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            result = cursor.execute(query, (formatted_url,)).fetchone()
+    conn = None
+    cursor = None
 
-            if result:
-                cursor.close()
-                conn.close()
-                return True
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
 
-            result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
-            if result_ip:
-                cursor.close()
-                conn.close()
-                return True
+        for query in queries:
+            try:
+                result = cursor.execute(query, (formatted_url,)).fetchone()
 
-            result_zero = cursor.execute(query, (zero_url,)).fetchone()
-            if result_zero:
-                cursor.close()
-                conn.close()
-                return True
+                if result:
+                    return True
 
-        except sqlite3.OperationalError:
-            pass  # Table is not found, ignore it.
-        finally:
+                result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
+                if result_ip:
+                    return True
+
+                result_zero = cursor.execute(query, (zero_url,)).fetchone()
+                if result_zero:
+                    return True
+
+            except sqlite3.OperationalError:
+                pass  # Table is not found, ignore it.
+
+    finally:
+        if cursor:
             cursor.close()
+        if conn:
             conn.close()
 
     return False
