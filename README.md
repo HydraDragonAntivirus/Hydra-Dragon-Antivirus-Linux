@@ -39,7 +39,6 @@ No data collected
 ## Installation On Arch Linux For Beginners
 ### Please First Test It On Virtual Machine Antivirus Might Be Crash Your System
 ### Tested On Cachy OS And If You Looking For Debian Tested On Kali Linux And It Worked But Best Works At Debian Based Distros For All Features
-- sudo pacman -Sy
 - sudo pacman -S python
 - sudo pacman -S python-appdirs
 - sudo pacman -S python-tlsh
@@ -88,7 +87,7 @@ No data collected
 - sudo freshclam
 - sudo systemctl
 - start clamav-daemon
-- pip install tk --break-system-packages 
+- pip install tk
 ### Download Antivirus from mega.nz link: https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA
 - Save At Downloads
 - unzip Antivirus.zip
