@@ -771,14 +771,14 @@ def get_iblocklist_query(url):
         # İkinci kısmı temizle ve başında ve sonundaki boşlukları sil
         return parts[1].strip()
     return url
-def is_website_infected(url, last_checked_url=None):
+def is_website_infected(url):
     databases = ['viruswebsites.db', 'viruswebsite.db', 'virusip.db', 'viruswebsitessmall.db', 'abusech.db', 'oldvirusbase.db']
     formatted_url = format_url(url)  # Format the URL
     iblocklist_query = get_iblocklist_query(url)  # Get the iblocklist query
     ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
     zero_url = "0.0.0.0"  # URL with 0.0.0.0 prefixed
     
-    checking_same_url = last_checked_url == formatted_url
+    checking_same_url == formatted_url
     
     for database in databases:
         conn = sqlite3.connect(database)
@@ -1028,15 +1028,14 @@ def is_phishing_website0(content):
             conn.close()
 
     return False
-def is_website_infected0(content, last_checked_url=None):
+
+def is_website_infected(url, checking_same_url=False):
     databases = ['viruswebsites.db', 'viruswebsite.db', 'virusip.db', 'viruswebsitessmall.db', 'abusech.db', 'oldvirusbase.db']
-    formatted_url = format_url(content)  # Format the URL
-    iblocklist_query = get_iblocklist_query(content)  # Get the iblocklist query
+    formatted_url = format_url(url)  # Format the URL
+    iblocklist_query = get_iblocklist_query(url)  # Get the iblocklist query
     ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
     zero_url = "0.0.0.0"  # URL with 0.0.0.0 prefixed
-    
-    checking_same_url = last_checked_url == formatted_url
-    
+
     for database in databases:
         conn = sqlite3.connect(database)
         cursor = conn.cursor()
@@ -1060,20 +1059,20 @@ def is_website_infected0(content, last_checked_url=None):
             "SELECT * FROM \"full_ip-port\" WHERE field3 = ?",
             "SELECT * FROM iblocklist WHERE field2 = ?"
         ]
-    for query in queries:
+        for query in queries:
             try:
                 result = cursor.execute(query, (formatted_url,)).fetchone()
                 if result:
                     cursor.close()
                     conn.close()
                     return True
-                
+
                 result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
                 if result_ip:
                     cursor.close()
                     conn.close()
                     return True
-                
+
                 result_zero = cursor.execute(query, (zero_url,)).fetchone()
                 if result_zero:
                     result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()
@@ -1081,7 +1080,7 @@ def is_website_infected0(content, last_checked_url=None):
                         cursor.close()
                         conn.close()
                         return True
-                
+
             except sqlite3.OperationalError:
                 pass  # Table is not found, ignore it.
 
@@ -1090,7 +1089,70 @@ def is_website_infected0(content, last_checked_url=None):
 
     if checking_same_url:
         return "Already checking the same website"  # Indicate that we are checking the same website again
-    return False  # Return False if no match is found in any database  
+
+    return False  # Return False if no match is found in database
+def is_website_infected0(content, checking_same_url=False):
+    databases = ['viruswebsites.db', 'viruswebsite.db', 'virusip.db', 'viruswebsitessmall.db', 'abusech.db', 'oldvirusbase.db']
+    formatted_url = format_url(content)  # Format the URL
+    iblocklist_query = get_iblocklist_query(content)  # Get the iblocklist query
+    ip_prefixed_url = "0.0.0.0" + formatted_url  # URL prefixed with 0.0.0.0 and format_url
+    zero_url = "0.0.0.0"  # URL with 0.0.0.0 prefixed
+
+    for database in databases:
+        conn = sqlite3.connect(database)
+        cursor = conn.cursor()
+
+        queries = [
+            "SELECT * FROM targetedthreatsurl WHERE ioc = ?",
+            "SELECT * FROM ipsamnestytech WHERE field1 = ?",
+            "SELECT * FROM hostsstalkware WHERE field1 = ?",
+            "SELECT * FROM networkstalkware WHERE indicator = ?",
+            "SELECT * FROM domainsamnestytech WHERE field1 = ?",
+            "SELECT * FROM viruswebsites WHERE field1 = ?",
+            "SELECT * FROM viruswebsite WHERE field1 = ?",
+            "SELECT * FROM inactive WHERE field1 = ?",
+            "SELECT * FROM malwarebazaar WHERE field1 = ?",
+            "SELECT * FROM ultimatehostblacklist WHERE field2 = ?",
+            "SELECT * FROM virusip WHERE field1 = ?",
+            "SELECT * FROM mcafee WHERE field1 = ?",
+            "SELECT * FROM full_urls WHERE field3 = ?",
+            "SELECT * FROM full_domains WHERE field3 = ?",
+            "SELECT * FROM SSBLIP WHERE field2 = ?",
+            "SELECT * FROM \"full_ip-port\" WHERE field3 = ?",
+            "SELECT * FROM iblocklist WHERE field2 = ?"
+        ]
+        for query in queries:
+            try:
+                result = cursor.execute(query, (formatted_url,)).fetchone()
+                if result:
+                    cursor.close()
+                    conn.close()
+                    return True
+
+                result_ip = cursor.execute(query, (ip_prefixed_url,)).fetchone()
+                if result_ip:
+                    cursor.close()
+                    conn.close()
+                    return True
+
+                result_zero = cursor.execute(query, (zero_url,)).fetchone()
+                if result_zero:
+                    result_iblocklist = cursor.execute(query, (iblocklist_query,)).fetchone()
+                    if result_iblocklist:
+                        cursor.close()
+                        conn.close()
+                        return True
+
+            except sqlite3.OperationalError:
+                pass  # Table is not found, ignore it.
+
+    cursor.close()
+    conn.close()
+
+    if checking_same_url:
+        return "Already checking the same website"  # Indicate that we are checking the same website again
+
+    return False  # Return False if no match is found in database
 def check_tracking_cookies(url, cursor):
     try:
         # Remove the preceding dot from the domain if present
@@ -1105,7 +1167,6 @@ def check_tracking_cookies(url, cursor):
     except Exception as e:
         print(f"Error checking potential tracking cookies: {e}")
         return False
-
 def access_firefox_history_continuous():
     try:
         # Find the Firefox profile folder
@@ -1204,7 +1265,7 @@ def access_firefox_history_continuous():
                 else:
                     print("The website is clean.")
 
-                if len(last_visited_websites) >= 5:
+                if len(last_visited_websites) >= 10:
                     last_visited_websites.pop(0)  # Remove the oldest visited website
                 last_visited_websites.append(url)
 
@@ -1318,7 +1379,7 @@ def access_firefox_history_continuous0(file_path):
                 else:
                     print("The website is clean.")
 
-                if len(last_visited_websites) >= 5:
+                if len(last_visited_websites) >= 10:
                     last_visited_websites.pop(0)  # Remove the oldest visited website
                 last_visited_websites.append(url)
 
