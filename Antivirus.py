@@ -2153,41 +2153,6 @@ class AntivirusGUI:
         firefox_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Firefox", menu=firefox_menu)
         firefox_menu.add_command(label="Check Firefox Profile", command=self.check_firefox_profile)
-
-    def perform_file_scan0(self):
-        # Clear the infected and clean files lists
-        self.infected_files = []
-        self.clean_files = []
-
-        # Clear the listboxes
-        self.infected_files_listbox.delete(0, tk.END)
-        self.clean_files_listbox.delete(0, tk.END)
-
-        file_path = filedialog.askopenfilename()
-        if file_path:
-            # Reset file counters
-            self.infected_files_count = 0
-            self.clean_files_count = 0
-
-            # Execute scans using ThreadPoolExecutor
-            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
-                future_clamscan = executor.submit(scan_file_with_clamscan, file_path)
-                future_parallel = executor.submit(scan_file, file_path)
-                future_malware_content = executor.submit(scan_file_for_malicious_content_without_sandbox, file_path)
-
-                # Update progress label as the scans progress
-                while not all(future.done() for future in [future_clamscan, future_parallel, future_malware_content]):
-                    progress = sum(future.done() for future in [future_clamscan, future_parallel, future_malware_content]) / 3 * 100
-                    self.progress_label.config(text=f"Progress: {progress:.2f}%")
-                    self.root.update_idletasks()
-
-                # Display the scan results
-                self.update_results_label(f"Infected files: {self.infected_files_count}\nClean files: {self.clean_files_count}")
-
-                # Update infected and clean files lists
-                self.update_infected_files_list()
-                self.update_clean_files_list()
-
     def update_infected_files_list(self):
         if hasattr(self, 'infected_files_listbox'):
             # Display infected files in the listbox
@@ -2201,7 +2166,54 @@ class AntivirusGUI:
             self.clean_files_listbox.delete(0, tk.END)
             for file in self.clean_files:
                 self.clean_files_listbox.insert(tk.END, file)
+    def display_scan_results(self, files, scan_type):
+        # Create a new window to display the results
+        results_window = tk.Toplevel(self.root)
+        results_window.title("Scan Results")
 
+        # Create a frame to hold the files
+        files_frame = tk.Frame(results_window)
+        files_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+
+        # Create a label for files
+        tk.Label(files_frame, text=f"{scan_type} Scan Results:").pack(anchor=tk.W)
+
+        # Create a listbox to display files
+        files_listbox = tk.Listbox(files_frame)
+        for file in files:
+            files_listbox.insert(tk.END, file)
+        files_listbox.pack(fill=tk.BOTH, expand=True)
+    def run_clamscan(self, file_path):
+        try:
+            # Run clamscan
+            command = ['clamscan', file_path]
+            result = subprocess.run(command, capture_output=True, text=True)
+            return result.stdout
+        except Exception as e:
+            return f"Error running clamscan: {e}" 
+
+    def perform_file_scan0(self):
+        file_path = filedialog.askopenfilename()
+        if file_path:
+            self.infected_files = []
+            self.clean_files = []
+
+            self.infected_files_listbox.delete(0, tk.END)
+            self.clean_files_listbox.delete(0, tk.END)
+
+            clamscan_output = self.run_clamscan(file_path)
+
+            self.update_console("=== ClamAV Scan Results ===")
+            self.update_console(clamscan_output)
+
+            file_scan_result = AntivirusGUI.scan_file(file_path)
+            malicious_content_scan_result = AntivirusGUI.scan_file_for_malicious_content_without_sandbox(file_path)
+
+            self.update_console("=== File Scan Results ===")
+            self.update_console(file_scan_result)
+
+            self.update_console("=== Malicious Content Scan Results ===")
+            self.update_console(malicious_content_scan_result)
     def perform_folder_scan0(self):
         folder_path = filedialog.askdirectory()
         if folder_path:
@@ -2222,8 +2234,7 @@ class AntivirusGUI:
                     self.root.update_idletasks()
 
                 # Display the number of infected and clean files
-                self.update_results_label(f"Infected files: {self.infected_files_count}\n"
-                                          f"Clean files: {self.clean_files_count}")
+                self.update_results_label(f"Infected files: {self.infected_files_count}\nClean files: {self.clean_files_count}")
 
                 # Display infected and clean files
                 self.update_infected_files_list()
@@ -2236,37 +2247,9 @@ class AntivirusGUI:
                 # Display any additional scan results or information
                 self.update_results_label("Scan completed. Additional scan results or information here.")
 
-    def display_scan_results(self):
-        # Create a new window to display the results
-        results_window = tk.Toplevel(self.root)
-        results_window.title("Scan Results")
-
-        # Create a frame to hold the infected files
-        infected_frame = tk.Frame(results_window)
-        infected_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-
-        # Create a label for infected files
-        tk.Label(infected_frame, text="Infected Files:").pack(anchor=tk.W)
-
-        # Create a listbox to display infected files
-        infected_listbox = tk.Listbox(infected_frame)
-        for file in self.infected_files:
-            infected_listbox.insert(tk.END, file)
-        infected_listbox.pack(fill=tk.BOTH, expand=True)
-
-        # Create a frame to hold the clean files
-        clean_frame = tk.Frame(results_window)
-        clean_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
-
-        # Create a label for clean files
-        tk.Label(clean_frame, text="Clean Files:").pack(anchor=tk.W)
-
-        # Create a listbox to display clean files
-        clean_listbox = tk.Listbox(clean_frame)
-        for file in self.clean_files:
-            clean_listbox.insert(tk.END, file)
-        clean_listbox.pack(fill=tk.BOTH, expand=True)
-
+                # Display scan results in a new window
+                self.display_scan_results(self.infected_files, "Infected")
+                self.display_scan_results(self.clean_files, "Clean")
     def check_website_in_blist0(self):
         website_url = simpledialog.askstring("Check Website in Blist", "Enter the website URL to check:")
         if not website_url:
@@ -2299,7 +2282,7 @@ class AntivirusGUI:
         self.console_text.see(tk.END)
 
     def press_enter(self):
-        # Simulate pressing Enter by writing a newline character to the process
+        # Simulate pressinrun_clamg Enter by writing a newline character to the process
         if self.rkhunter_process:
             self.rkhunter_process.stdin.write('\n')
             self.rkhunter_process.stdin.flush()
@@ -2450,7 +2433,7 @@ def main():
             if os.path.getsize(file_path) == 0:
                print("File is empty (0-byte size), rejecting.")
                return
-            # Prompt the user to enter the home directory
+            # Prompt the user to enter the home directorun_clamry
             home_dir = input("Enter the home directory and username for Firefox history scan (e.g., /home/yourusername If you haven't started it as sudo, leave it blank): ")
 
             suspicious_file_path = file_path
