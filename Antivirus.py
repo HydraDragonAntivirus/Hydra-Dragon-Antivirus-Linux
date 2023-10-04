@@ -406,14 +406,12 @@ def is_file_infected_sha256(sha256):
 
     # If the code reaches this point, it means the record with the specified field1 value was not found in any of the databases.
     return False
-
 def calculate_md5(file_path):
     hash_md5 = hashlib.md5()
     with open(file_path, "rb") as file:
         for chunk in iter(lambda: file.read(4096), b""):
             hash_md5.update(chunk)
     return hash_md5.hexdigest()
-
 def calculate_sha1(file_path):
     hash_sha1 = hashlib.sha1()
     with open(file_path, "rb") as file:
@@ -440,29 +438,40 @@ def delete_file(file_path):
         return f"Error deleting {file_path}: {e}"
 def scan_file(file_path):
     try:
+        # Check if the file exists
+        if not os.path.exists(file_path):
+            return f"File not found: {file_path}"
+
+        # Get the file size
         file_size = os.path.getsize(file_path)
         
         # Skip empty files
         if file_size == 0:
-            return f"Clean file: {file_path}"
-        
-        # Calculate hash values
+            return f"Clean file (empty): {file_path}"
+
+        # Calculate hash values and perform further checks for infection
         md5 = calculate_md5(file_path)
         sha1 = calculate_sha1(file_path)
         sha256 = calculate_sha256(file_path)
         ssdeep = calculate_ssdeep(file_path)
         tlsh = calculate_tlsh(file_path)
+
         # Check if the file is infected using hash-based methods
         if is_file_infected_md5(md5) or is_file_infected_sha1(sha1) or is_file_infected_sha256(sha256) or is_file_infected_ssdeep(ssdeep) or is_file_infected_tlsh(tlsh):
             print(f"Infected file detected: {file_path}\nMD5 Hash: {md5}")
             print(delete_file(file_path))  # Automatically delete infected file
         else:
             return f"Clean file according to databases: {file_path}"
-        
+
     except PermissionError:
         return f"Access denied: {file_path}"
     except Exception as e:
         return f"Error processing {file_path}: {e}"
+def scan_file_with_clamscan(file_path):
+    try:
+        subprocess.run(["clamscan", "--heuristic-alerts=yes", "--remove=yes", "--detect-pua=yes", "--normalize=no", file_path])
+    except Exception as e:
+        print(f"Error running ClamScan: {e}")
 def scan_folder_parallel(folder_path):
     infected_files = []
     
@@ -1487,7 +1496,6 @@ def scan_file_for_malicious_content(file_path):
 
     except subprocess.CalledProcessError as e:
         print("Error running sandbox:", e)
-
 def scan_file_for_malicious_content_without_sandbox(file_path):
     try:
         with open(file_path, "r", encoding="utf-8") as file:
@@ -2269,22 +2277,33 @@ def main():
         print("You need to install firejail, strace, chkrootkit, clamav and rkhunter.")
         print("You need to give root access to the program.")
         print("Select an option:")
-        print("1. Perform a folder scan")
-        print("2. Check if a website is infected by typing the URL")
-        print("3. Real-time web and file protection")
-        print("4. Perform an intuitive sandbox file scan (Run on a VM and perform a file scan first)")
-        print("5. Calculate hashes of files in a folder")
-        print("6. Are someone clicking on your keyboard? Test it!")
-        print("7. Check urlbl2.db for known websites. Don't add www. or http etc")
-        print("8. Rootkit scan with chkrootkit")
-        print("9. Rootkit scan with rkhunter")
-        print("10.Check Firefox profile")
-        print("11.User Interface Mode")
-        print("12. Exit")
+        print("1. Perform a file scan")
+        print("2. Perform a folder scan")
+        print("3. Check if a website is infected by typing the URL")
+        print("4. Real-time web and file protection")
+        print("5. Perform an intuitive sandbox file scan (Run on a VM and perform a file scan first)")
+        print("6. Calculate hashes of files in a folder")
+        print("7. Are someone clicking on your keyboard? Test it!")
+        print("8. Check urlbl2.db for known websites. Don't add www. or http etc")
+        print("9. Rootkit scan with chkrootkit")
+        print("10. Rootkit scan with rkhunter")
+        print("11.Check Firefox profile")
+        print("12.User Interface Mode")
+        print("13. Exit")
         
         choice = input("Enter your choice: ")
-        
         if choice == "1":
+            file_path = input("Enter the path of the file to scan: ").strip("'")
+            if os.path.exists(file_path):
+                if os.path.getsize(file_path) == 0:
+                    print("File is empty (0-byte size), rejecting.")
+                else:
+                    scan_file(file_path)
+                    scan_file_with_clamscan(file_path)
+                    scan_file_for_malicious_content_without_sandbox(file_path)
+            else:
+                print(f"File not found: {file_path}")
+        elif choice == "2":
             folder_path = input("Enter the path of the folder to scan: ")
             
             if os.path.exists(folder_path) and os.path.isdir(folder_path):
@@ -2295,7 +2314,7 @@ def main():
             else:
                 print("Invalid folder path.")
         
-        elif choice == "2":
+        elif choice == "3":
             website_url = input("Enter the website URL to check: ")
             if is_website_infected(website_url):
                 print("The website is infected.")
@@ -2303,7 +2322,7 @@ def main():
                 print("The website is phishing.")
             else:
                 print("The website is clean.")   
-        elif choice == "3":
+        elif choice == "4":
             # Prompt the user to enter the home directory
             home_dir = input("Enter the home directory and username for Firefox history scan (e.g., /home/yourusername If you haven't started it as sudo, leave it blank): ")
             with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
@@ -2311,7 +2330,7 @@ def main():
                 executor.submit(access_firefox_history_continuous)
                 executor.submit(scan_running_files_with_custom_and_clamav_continuous)
                 executor.submit(monitoring_running_processes)        
-        elif choice == "4":
+        elif choice == "5":
             file_path = input("Enter the path of the file to intuitively scan: ").strip("'")
                  # Check if the file exists before proceeding
             if not os.path.exists(file_path):
@@ -2360,30 +2379,30 @@ def main():
                 print("find_connected_ips result:", result6)
                 print("continuously_monitor_file result:", result7)
                 print("extract_ips_from_strace result:", result8)     
-        elif choice == "5":
+        elif choice == "6":
             folder_path = input("Enter the path of the folder to calculate hashes for: ")
             calculate_hashes_in_folder(folder_path)      
-        elif choice == "6":
-            curses.wrapper(on_key_press)     
         elif choice == "7":
-            check_website_in_blist()
+            curses.wrapper(on_key_press)     
         elif choice == "8":
-            subprocess.run(['sudo', 'chkrootkit'])
+            check_website_in_blist()
         elif choice == "9":
-            subprocess.run(['sudo', 'rkhunter', '--check'])
+            subprocess.run(['sudo', 'chkrootkit'])
         elif choice == "10":
+            subprocess.run(['sudo', 'rkhunter', '--check'])
+        elif choice == "11":
             home_dir = input("Enter the home directory and username (e.g., /home/yourusername If you haven't started it as sudo, leave it blank):  ").strip()
             profile_path = find_firefox_profile(home_dir)
             if profile_path:
                 print(f"Found Firefox profile at: {profile_path}")
             else:
                 print("No Firefox profile found.")
-        elif choice == "11":
+        elif choice == "12":
             print("UI Mode Enabled")
             root = tk.Tk()
             gui = AntivirusGUI(root)
             root.mainloop()
-        elif choice == "12":
+        elif choice == "13":
             print("Exiting...")
             break
         else:
