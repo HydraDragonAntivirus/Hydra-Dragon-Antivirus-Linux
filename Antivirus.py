@@ -2116,6 +2116,7 @@ class AntivirusGUI:
         file_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="File", menu=file_menu)
         file_menu.add_command(label="Perform a folder scan", command=self.perform_folder_scan0)
+        file_menu.add_command(label="Perform a file scan", command=self.perform_file_scan0)
 
         rootkit_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Rootkit", menu=rootkit_menu)
@@ -2129,6 +2130,18 @@ class AntivirusGUI:
         firefox_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Firefox", menu=firefox_menu)
         firefox_menu.add_command(label="Check Firefox Profile", command=self.check_firefox_profile)
+    def perform_file_scan0(self):
+        file_path = filedialog.askopenfilename()
+        if file_path:
+            if os.path.exists(file_path):
+                if os.path.getsize(file_path) == 0:
+                    self.update_console("File is empty (0-byte size), rejecting.")
+                else:
+                    scan_file(file_path)
+                    scan_file_with_clamscan(file_path)
+                    scan_file_for_malicious_content_without_sandbox(file_path)
+            else:
+                self.update_console(f"File not found: {file_path}")
     def perform_folder_scan0(self):
         folder_path = filedialog.askdirectory()
         if folder_path:
