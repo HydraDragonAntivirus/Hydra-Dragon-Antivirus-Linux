@@ -463,7 +463,6 @@ def scan_file(file_path):
         return f"Access denied: {file_path}"
     except Exception as e:
         return f"Error processing {file_path}: {e}"
-
 def scan_folder_parallel(folder_path):
     infected_files = []
     
