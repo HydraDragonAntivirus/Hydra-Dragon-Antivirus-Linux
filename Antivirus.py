@@ -2112,6 +2112,9 @@ class AntivirusGUI:
         # Initialize file counters
         self.infected_files_count = 0
         self.clean_files_count = 0
+        # Initialize key_events to keep track of keyboard events
+        self.key_events = []
+        self.rat_detected = False
     def create_menu(self):
         menu = tk.Menu(self.root)
         self.root.config(menu=menu)
@@ -2127,6 +2130,28 @@ class AntivirusGUI:
         firefox_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Firefox", menu=firefox_menu)
         firefox_menu.add_command(label="Check Firefox Profile", command=self.check_firefox_profile)
+        test_keyboard_menu = tk.Menu(menu, tearoff=0)
+        menu.add_cascade(label="Test Keyboard Activity", menu=test_keyboard_menu)
+        test_keyboard_menu.add_command(label="Test Keyboard Activity", command=self.test_keyboard_activity)
+    def test_keyboard_activity(self):
+        # Function to test keyboard activity
+        print("Testing keyboard activity... Press any key.")
+        self.key_events = []  # Reset key events
+
+        def on_key_press(event):
+            char = event.char
+            key = char if 32 <= ord(char) <= 126 else f"Keycode {ord(char)}"
+            self.key_events.append(key)
+
+            if len(self.key_events) >= THRESHOLD_KEYPRESS_COUNT:
+                self.detect_rat()
+
+        # Bind key press event to on_key_press
+        self.root.bind("<Key>", on_key_press)
+
+    def detect_rat(self):
+        self.rat_detected = True
+        print("Possible Remote Access Trojan (RAT) activity detected!")
     def display_scan_results(self, files, scan_type):
         # Create a new window to display the results
         results_window = tk.Toplevel(self.root)
