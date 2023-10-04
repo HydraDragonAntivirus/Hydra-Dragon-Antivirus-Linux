@@ -2095,20 +2095,44 @@ class AntivirusGUI:
         # Create the menu
         self.create_menu()
 
+        # Create a frame to hold the file scan section
+        self.scan_frame = tk.Frame(self.root)
+        self.scan_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+
         # Create a Text widget to simulate console
-        self.console_text = tk.Text(self.root, wrap="word", height=20, width=80)
+        self.console_text = tk.Text(self.scan_frame, wrap="word", height=20, width=80)
         self.console_text.pack(expand=True, fill=tk.BOTH)
-        # Add a button to press Enter
-        self.enter_button = tk.Button(self.root, text="Press Enter", command=self.press_enter)
-        self.enter_button.pack()
+
+        # Add a button to perform file scan
+        self.perform_file_scan_button = tk.Button(self.scan_frame, text="Perform File Scan", command=self.perform_file_scan0)
+        self.perform_file_scan_button.pack(pady=(10, 0))
+
+        # Create a frame to hold infected and clean files section
+        self.files_frame = tk.Frame(self.root)
+        self.files_frame.pack(padx=10, pady=(0, 10), fill=tk.BOTH, expand=True)
+
+        # Create labels for infected and clean files
+        tk.Label(self.files_frame, text="Infected Files:").pack(side=tk.LEFT, padx=(0, 10))
+        tk.Label(self.files_frame, text="Clean Files:").pack(side=tk.RIGHT, padx=(10, 0))
+
+        # Create listboxes for infected and clean files
+        self.infected_files_listbox = tk.Listbox(self.files_frame, width=40)
+        self.clean_files_listbox = tk.Listbox(self.files_frame, width=40)
+
+        self.infected_files_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.clean_files_listbox.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+
         # Initialize rkhunter_process
         self.rkhunter_process = None
-        # Create a progress bar
+
+        # Create a progress label
         self.progress_label = tk.Label(self.root, text="Progress: 0%")
         self.progress_label.pack()
+
         # Initialize file counters
         self.infected_files_count = 0
         self.clean_files_count = 0
+
     def create_menu(self):
         menu = tk.Menu(self.root)
         self.root.config(menu=menu)
@@ -2116,7 +2140,6 @@ class AntivirusGUI:
         file_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="File", menu=file_menu)
         file_menu.add_command(label="Perform a folder scan", command=self.perform_folder_scan0)
-        file_menu.add_command(label="Perform a file scan", command=self.perform_file_scan0)
 
         rootkit_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Rootkit", menu=rootkit_menu)
@@ -2130,18 +2153,55 @@ class AntivirusGUI:
         firefox_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Firefox", menu=firefox_menu)
         firefox_menu.add_command(label="Check Firefox Profile", command=self.check_firefox_profile)
+
     def perform_file_scan0(self):
+        # Clear the infected and clean files lists
+        self.infected_files = []
+        self.clean_files = []
+
+        # Clear the listboxes
+        self.infected_files_listbox.delete(0, tk.END)
+        self.clean_files_listbox.delete(0, tk.END)
+
         file_path = filedialog.askopenfilename()
         if file_path:
-            if os.path.exists(file_path):
-                if os.path.getsize(file_path) == 0:
-                    self.update_console("File is empty (0-byte size), rejecting.")
-                else:
-                    scan_file(file_path)
-                    scan_file_with_clamscan(file_path)
-                    scan_file_for_malicious_content_without_sandbox(file_path)
-            else:
-                self.update_console(f"File not found: {file_path}")
+            # Reset file counters
+            self.infected_files_count = 0
+            self.clean_files_count = 0
+
+            # Execute scans using ThreadPoolExecutor
+            with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+                future_clamscan = executor.submit(scan_file_with_clamscan, file_path)
+                future_parallel = executor.submit(scan_file, file_path)
+                future_malware_content = executor.submit(scan_file_for_malicious_content_without_sandbox, file_path)
+
+                # Update progress label as the scans progress
+                while not all(future.done() for future in [future_clamscan, future_parallel, future_malware_content]):
+                    progress = sum(future.done() for future in [future_clamscan, future_parallel, future_malware_content]) / 3 * 100
+                    self.progress_label.config(text=f"Progress: {progress:.2f}%")
+                    self.root.update_idletasks()
+
+                # Display the scan results
+                self.update_results_label(f"Infected files: {self.infected_files_count}\nClean files: {self.clean_files_count}")
+
+                # Update infected and clean files lists
+                self.update_infected_files_list()
+                self.update_clean_files_list()
+
+    def update_infected_files_list(self):
+        if hasattr(self, 'infected_files_listbox'):
+            # Display infected files in the listbox
+            self.infected_files_listbox.delete(0, tk.END)
+            for file in self.infected_files:
+                self.infected_files_listbox.insert(tk.END, file)
+
+    def update_clean_files_list(self):
+        if hasattr(self, 'clean_files_listbox'):
+            # Display clean files in the listbox
+            self.clean_files_listbox.delete(0, tk.END)
+            for file in self.clean_files:
+                self.clean_files_listbox.insert(tk.END, file)
+
     def perform_folder_scan0(self):
         folder_path = filedialog.askdirectory()
         if folder_path:
@@ -2164,6 +2224,49 @@ class AntivirusGUI:
                 # Display the number of infected and clean files
                 self.update_results_label(f"Infected files: {self.infected_files_count}\n"
                                           f"Clean files: {self.clean_files_count}")
+
+                # Display infected and clean files
+                self.update_infected_files_list()
+                self.update_clean_files_list()
+
+                # Display the total scan time
+                total_scan_time = sum([future.result() for future in [future_clamscan, future_parallel, future_malware_content]])
+                self.update_results_label(f"Total scan time: {total_scan_time:.2f} seconds")
+
+                # Display any additional scan results or information
+                self.update_results_label("Scan completed. Additional scan results or information here.")
+
+    def display_scan_results(self):
+        # Create a new window to display the results
+        results_window = tk.Toplevel(self.root)
+        results_window.title("Scan Results")
+
+        # Create a frame to hold the infected files
+        infected_frame = tk.Frame(results_window)
+        infected_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+
+        # Create a label for infected files
+        tk.Label(infected_frame, text="Infected Files:").pack(anchor=tk.W)
+
+        # Create a listbox to display infected files
+        infected_listbox = tk.Listbox(infected_frame)
+        for file in self.infected_files:
+            infected_listbox.insert(tk.END, file)
+        infected_listbox.pack(fill=tk.BOTH, expand=True)
+
+        # Create a frame to hold the clean files
+        clean_frame = tk.Frame(results_window)
+        clean_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
+
+        # Create a label for clean files
+        tk.Label(clean_frame, text="Clean Files:").pack(anchor=tk.W)
+
+        # Create a listbox to display clean files
+        clean_listbox = tk.Listbox(clean_frame)
+        for file in self.clean_files:
+            clean_listbox.insert(tk.END, file)
+        clean_listbox.pack(fill=tk.BOTH, expand=True)
+
     def check_website_in_blist0(self):
         website_url = simpledialog.askstring("Check Website in Blist", "Enter the website URL to check:")
         if not website_url:
@@ -2194,16 +2297,13 @@ class AntivirusGUI:
         self.console_text.insert(tk.END, text + '\n')
         # Scroll to the end
         self.console_text.see(tk.END)
+
     def press_enter(self):
         # Simulate pressing Enter by writing a newline character to the process
         if self.rkhunter_process:
             self.rkhunter_process.stdin.write('\n')
             self.rkhunter_process.stdin.flush()
-    def press_enter(self):
-        # Simulate pressing Enter by writing a newline character to the process
-        if self.rkhunter_process:
-            self.rkhunter_process.stdin.write('\n')
-            self.rkhunter_process.stdin.flush()
+
     def run_rkhunter(self):
         try:
             # Run rkhunter with sudo
@@ -2237,11 +2337,13 @@ class AntivirusGUI:
 
         except Exception as e:
             self.update_results_label(f"Error running rkhunter: {e}")
+
     def update_console(self, text):
         # Append the text to the console
         self.console_text.insert(tk.END, text + '\n')
         # Scroll to the end
         self.console_text.see(tk.END)
+
     def run_chkrootkit(self):
         try:
             result = subprocess.run(['sudo', 'chkrootkit'], capture_output=True, text=True)
@@ -2250,16 +2352,19 @@ class AntivirusGUI:
                 self.update_console(line)
         except Exception as e:
             self.update_console(f"Error running chkrootkit: {e}")
+
     def update_console(self, text):
         # Append the text to the console
         self.console_text.insert(tk.END, text + '\n')
         # Scroll to the end
         self.console_text.see(tk.END)
+
     def update_results(self):
         while True:
             # Get the result from the queue and insert it into the Listbox
             result = self.result_queue.get()
             self.result_listbox.insert(tk.END, result)
+
     def check_firefox_profile(self):
         home_dir = filedialog.askdirectory(title="Select Firefox Profile Directory", initialdir=os.path.expanduser("~"))
         if home_dir:
@@ -2269,7 +2374,6 @@ class AntivirusGUI:
             else:
                 self.update_results_label("No Firefox profile found.")
 
-    # Add a method to update the results label
     def update_results_label(self, text):
         # Destroy previous label
         for widget in self.root.winfo_children():
