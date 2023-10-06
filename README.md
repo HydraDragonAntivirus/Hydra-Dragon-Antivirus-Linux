@@ -128,3 +128,6 @@ Create requirements.txt
 - You can use virusshare.com but have some false positives be careful or look this:
 - https://tracker.h3x.eu/download/5000
 - https://www.reddit.com/r/Malware/comments/7fabu5/sites_to_download_malware/
+- ## How To Improve Protection Rate Very Easily?
+- The best easiest way is the writing YARA rules otherwise learn reverse engeering.
+- You can use ClamAV via for that. Notice it may cause too many false positives but less false negatives.
