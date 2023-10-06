@@ -88,6 +88,7 @@ No data collected
 - sudo systemctl
 - start clamav-daemon
 - pip install tk
+- Use my yara and hdb file in clamav signatures.
 ### Download Antivirus from mega.nz link: https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA
 - Save At Downloads
 - unzip Antivirus.zip
