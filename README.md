@@ -132,3 +132,4 @@ Create requirements.txt
 - ## How To Improve Protection Rate Very Easily?
 - The best easiest way is the writing YARA rules otherwise learn reverse engeering.
 - You can use ClamAV via for that. Notice it may cause too many false positives but less false negatives and you can easily name the virus names. I'm going to convert my rules to YARA rules.
+- https://www.rfxn.com/projects/linux-malware-detect/ Use this thing too.
