@@ -130,4 +130,4 @@ Create requirements.txt
 - https://www.reddit.com/r/Malware/comments/7fabu5/sites_to_download_malware/
 - ## How To Improve Protection Rate Very Easily?
 - The best easiest way is the writing YARA rules otherwise learn reverse engeering.
-- You can use ClamAV via for that. Notice it may cause too many false positives but less false negatives and you can easily name the virus names.
+- You can use ClamAV via for that. Notice it may cause too many false positives but less false negatives and you can easily name the virus names. I'm going to convert my rules to YARA rules.
