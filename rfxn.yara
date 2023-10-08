@@ -75669,4 +75669,2589 @@ rule ISO_LNK_JS_CMD_DLL {
       for any i in (1..#lnk_header):
 	  (($minimized_inactive in (@lnk_header[i]+60..@lnk_header[i]+61)) and ($js_ext in (@lnk_header[i]+255..@lnk_header[i]+304)))
 }
+rule win_agent_tesla {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2020-10-01"
+        description = "detects Agent Tesla"
+        tlp         = "TLP:WHITE"
+        version     = "v1.0"
+        hash        = "dcd7323af2490ceccfc9da2c7f92c54a"
+        malpedia_family = "win.agent_tesla"
+
+    strings:
+        $string_1  = "get_CHoo"
+        $string_2  = "get_Lenght"
+        $string_3  = "get_kbok"
+        $string_4  = "get_sSL"
+        $string_5  = "get_useSeparateFolderTree"
+        $string_6  = "set_AccountCredentialsModel"
+        $string_7  = "set_BindingAccountConfiguration"
+        $string_8  = "set_CHoo"
+        $string_9  = "set_CreateNoWindow"
+        $string_10 = "set_IdnAddress"
+        $string_11 = "set_IsBodyHtml"
+        $string_12 = "set_Lenght"
+        $string_13 = "set_MaximumAutomaticRedirections"
+        $string_14 = "set_UseShellExecute"
+        $string_15 = "set_disabledByRestriction"
+        $string_16 = "set_kbok"
+        $string_17 = "set_sSL"
+        $string_18 = "set_signingEncryptionPreset"
+        $string_19 = "set_useSeparateFolderTree"
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        15 of ($string_*) 
+}rule win_amadey {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        version         = "v1.0"
+        tlp             = "TLP:WHITE"
+        date            = "2022-11-17"
+        description     = "matches unpacked Amadey samples"
+        malpedia_family = "win.amadey"
+        hash_md5        = "25cfcfdb6d73d9cfd88a5247d4038727"
+        hash_sha1       = "912d1ef61750bc622ee069cdeed2adbfe208c54d"
+        hash_sha256     = "03effd3f94517b08061db014de12f8bf01166a04e93adc2f240a6616bb3bd29a"
+
+    strings:
+        $pdb  = "\\Amadey\\Release\\Amadey.pdb" 
+        /*  Amadey uses multiple hex strings to decrypt the strings, C2 traffic 
+            and as identification. The preceeding string 'stoi ...' is added to 
+            improve performance. 
+        */
+        $keys = /stoi argument out of range\x00\x00[a-f0-9]{32}\x00{1,16}[a-f0-9]{32}\x00{1,4}[a-f0-9]{6}\x00{1,4}[a-f0-9]{32}\x00/
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            $pdb or $keys
+        )
+}
+rule win_asyncrat_j1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2020-04-26"
+        description = "detects AsyncRAT"
+        references  = "https://github.com/NYAN-x-CAT/AsyncRAT-C-Sharp"
+        tlp         = "TLP:WHITE"
+        version     = "v1.0"
+
+    strings:
+        $str_anti_1 = "VIRTUAL" wide
+        $str_anti_2 = "vmware" wide
+        $str_anti_3 = "VirtualBox" wide
+        $str_anti_4 = "SbieDll.dll" wide
+
+        $str_miner_1 = "--donate-level=" wide
+
+        $str_b_rev_run    = "\\nuR\\noisreVtnerruC\\swodniW\\tfosorciM\\erawtfoS" wide
+        $str_b_msg_pack_1 = "(ext8,ext16,ex32) type $c7,$c8,$c9" wide
+        $str_b_msg_pack_2 = "(never used) type $c1" wide
+        $str_b_schtask_1  = "/create /f /sc ONLOGON /RL HIGHEST /tn \"'" wide
+        $str_b_schtask_2  = "\"' /tr \"'" wide
+
+        $str_config_1 = "Antivirus" wide
+        $str_config_2 = "Pastebin" wide
+        $str_config_3 = "HWID" wide
+        $str_config_4 = "Installed" wide
+        $str_config_5 = "Pong" wide
+        $str_config_6 = "Performance" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of ($str_anti_*)  and 
+        all of ($str_config_*) and ( 
+            all of ($str_miner_*) or 
+            all of ($str_b_*)
+        )
+}
+rule win_aurora_stealer_a {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        version         = "v1.0"
+        tlp             = "TLP:WHITE"
+        date            = "2022-12-14"
+        description     = "detects Aurora Stealer samples"
+        malpedia_family = "win.aurora_stealer"
+        hash1_md5        = "51c153501e991f6ce4901e6d9578d0c8"
+        hash1_sha1       = "3816f17052b28603855bde3e57db77a8455bdea4"
+        hash1_sha256     = "c148c449e1f6c4c53a7278090453d935d1ab71c3e8b69511f98993b6057f612d"
+        hash2_md5        = "65692e1d5b98225dbfb1b6b2b8935689"
+        hash2_sha1       = "0b51765c175954c9e47c39309e020bcb0f90b783"
+        hash2_sha256     = "5a42aa4fc8180c7489ce54d7a43f19d49136bd15ed7decf81f6e9e638bdaee2b"
+
+    strings:
+
+        $str_func_01 = "main.(*DATA_BLOB).ToByteArray"
+        $str_func_02 = "main.Base64Encode"
+        $str_func_03 = "main.Capture"
+        $str_func_04 = "main.CaptureRect"
+        $str_func_05 = "main.ConnectToServer"
+        $str_func_06 = "main.CreateImage"
+        $str_func_07 = "main.FileExsist"
+        $str_func_08 = "main.GetDisplayBounds"
+        $str_func_09 = "main.GetInfoUser"
+        $str_func_10 = "main.GetOS"
+        $str_func_11 = "main.Grab"
+        $str_func_12 = "main.MachineID"
+        $str_func_13 = "main.NewBlob"
+        $str_func_14 = "main.NumActiveDisplays"
+        $str_func_15 = "main.PathTrans"
+        $str_func_16 = "main.SendToServer_NEW"
+        $str_func_17 = "main.SetUsermame"
+        $str_func_18 = "main.Zip"
+        $str_func_19 = "main.base64Decode"
+        $str_func_20 = "main.countupMonitorCallback"
+        $str_func_21 = "main.enumDisplayMonitors"
+        $str_func_22 = "main.getCPU"
+        $str_func_23 = "main.getDesktopWindow"
+        $str_func_24 = "main.getGPU"
+        $str_func_25 = "main.getMasterKey"
+        $str_func_26 = "main.getMonitorBoundsCallback"
+        $str_func_27 = "main.getMonitorRealSize"
+        $str_func_28 = "main.sysTotalMemory"
+        $str_func_29 = "main.xDecrypt"
+
+        $str_type_01 = "type..eq.main.Browser_G"
+        $str_type_02 = "type..eq.main.STRUSER"
+        $str_type_03 = "type..eq.main.Telegram_G"
+        $str_type_04 = "type..eq.main.Crypto_G"
+        $str_type_05 = "type..eq.main.ScreenShot_G"
+        $str_type_06 = "type..eq.main.FileGrabber_G"
+        $str_type_07 = "type..eq.main.FTP_G"
+        $str_type_08 = "type..eq.main.Steam_G"
+        $str_type_09 = "type..eq.main.DATA_BLOB"
+        $str_type_10 = "type..eq.main.Grabber"
+
+        $varia_01 = "\\User Data\\Local State"
+        $varia_02 = "\\\\Opera Stable\\\\Local State"
+        $varia_03 = "Reconnect 1"
+        $varia_04 = "@ftmone"
+        $varia_05 = "^user^"
+        $varia_06 = "wmic path win32_VideoController get name"
+        $varia_07 = "\\AppData\\Roaming\\Telegram Desktop\\tdata"
+        $varia_08 = "C:\\Windows.old\\Users\\"
+        $varia_09 = "ScreenShot"
+        $varia_10 = "Crypto"
+
+    condition:
+        uint16(0) == 0x5A4D and
+        (
+            32 of ($str_*) or
+            9 of ($varia_*)
+        )
+}rule win_danabot {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2022-04-19"
+        version     = "v1.1"
+        description = "detects DanaBot"
+        hash1       = "b7f891f4ed079420e16c4509680cfad824b061feb94a0d801c96b82e1f7d52ad"
+        hash1b      = "62174157b42e5c8c86b05baf56dfd24b"
+        hash2       = "c8f27c0e0d4e91b1a6f62f165d45d8616fc24d9c798eb8ab4269a60e29a2de5e"
+        hash3       = "5cb70c87f0b98279420dde0592770394bf8d5b57df50bce4106d868154fd74cb"
+        tlp         = "TLP:WHITE"
+        malpedia_family = "win.danabot"
+
+    strings:
+        $keyboard = { C6 05 [4] 71 C6 05 [4] 77 C6 05 [4] 65 C6 05 [4] 72 C6 05 [4] 74 C6 05 [4] 79 C6 05 [4] 75 C6 05 [4] 69 C6 05 [4] 6F  }
+        $move_y   = { 8B 45 F8 C6 80 [4] 79 } // mov     eax, [ebp-8], mov     byte ptr <addr>[eax], 79h
+        $id_str   = /[A-F0-9]{32}zz/
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            all of them 
+        )
+}
+rule win_discordpws_j1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "detects a Discord password stealer"
+
+    strings:
+        $str_services_1 = "Roaming\\Discord" wide
+        $str_services_2 = "Roaming\\discordcanary" wide
+        $str_services_3 = "Roaming\\discordptb" wide
+        $str_services_4 = "Local\\Google\\Chrome\\User Data\\Default" wide
+        $str_services_5 = "Local\\Naver\\Naver Whale\\User Data\\Default" wide
+        $str_services_6 = "Roaming\\Opera Software\\Opera Stable" wide
+        $str_services_7 = "Local\\BraveSoftware\\Brave-Browser\\User Data\\Default" wide
+        $str_services_8 = "Local\\Yandex\\YandexBrowser\\User Data\\Default" wide
+
+        $str_token_1 = "[\\w-]{24}\\.[\\w-]{6}\\.[\\w-]{27}" wide
+        $str_token_2 = "mfa\\.[\\w-]{84}" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of ($str_services_*) and 
+        all of ($str_token_*)
+}rule win_erbium_stealer_a1 {
+
+    meta:
+        author       = "Johannes Bader @viql"
+        version      = "v1.0"
+        tlp          = "TLP:WHITE"
+        date         = "2022-09-01"
+        description  = "detects the unpacked Erbium stealer"
+        hash1_md5    = "e719388778f14e77819a62c5759d114b"
+        hash1_sha1   = "540fe15ae176cadcfa059354fcdfe59a41089450"
+        hash1_sha256 = "d932a62ab0fb28e439a5a7aab8db97b286533eafccf039dd079537ac9e91f551"
+        hash2_md5    = "74f53a6ad69f61379b6ca74144b597e6"
+        hash2_sha1   = "f188b5edc93ca1e250aee92db84f416b1642ec7f"
+        hash2_sha256 = "d45c7e27054ba5d38a10e7e9d302e1d6ce74f17cf23085b65ccfba08e21a8d0b"
+
+    strings:
+        $str_path            = "ErbiumDed/api.php?method=getstub&bid=" wide
+        $str_tag             = "malik_here" ascii
+        $fowler_noll_vo_hash = {C5 9D 1C 81 [1-100] 93 01 00 01}
+        //$zw = {00 DE 10 F3 DA}
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            all of ($str_*) and #fowler_noll_vo_hash >= 2 
+        )
+}rule win_ffdroider {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2022-04-08"
+        description = "detects FFDroider"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+
+    strings:
+        $string_pdb   = "F:\\FbRobot\\Release\\FbRobot.pdb"
+        $string_mutex = "37238328-1324242-5456786-8fdff0-67547552436675" wide
+        $string_path  = "/seemorebty/"
+
+        $tld_ca = ".ca" wide
+        $tld_cn = ".cn" wide
+        $tld_eg = ".eg" wide
+        $tld_fr = ".fr" wide
+        $tld_de = ".de" wide
+        $tld_in = ".in" wide
+        $tld_it = ".it" wide
+        $tld_cojp = ".co.jp" wide
+        $tld_nl = ".nl" wide
+        $tld_pl = ".pl" wide
+        $tld_sa = ".sa" wide
+        $tld_sg = ".sg" wide
+        $tld_es = ".es" wide
+        $tld_ae = ".ae" wide
+        $tld_couk = ".co.uk" wide
+        $tld_com = ".com" wide
+        $tld_comau = ".com.au" wide
+        $tld_combr = ".com.br" wide
+        $tld_commx = ".com.mx" wide
+        $tld_comtr = ".com.tr" wide
+        
+        $facebook_1 = "https://www.facebook.com/ads/manager/account_settings/account_billing" wide
+        $facebook_2 = "https://www.facebook.com/pages/?category=your_pages&ref=bookmarks"
+        $facebook_3 = "https://www.facebook.com/bookmarks/pages?ref_type=logout_gear" 
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            2 of ($string_*) or
+            (
+                all of ($tld_*) and
+                all of ($facebook_*)
+            ) 
+        )
+}rule win_gcleaner {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        date            = "2022-05-29"
+        version         = "v1.0"
+        description     = "detects GCleaner"
+        tlp             = "TLP:WHITE"
+        malpedia_family = "win.gcleaner"
+        hash1_md5       = "8151e61aec021fa04bce8a30ea052e9d"
+        hash1_sha1      = "4b972d2e74a286e9663d25913610b409e713befd"
+        hash1_sha256    = "868fceaa4c01c2e2ceee3a27ac24ec9c16c55401a7e5a7ca05f14463f88c180f"
+        hash2_md5       = "7526665a9d5d3d4b0cfffb2192c0c2b3"
+        hash2_sha1      = "13bf754b44526a7a8b5b96cec0e482312c14838c"
+        hash2_sha256    = "bb5cd698b03b3a47a2e55a6be3d62f3ee7c55630eb831b787e458f96aefe631b"
+        hash3_md5       = "a39e68ae37310b79c72025c6dfba0a2a"
+        hash3_sha1      = "ae007e61c16514a182d21ee4e802b7fcb07f3871"
+        hash3_sha256    = "c5395d24c0a1302d23f95c1f95de0f662dc457ef785138b0e58b0324965c8a84"
+
+    strings:
+        $accept rule win_agent_tesla {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2020-10-01"
+        description = "detects Agent Tesla"
+        tlp         = "TLP:WHITE"
+        version     = "v1.0"
+        hash        = "dcd7323af2490ceccfc9da2c7f92c54a"
+        malpedia_family = "win.agent_tesla"
+
+    strings:
+        $string_1  = "get_CHoo"
+        $string_2  = "get_Lenght"
+        $string_3  = "get_kbok"
+        $string_4  = "get_sSL"
+        $string_5  = "get_useSeparateFolderTree"
+        $string_6  = "set_AccountCredentialsModel"
+        $string_7  = "set_BindingAccountConfiguration"
+        $string_8  = "set_CHoo"
+        $string_9  = "set_CreateNoWindow"
+        $string_10 = "set_IdnAddress"
+        $string_11 = "set_IsBodyHtml"
+        $string_12 = "set_Lenght"
+        $string_13 = "set_MaximumAutomaticRedirections"
+        $string_14 = "set_UseShellExecute"
+        $string_15 = "set_disabledByRestriction"
+        $string_16 = "set_kbok"
+        $string_17 = "set_sSL"
+        $string_18 = "set_signingEncryptionPreset"
+        $string_19 = "set_useSeparateFolderTree"
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        15 of ($string_*) 
+}rule win_amadey {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        version         = "v1.0"
+        tlp             = "TLP:WHITE"
+        date            = "2022-11-17"
+        description     = "matches unpacked Amadey samples"
+        malpedia_family = "win.amadey"
+        hash_md5        = "25cfcfdb6d73d9cfd88a5247d4038727"
+        hash_sha1       = "912d1ef61750bc622ee069cdeed2adbfe208c54d"
+        hash_sha256     = "03effd3f94517b08061db014de12f8bf01166a04e93adc2f240a6616bb3bd29a"
+
+    strings:
+        $pdb  = "\\Amadey\\Release\\Amadey.pdb" 
+        /*  Amadey uses multiple hex strings to decrypt the strings, C2 traffic 
+            and as identification. The preceeding string 'stoi ...' is added to 
+            improve performance. 
+        */
+        $keys = /stoi argument out of range\x00\x00[a-f0-9]{32}\x00{1,16}[a-f0-9]{32}\x00{1,4}[a-f0-9]{6}\x00{1,4}[a-f0-9]{32}\x00/
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            $pdb or $keys
+        )
+}
+rule win_asyncrat_j1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2020-04-26"
+        description = "detects AsyncRAT"
+        references  = "https://github.com/NYAN-x-CAT/AsyncRAT-C-Sharp"
+        tlp         = "TLP:WHITE"
+        version     = "v1.0"
+
+    strings:
+        $str_anti_1 = "VIRTUAL" wide
+        $str_anti_2 = "vmware" wide
+        $str_anti_3 = "VirtualBox" wide
+        $str_anti_4 = "SbieDll.dll" wide
+
+        $str_miner_1 = "--donate-level=" wide
+
+        $str_b_rev_run    = "\\nuR\\noisreVtnerruC\\swodniW\\tfosorciM\\erawtfoS" wide
+        $str_b_msg_pack_1 = "(ext8,ext16,ex32) type $c7,$c8,$c9" wide
+        $str_b_msg_pack_2 = "(never used) type $c1" wide
+        $str_b_schtask_1  = "/create /f /sc ONLOGON /RL HIGHEST /tn \"'" wide
+        $str_b_schtask_2  = "\"' /tr \"'" wide
+
+        $str_config_1 = "Antivirus" wide
+        $str_config_2 = "Pastebin" wide
+        $str_config_3 = "HWID" wide
+        $str_config_4 = "Installed" wide
+        $str_config_5 = "Pong" wide
+        $str_config_6 = "Performance" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of ($str_anti_*)  and 
+        all of ($str_config_*) and ( 
+            all of ($str_miner_*) or 
+            all of ($str_b_*)
+        )
+}
+rule win_aurora_stealer_a {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        version         = "v1.0"
+        tlp             = "TLP:WHITE"
+        date            = "2022-12-14"
+        description     = "detects Aurora Stealer samples"
+        malpedia_family = "win.aurora_stealer"
+        hash1_md5        = "51c153501e991f6ce4901e6d9578d0c8"
+        hash1_sha1       = "3816f17052b28603855bde3e57db77a8455bdea4"
+        hash1_sha256     = "c148c449e1f6c4c53a7278090453d935d1ab71c3e8b69511f98993b6057f612d"
+        hash2_md5        = "65692e1d5b98225dbfb1b6b2b8935689"
+        hash2_sha1       = "0b51765c175954c9e47c39309e020bcb0f90b783"
+        hash2_sha256     = "5a42aa4fc8180c7489ce54d7a43f19d49136bd15ed7decf81f6e9e638bdaee2b"
+
+    strings:
+
+        $str_func_01 = "main.(*DATA_BLOB).ToByteArray"
+        $str_func_02 = "main.Base64Encode"
+        $str_func_03 = "main.Capture"
+        $str_func_04 = "main.CaptureRect"
+        $str_func_05 = "main.ConnectToServer"
+        $str_func_06 = "main.CreateImage"
+        $str_func_07 = "main.FileExsist"
+        $str_func_08 = "main.GetDisplayBounds"
+        $str_func_09 = "main.GetInfoUser"
+        $str_func_10 = "main.GetOS"
+        $str_func_11 = "main.Grab"
+        $str_func_12 = "main.MachineID"
+        $str_func_13 = "main.NewBlob"
+        $str_func_14 = "main.NumActiveDisplays"
+        $str_func_15 = "main.PathTrans"
+        $str_func_16 = "main.SendToServer_NEW"
+        $str_func_17 = "main.SetUsermame"
+        $str_func_18 = "main.Zip"
+        $str_func_19 = "main.base64Decode"
+        $str_func_20 = "main.countupMonitorCallback"
+        $str_func_21 = "main.enumDisplayMonitors"
+        $str_func_22 = "main.getCPU"
+        $str_func_23 = "main.getDesktopWindow"
+        $str_func_24 = "main.getGPU"
+        $str_func_25 = "main.getMasterKey"
+        $str_func_26 = "main.getMonitorBoundsCallback"
+        $str_func_27 = "main.getMonitorRealSize"
+        $str_func_28 = "main.sysTotalMemory"
+        $str_func_29 = "main.xDecrypt"
+
+        $str_type_01 = "type..eq.main.Browser_G"
+        $str_type_02 = "type..eq.main.STRUSER"
+        $str_type_03 = "type..eq.main.Telegram_G"
+        $str_type_04 = "type..eq.main.Crypto_G"
+        $str_type_05 = "type..eq.main.ScreenShot_G"
+        $str_type_06 = "type..eq.main.FileGrabber_G"
+        $str_type_07 = "type..eq.main.FTP_G"
+        $str_type_08 = "type..eq.main.Steam_G"
+        $str_type_09 = "type..eq.main.DATA_BLOB"
+        $str_type_10 = "type..eq.main.Grabber"
+
+        $varia_01 = "\\User Data\\Local State"
+        $varia_02 = "\\\\Opera Stable\\\\Local State"
+        $varia_03 = "Reconnect 1"
+        $varia_04 = "@ftmone"
+        $varia_05 = "^user^"
+        $varia_06 = "wmic path win32_VideoController get name"
+        $varia_07 = "\\AppData\\Roaming\\Telegram Desktop\\tdata"
+        $varia_08 = "C:\\Windows.old\\Users\\"
+        $varia_09 = "ScreenShot"
+        $varia_10 = "Crypto"
+
+    condition:
+        uint16(0) == 0x5A4D and
+        (
+            32 of ($str_*) or
+            9 of ($varia_*)
+        )
+}rule win_danabot {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2022-04-19"
+        version     = "v1.1"
+        description = "detects DanaBot"
+        hash1       = "b7f891f4ed079420e16c4509680cfad824b061feb94a0d801c96b82e1f7d52ad"
+        hash1b      = "62174157b42e5c8c86b05baf56dfd24b"
+        hash2       = "c8f27c0e0d4e91b1a6f62f165d45d8616fc24d9c798eb8ab4269a60e29a2de5e"
+        hash3       = "5cb70c87f0b98279420dde0592770394bf8d5b57df50bce4106d868154fd74cb"
+        tlp         = "TLP:WHITE"
+        malpedia_family = "win.danabot"
+
+    strings:
+        $keyboard = { C6 05 [4] 71 C6 05 [4] 77 C6 05 [4] 65 C6 05 [4] 72 C6 05 [4] 74 C6 05 [4] 79 C6 05 [4] 75 C6 05 [4] 69 C6 05 [4] 6F  }
+        $move_y   = { 8B 45 F8 C6 80 [4] 79 } // mov     eax, [ebp-8], mov     byte ptr <addr>[eax], 79h
+        $id_str   = /[A-F0-9]{32}zz/
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            all of them 
+        )
+}
+rule win_discordpws_j1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "detects a Discord password stealer"
+
+    strings:
+        $str_services_1 = "Roaming\\Discord" wide
+        $str_services_2 = "Roaming\\discordcanary" wide
+        $str_services_3 = "Roaming\\discordptb" wide
+        $str_services_4 = "Local\\Google\\Chrome\\User Data\\Default" wide
+        $str_services_5 = "Local\\Naver\\Naver Whale\\User Data\\Default" wide
+        $str_services_6 = "Roaming\\Opera Software\\Opera Stable" wide
+        $str_services_7 = "Local\\BraveSoftware\\Brave-Browser\\User Data\\Default" wide
+        $str_services_8 = "Local\\Yandex\\YandexBrowser\\User Data\\Default" wide
+
+        $str_token_1 = "[\\w-]{24}\\.[\\w-]{6}\\.[\\w-]{27}" wide
+        $str_token_2 = "mfa\\.[\\w-]{84}" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of ($str_services_*) and 
+        all of ($str_token_*)
+}rule win_erbium_stealer_a1 {
+
+    meta:
+        author       = "Johannes Bader @viql"
+        version      = "v1.0"
+        tlp          = "TLP:WHITE"
+        date         = "2022-09-01"
+        description  = "detects the unpacked Erbium stealer"
+        hash1_md5    = "e719388778f14e77819a62c5759d114b"
+        hash1_sha1   = "540fe15ae176cadcfa059354fcdfe59a41089450"
+        hash1_sha256 = "d932a62ab0fb28e439a5a7aab8db97b286533eafccf039dd079537ac9e91f551"
+        hash2_md5    = "74f53a6ad69f61379b6ca74144b597e6"
+        hash2_sha1   = "f188b5edc93ca1e250aee92db84f416b1642ec7f"
+        hash2_sha256 = "d45c7e27054ba5d38a10e7e9d302e1d6ce74f17cf23085b65ccfba08e21a8d0b"
+
+    strings:
+        $str_path            = "ErbiumDed/api.php?method=getstub&bid=" wide
+        $str_tag             = "malik_here" ascii
+        $fowler_noll_vo_hash = {C5 9D 1C 81 [1-100] 93 01 00 01}
+        //$zw = {00 DE 10 F3 DA}
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            all of ($str_*) and #fowler_noll_vo_hash >= 2 
+        )
+}rule win_ffdroider {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2022-04-08"
+        description = "detects FFDroider"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+
+    strings:
+        $string_pdb   = "F:\\FbRobot\\Release\\FbRobot.pdb"
+        $string_mutex = "37238328-1324242-5456786-8fdff0-67547552436675" wide
+        $string_path  = "/seemorebty/"
+
+        $tld_ca = ".ca" wide
+        $tld_cn = ".cn" wide
+        $tld_eg = ".eg" wide
+        $tld_fr = ".fr" wide
+        $tld_de = ".de" wide
+        $tld_in = ".in" wide
+        $tld_it = ".it" wide
+        $tld_cojp = ".co.jp" wide
+        $tld_nl = ".nl" wide
+        $tld_pl = ".pl" wide
+        $tld_sa = ".sa" wide
+        $tld_sg = ".sg" wide
+        $tld_es = ".es" wide
+        $tld_ae = ".ae" wide
+        $tld_couk = ".co.uk" wide
+        $tld_com = ".com" wide
+        $tld_comau = ".com.au" wide
+        $tld_combr = ".com.br" wide
+        $tld_commx = ".com.mx" wide
+        $tld_comtr = ".com.tr" wide
+        
+        $facebook_1 = "https://www.facebook.com/ads/manager/account_settings/account_billing" wide
+        $facebook_2 = "https://www.facebook.com/pages/?category=your_pages&ref=bookmarks"
+        $facebook_3 = "https://www.facebook.com/bookmarks/pages?ref_type=logout_gear" 
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            2 of ($string_*) or
+            (
+                all of ($tld_*) and
+                all of ($facebook_*)
+            ) 
+        )
+}rule win_gcleaner {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        date            = "2022-05-29"
+        version         = "v1.0"
+        description     = "detects GCleaner"
+        tlp             = "TLP:WHITE"
+        malpedia_family = "win.gcleaner"
+        hash1_md5       = "8151e61aec021fa04bce8a30ea052e9d"
+        hash1_sha1      = "4b972d2e74a286e9663d25913610b409e713befd"
+        hash1_sha256    = "868fceaa4c01c2e2ceee3a27ac24ec9c16c55401a7e5a7ca05f14463f88c180f"
+        hash2_md5       = "7526665a9d5d3d4b0cfffb2192c0c2b3"
+        hash2_sha1      = "13bf754b44526a7a8b5b96cec0e482312c14838c"
+        hash2_sha256    = "bb5cd698b03b3a47a2e55a6be3d62f3ee7c55630eb831b787e458f96aefe631b"
+        hash3_md5       = "a39e68ae37310b79c72025c6dfba0a2a"
+        hash3_sha1      = "ae007e61c16514a182d21ee4e802b7fcb07f3871"
+        hash3_sha256    = "c5395d24c0a1302d23f95c1f95de0f662dc457ef785138b0e58b0324965c8a84"
+
+    strings:
+        $accept = "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1"
+        $accept_lang = "Accept-Language: ru-RU,ru;q=0.9,en;q=0.8" 
+        $accept_charset = "Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1"
+        $accept_encoding = "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0"
+        
+        $unkown = "<unknown>"
+        $cmd1 = "\" & exit" 
+        $cmd2 = "\" /f & erase "
+        $cmd3 = "/c taskkill /im \""
+
+        $anti1 = " Far "
+        $anti2 = "roxifier"
+        $anti3 = "HTTP Analyzer"
+        $anti4 = "Wireshark"
+        $anti5 = "NetworkMiner"
+
+        $mix1 = "mixshop"
+        $mix2 = "mixtwo"
+        $mix3 = "mixnull"
+        $mix4 = "mixazed"
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        15 of them
+}
+rule win_imminentrat_j1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "detects the imminent rat"
+        hash1       = "a728603061b5aa98fa40fb0447ba71e3"
+        hash2       = "5d8446a23b80e9b6cb7406c2ba81d606685cf11b24e9eb8309153a47b04f3aad"
+        malpedia_family = "win.imminent_monitor_rat"
+
+    strings:
+        $str_mining_1 = "Downloading miner data" wide
+        $str_mining_2 = "This client is already mining" wide
+        $str_mining_3 = "Started mining successfully" wide
+        $str_mining_4 = "Unable to start mining" wide
+        $str_mining_5 = "-o {0} -u {1} -p {2} -a scrypt -I {3} -T {4}" wide
+
+        $str_plugin_1 = "\\Imminent\\Plugins\\" wide
+
+        $str_fingerprint_1 = "Screens: {0}" wide
+        $str_fingerprint_2 = "Battery: {0}" wide
+        $str_fingerprint_3 = "Ram Usage: {0}%" wide
+        $str_fingerprint_4 = "Last Reboot: {0}" wide
+        $str_fingerprint_5 = "Graphics Card: {0}" wide
+        $str_fingerprint_6 = "Firewall: {0}" wide
+        $str_fingerprint_7 = "Anti-Virus: {0}" wide
+        $str_fingerprint_8 = "Unique Identifier: {0}" wide
+        $str_fingerprint_9 = "Privileges: {0}" wide
+        $str_fingerprint_10 = "MAC Address: {0}" wide
+        $str_fingerprint_11 = "Client Location: {0}" wide
+        $str_fingerprint_12 = "Ram: {0}" wide
+        $str_fingerprint_13 = "LAN: {0}" wide
+        $str_fingerprint_14 = "Processor: {0}" wide
+        $str_fingerprint_15 = "Computer Username: {0}" wide
+        $str_fingerprint_16 = "Operating System: {0}" wide
+        $str_fingerprint_17 = "Client Identifier: {0}" wide
+        $str_fingerprint_18 = "Computer Name: {0}" wide
+
+        $str_filedownload_1 = "File downloaded & executed" wide
+        $str_filedownload_2 = "File downloaded & updated" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        3 of ($str_mining_*) and 
+        $str_plugin_1 and 
+        15 of ($str_fingerprint_*) and 
+        all of ($str_filedownload_*)
+}rule win_laplas_clipper {
+    
+    meta:
+        author          = "Johannes Bader @viql"
+        date            = "2022-11-09"
+        version         = "v1.0"
+        description     = "detects unpacked Laplas Clipper"
+        tlp             = "TLP:WHITE"
+        hash1_md5       = "3afb4573dea2dbac4bb5f1915f7a4dce"
+        hash1_sha1      = "9ad8b880f3ab35f0d1a7fe46d9d8e0bea36e0d14"
+        hash1_sha256    = "52901dc481d1be2129725e3c4810ae895f9840e27a1dce69630dedcf71b6c021"
+
+    strings:
+        $func_names_0 = "main.request"
+        $func_names_1 = "main.setOnline"
+        $func_names_2 = "main.getRegex"
+        $func_names_3 = "main.getAddress"
+        $func_names_4 = "main.waitOpenClipboard"
+        $func_names_5 = "main.clipboardRead"
+        $func_names_6 = "main.clipboardWrite"
+        $func_names_7 = "main.startHandler"
+        $func_names_8 = "main.isRunning"
+        $func_names_9 = "main.main"
+        $func_names_10 = "main.isStartupEnabled"
+        $func_names_11 = "main.decrypt"
+        $func_names_12 = "main.existsPath"
+        $func_names_13 = "main.getPid"
+        $func_names_14 = "main.writePid"
+        $func_names_15 = "main.enableStartup"
+        $func_names_16 = "main.copyFile"
+        $func_names_17 = "main.clipboardWrite.func1"
+        $func_names_18 = "main.init"
+
+        $startup_0 = "/sc"
+        $startup_1 = "/ri"
+        $startup_2 = "/st"
+        $startup_3 = "/tr"
+        $startup_4 = "/tn"
+        $startup_5 = "/create"
+        $startup_6 = "/C"
+        $startup_7 = "once"
+        $startup_8 = "cmd.exe"
+        $startup_9 = "9999:59"
+        $startup_10 = "00:00"
+
+        $request_0 = "http://"
+        $request_1 = "/bot/"
+        $request_2 = "key="
+
+    condition: 
+        uint16(0) == 0x5A4D and 
+        17 of ($func_names_*)  and
+        9 of ($startup_*) and
+        all of ($request_*)
+}
+rule win_limerat_j1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.1"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "detects the lime rat"
+        hash        = "2a0575b66a700edb40a07434895bf7a9"
+        malpedia_family = "win.limerat"
+
+    strings:
+        $str_1 = "Y21kLmV4ZSAvYyBwaW5nIDAgLW4gMiAmIGRlbCA=" wide
+        $str_2 = "schtasks /create /f /sc ONLOGON /RL HIGHEST /tn LimeRAT-Admin" wide
+        $str_3 = "Minning..." wide
+        $str_4 = "--donate-level=" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        3 of them
+}
+rule win_lu0bot_loader {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2023-03-08"
+        description = "detects the loader of the Lu0bot malware"
+        tlp         = "TLP:WHITE"
+        version     = "v1.0"
+        hash_md5    = "c5eb9c6ded323a8db7eb739e514bb46c"
+        hash_sha1   = "cede3aa5e1821a47f416c64bc48d1aab72eb48ca"
+        hash_sha256 = "5a2283a997ab6a9680b69f9318315df3c9e634b3c4dd4a46f8bc5df35fc81284"
+
+    strings:
+        /*
+            add     edi, ?h 
+            sub     dword ptr [esi], <4 byte key>
+            add     esi, 4
+            (optional mov)
+            cmp     esi, edi
+        */
+        $decryption = { 81 C7 ?? 0? 00 00 
+                        81 2E ?? ?? ?? ??
+                        83 C6 04
+                        [0-4]
+                        39 FE} 
+        /*
+            mov     ebx, 0
+            push    ebx
+            push    eax
+            mov     eax, offset WinExec
+            call    dword ptr [eax]
+        */
+        $winexec    = { BB 00 00 00 00
+                        53
+                        50
+                        B8 ?? ?? ?? ??
+                        FF 10}
+        /*
+
+            mov     eax, 0
+            push    eax
+            call    ExitProcess
+        */
+        $exit       = { B8 00 00 00 00
+                        50
+                        E8}
+
+    condition:
+        (uint16(0) == 0x5A4D) and
+        $decryption and
+        $winexec and
+        $exit
+} rule win_matiex_keylogger {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2020-07-20"
+        description = "detects the Matiex Keylogger"
+        tlp         = "TLP:WHITE"
+        version     = "v1.0"
+
+    strings:
+        $obfuscator_1 = "OiCuntJollyGoodDayYeHavin_____________________________________________________"
+        $obfuscator_2 = "ObfuscatedByGoliath"
+        $obfuscator_3 = "de4fuckyou"
+        $obfuscator_4 = "ObfuscatedByGoliath"
+        $obfuscator_5 = "Beds-Protector"
+
+        $recoveries_1  = "Orginal_Slim"
+        $recoveries_2  = "Orginal_IceDragon"
+        $recoveries_3  = "Orginal_PaleMoon"
+        $recoveries_4  = "Orginal_IceCat"
+        $recoveries_5  = "Orginal_PostBox"
+        $recoveries_6  = "Orginal_FireFox"
+        $recoveries_7  = "Orginal_CyberFox"
+        $recoveries_8  = "Orginal_WaterFox"
+        $recoveries_9  = "Orginal_SeaMonkey"
+        $recoveries_10 = "Orginal_Outlook"
+        $recoveries_11 = "Orginal_Foxmail"
+        $recoveries_12 = "Orginal_Kinzaa"
+        $recoveries_13 = "Orginal_Sputnik"
+        $recoveries_14 = "Orginal_Falkon"
+        $recoveries_15 = "Orginal_SalamWeb"
+        $recoveries_16 = "Orginal_CoolNovo"
+        $recoveries_17 = "Orginal_QIPSurf"
+        $recoveries_18 = "Orginal_BlackHawk"
+        $recoveries_19 = "Orginal_7Star"
+        $recoveries_20 = "Orginal_Sleipnir"
+        $recoveries_21 = "Orginal_Citrio"
+        $recoveries_22 = "Orginal_Chrome_Canary"
+        $recoveries_23 = "Orginal_Chrome"
+        $recoveries_24 = "Orginal_Coowon"
+        $recoveries_25 = "Orginal_CocCoc"
+        $recoveries_26 = "Orginal_Uran"
+        $recoveries_27 = "Orginal_QQ"
+        $recoveries_28 = "Orginal_orbitum"
+        $recoveries_29 = "Orginal_Slimjet"
+        $recoveries_30 = "Orginal_Iridium"
+        $recoveries_31 = "Orginal_Vivaldi"
+        $recoveries_32 = "Orginal_Iron"
+        $recoveries_33 = "Orginal_Chromium"
+        $recoveries_34 = "Orginal_Ghost"
+        $recoveries_35 = "Orginal_Cent"
+        $recoveries_36 = "Orginal_xVast"
+        $recoveries_37 = "Orginal_Chedot"
+        $recoveries_38 = "Orginal_Superbird"
+        $recoveries_39 = "Orginal_360_English"
+        $recoveries_40 = "Orginal_360_China"
+        $recoveries_41 = "Orginal_Comodo"
+        $recoveries_42 = "Orginal_Brave"
+        $recoveries_43 = "Orginal_Torch"
+        $recoveries_44 = "Orginal_UC"
+        $recoveries_45 = "Orginal_Blisk"
+        $recoveries_46 = "Orginal_Epic"
+        $recoveries_47 = "Orginal_Yandex"
+        $recoveries_48 = "Orginal_Nichrome"
+        $recoveries_49 = "Orginal_Amigo"
+        $recoveries_50 = "Orginal_Kometa"
+        $recoveries_51 = "Orginal_Xpom"
+        $recoveries_52 = "Orginal_Elements"
+        $recoveries_53 = "Orginal_Microsoft"
+        $recoveries_54 = "Orginal_Opera"
+        $recoveries_55 = "Orginal_FileZilla"
+        $recoveries_56 = "Orginal_Pidgin"
+        $recoveries_57 = "Orginal_Liebao"
+        $recoveries_58 = "Orginal_avast"
+        $recoveries_59 = "Orginal_Discord"
+        $recoveries_60 = "Orginal_FireFox"
+        $recoveries_61 = "Orginal_WaterFox"
+        $recoveries_62 = "Orginal_Thunderbird"
+        $recoveries_63 = "Orginal_SeaMonkey"
+        $recoveries_64 = "Orginal_IceDragon"
+        $recoveries_65 = "Orginal_CyberFox"
+        $recoveries_66 = "Orginal_Slim"
+        $recoveries_67 = "Orginal_IceCat"
+        $recoveries_68 = "Orginal_PostBox"
+        $recoveries_69 = "Orginal_PaleMoon"
+        $recoveries_70 = "Orginal_Thunderbird"
+
+        $logger_1 = "KeyboardLoggerTimer"
+        $logger_2 = "ScreenshotLoggerTimer"
+        $logger_3 = "VoiceRecordLogger"
+        $logger_4 = "IPLogger"
+        $logger_5 = "ClipboardLoggerTimer"
+
+        $unique_1 = "TheWiFisOutput"
+        $unique_2 = "Decrypttttt"
+        $unique_3 = "ThewinProductss"
+        $unique_4 = "TheWiFi_Orginal"
+        $unique_5 = "isV10"
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of ($obfuscator_*) and
+        65 of ($recoveries_*) and
+        4 of ($logger_*) and
+        3 of ($unique_*)
+}
+rule win_modern_loader_v1_01 {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        version         = "v1.01"
+        tlp             = "TLP:WHITE"
+        date            = "2022-12-08"
+        description     = "matches unpacked ModernLoader samples"
+        malpedia_family = "win.modern_loader"
+        hash_md5        = "c6897769c0af03215d61e8e63416e5fc"
+        hash_sha1       = "12261b515dabba8a5bb0daf0a904792d3acd8f9b"
+        hash_sha256     = "ceae593f359a902398e094e1cdbc4502c8fd0ba6b71e625969da6df5464dea95"
+
+    strings:
+        $log_01 = "[DEBUG] Download & Execute Content: <" wide
+        $log_02 = "[DEBUG] Execute Content: <" wide
+        $log_03 = "[DEBUG] Init Completed Response: <" wide
+        $log_04 = "[DEBUG] Listen Response: <" wide
+        $log_05 = "[DEBUG] Task Completed Response: <" wide
+        $log_06 = "[DEBUG] Task Failed Response: <" wide
+        $log_07 = "[DEBUG] Task Result: <" wide
+        $log_08 = "[ERROR] Creating Request Failed" wide
+        $log_09 = "[ERROR] Listen Failed" wide
+        $log_10 = "[ERROR] No available tasks or tasks parsing error" wide
+        $log_11 = "[ERROR] Reading Response Failed" wide
+
+        $fingerprint_1 = "\"AntiVirus\":\"N/A\"," wide
+        $fingerprint_2 = "\"CORP\":\"N/A\"," wide
+        $fingerprint_3 = "\"Network PCs\":\"N/A\"}" wide
+        $fingerprint_4 = "\"RDP\":\"" wide
+        $fingerprint_5 = "\"Role\":\"Admin\"," wide
+        $fingerprint_6 = "\"Role\":\"User\"," wide
+        $fingerprint_7 = "\"Total Space\":\"" wide
+        $fingerprint_8 = "\"Version\":\"" wide
+
+        $varia_01 = "%XBoxLive%" wide
+        $varia_02 = "AddressWidth" wide
+        $varia_03 = "C:\\Users\\Public\\Documents\\Data\\hidden_service\\hostn" wide
+        $varia_04 = "Download & Execute" wide
+        $varia_05 = "HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\SYSTEM\\CENT" wide
+        $varia_06 = "ProcessorNameString" wide
+        $varia_07 = "RALPROCESSOR\\0" wide
+        $varia_08 = "Win32_ComputerSystem" wide
+        $varia_09 = "partofdomain" wide
+        $varia_10 = "root\\SecurityCenter2" wide
+
+        $sql_1 = "SELECT * FROM AntivirusProduct" wide
+        $sql_2 = "SELECT * FROM Win32_DisplayConfiguration" wide
+        $sql_3 = "SELECT Caption FROM Win32_OperatingSystem" wide
+        $sql_4 = "SELECT UUID FROM Win32_ComputerSystemProduct" wide
+        $sql_5 = "select * from Win32_Processor" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            30 of them
+        )
+}
+rule win_neshta_1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "detects Neshta"
+
+    strings:
+        $a = "! Best regards 2 Tommy Salo. [Nov-2005] yours [Dziadulja Apanas]" ascii
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        $a
+}rule win_njrat {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "identifies njRat version 0.7d"
+
+    strings:
+        $str_1 = "[TAP]" wide
+        $str_2 = "[ENTER]" wide
+        $str_3 = "cmd.exe /C Y /N /D Y /T 1 & Del" wide
+        $str_4 = "Download ERROR" wide
+        $str_5 = "Executed As" wide
+        $str_6 = "Updating To" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of them 
+}
+
+rule win_njrat_2 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "identifies njRat vesrion 0.7 Golden"
+
+    strings:
+        $a = "Njrat 0.7 Golden By Hassan Amiri" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of them
+}
+
+rule win_njrat_3 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "identifies njRat"
+
+    strings:
+        $str_var_1 = "HOST" ascii
+        $str_var_2 = "Port" ascii
+        $str_var_3 = "Botid" ascii
+        $str_var_4 = "Version" ascii
+        $str_var_5 = "InstallDir" ascii
+        $str_var_6 = "InstallPath" ascii
+        $str_var_7 = "InstallFname" ascii
+        $str_var_8 = "Reg_Key" ascii
+        $str_var_9 = "Start_Up" ascii
+        $str_var_10 = "PasswordSocket" ascii
+        $str_var_11 = "HOST2" ascii
+
+        $str_av_1 = "NOD32" wide
+        $str_av_2 = "AVG" wide
+        $str_av_3 = "Avira" wide
+        $str_av_4 = "AhnLab-V3" wide
+        $str_av_5 = "BitDefender" wide
+        $str_av_6 = "ByteHero" wide
+        $str_av_7 = "ClamAV" wide
+        $str_av_8 = "F-Prot" wide
+        $str_av_9 = "F-Secure" wide
+        $str_av_10 = "GData" wide
+        $str_av_11 = "Jiangmin" wide
+        $str_av_12 = "Kaspersky" wide
+        $str_av_13 = "McAfee" wide
+        $str_av_14 = "Microsoft Security Essentials" wide
+        $str_av_15 = "Windows Defender" wide
+        $str_av_16 = "Norman" wide
+        $str_av_17 = "nProtect" wide
+        $str_av_18 = "Panda" wide
+        $str_av_19 = "Prevx" wide
+        $str_av_20 = "Sophos" wide
+        $str_av_21 = "Sophos" wide
+        $str_av_22 = "SUPERAntiSpyware" wide
+        $str_av_23 = "Symantec" wide
+        $str_av_24 = "TheHacker" wide
+        $str_av_25 = "TrendMicro" wide
+        $str_av_26 = "VBA32" wide
+        $str_av_27 = "VIPRE" wide
+        $str_av_28 = "ViRobot" wide
+        $str_av_29 = "VBA32" wide
+        $str_av_30 = "VirusBuster" wide
+
+        $str_func_1 = "njLogger" ascii
+        $str_func_2 = "SetWindowsHookEx" ascii
+        $str_func_3 = "CallNextHookEx" ascii
+        $str_func_4 = "VKCodeToUnicode" ascii
+        $str_func_5 = "GetWindowThreadProcessId" ascii
+        $str_func_6 = "MapVirtualKey" ascii
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        10 of ($str_var_*) and 
+        28 of ($str_av_*) and 
+        4 of ($str_func_*)
+}
+
+rule win_njrat_x7 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "identifies njRat"
+
+    strings:
+        $str_keys_1 = "[TAP]" wide
+        $str_keys_2 = "[ENTER]" wide
+
+        $str_func_1 = "VKCodeToUnicode" ascii
+        $str_func_2 = "MapVirtualKey" ascii
+        $str_func_3 = "capGetDriverDescriptionA" ascii
+
+        $str_var_1 = "LastAS" ascii
+        $str_var_2 = "LastAV" ascii
+        $str_var_3 = "TempoSleep" ascii
+        $str_var_4 = "DownloadHostOrNotURL" ascii
+        $str_var_5 = "CopyMyFileDir" ascii
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of them 
+}rule win_origin_logger {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2022-09-20"
+        description = "detects Orign Logger"
+        tlp         = "TLP:WHITE"
+        version     = "v1.0"
+        hash_sha256 = "595a7ea981a3948c4f387a5a6af54a70a41dd604685c72cbd2a55880c2b702ed"
+        hash_md5    = "bd9981b13c37d3ba04e55152243b1e3e"
+        hash_sha1   = "4669160ec356a8640cef92ddbaf7247d717a3ef1"
+
+    strings:
+        $name           = "OriginLogger" wide
+        $exe            = "OriginLogger.exe" wide
+        $cfg_section_0  = "[LOGSETTINGS]"
+        $cfg_section_1  = "[ASSEMBLY]"
+        $cfg_section_2  = "[STEALER]"
+        $cfg_section_3  = "[BINDER]"
+        $cfg_section_4  = "[INSTALLATION]"
+        $cfg_section_5  = "[OPTIONS]"
+        $cfg_section_6  = "[DOWNLOADER]"
+        $cfg_section_7  = "[EXTENSION]"
+        $cfg_section_8  = "[FILEPUMPER]"
+        $cfg_section_9  = "[FAKEMSG]"
+        $cfg_section_10 = "[HOST]"
+        $cfg_section_11 = "[BUILD]"
+        $cfg_entries_0  = "BinderON="
+        $cfg_entries_1  = "blackhawk="
+        $cfg_entries_2  = "centbrowser="
+        $cfg_entries_3  = "chedot="
+        $cfg_entries_4  = "citrio="
+        $cfg_entries_5  = "clawsmail="
+        $cfg_entries_6  = "CloneON="
+        $cfg_entries_7  = "coccoc="
+        $cfg_entries_8  = "Coolnovo="
+        $cfg_entries_9  = "coowon="
+        $cfg_entries_10 = "cyberfox="
+        $cfg_entries_11 = "Delaysec="
+        $cfg_entries_12 = "dest_date="
+        $cfg_entries_13 = "Disablecp="
+        $cfg_entries_14 = "Disablemsconfig="
+        $cfg_entries_15 = "Disablesysrestore="
+        $cfg_entries_16 = "DownloaderON="
+        $cfg_entries_17 = "emclient="
+        $cfg_entries_18 = "epicpb="
+        $cfg_entries_19 = "estensionON="
+        $cfg_entries_20 = "Eudora="
+        $cfg_entries_21 = "falkon="
+        $cfg_entries_22 = "FileassemblyON="
+        $cfg_entries_23 = "FlashFXP="
+        $cfg_entries_24 = "FPRadiobut="
+        $cfg_entries_25 = "HostON="
+        $cfg_entries_26 = "icecat="
+        $cfg_entries_27 = "icedragon="
+        $cfg_entries_28 = "IconON="
+        $cfg_entries_29 = "IncrediMail="
+        $cfg_entries_30 = "iridium="
+        $cfg_entries_31 = "JustOne="
+        $cfg_entries_32 = "kmeleon="
+        $cfg_entries_33 = "kometa="
+        $cfg_entries_34 = "liebao="
+        $cfg_entries_35 = "orbitum="
+        $cfg_entries_36 = "palemoon="
+        $cfg_entries_37 = "pumderON="
+        $cfg_entries_38 = "pumpertext="
+        $cfg_entries_39 = "qqbrowser="
+        $cfg_entries_40 = "screeninterval="
+        $cfg_entries_41 = "SelectFolder="
+        $cfg_entries_42 = "sleipnir="
+        $cfg_entries_43 = "SmartLogger="
+        $cfg_entries_44 = "smartLoggerType="
+        $cfg_entries_45 = "SmartWords="
+        $cfg_entries_46 = "sputnik="
+        $cfg_entries_47 = "telegram_api="
+        $cfg_entries_48 = "telegram_chatid="
+        $cfg_entries_49 = "toemail="
+        $cfg_entries_50 = "trillian="
+        $cfg_entries_51 = "UCBrowser="
+        $cfg_entries_52 = "USBSpread="
+        $cfg_entries_53 = "vivaldi="
+        $cfg_entries_54 = "waterfox="
+        $cfg_entries_55 = "WebFilterON="
+
+    condition:
+        (uint16(0) == 0x5A4D or uint32(0) == 0x04034b50) and
+        (#name >= 4 or #exe >= 2) and 
+        10 of ($cfg_section_*)  and
+        50 of ($cfg_entries_*) 
+} rule win_phorpiex_a {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        version         = "v1.0"
+        tlp             = "TLP:WHITE"
+        date            = "2022-12-13"
+        description     = "detects unpacked Phorpiex samples"
+        malpedia_family = "win.phorpiex"
+        hash_md5        = "6b6398fa7d461b09b8652ec0f8bafeb4"
+        hash_sha1       = "43bf88ea96bb4de9f4bbc66686820260033cd2d7"
+        hash_sha256     = "bd2976d327a94f87c933a3632a1c56d0050b047506f5146b1a47d2b9fd5b798d"
+
+    strings:
+        $str_1 = ":--tLdr--:" 
+        $str_2 = "T-449505056674060607" wide
+
+        $path_1 = "\\public_html" wide 
+        $path_2 = "\\htdocs" wide
+        $path_3 = "\\httpdocs" wide
+        $path_4 = "\\wwwroot" wide
+        $path_5 = "\\ftproot" wide
+        $path_6 = "\\share" wide
+        $path_7 = "\\income" wide
+        $path_8 = "\\upload" wide
+
+        $cmd_0 = "/c start _ & _\\DeviceManager.exe & exit" wide 
+        $cmd_1 = "%ls\\_\\DeviceConfigManager.exe" wide
+        $cmd_2 = "%ls\\_\\DeviceManager.exe" wide
+        $cmd_3 = "/c rmdir /q /s \"%ls\"" wide
+        $cmd_4 = "/c move /y \"%ls\", \"%ls\"" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of ($str*) or 
+        all of ($path*) or
+        all of ($cmd*) 
+}
+
+rule win_phorpiex_b {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        version         = "v1.0"
+        tlp             = "TLP:WHITE"
+        date            = "2023-04-24"
+        description     = "detects unpacked Phorpiex samples"
+        malpedia_family = "win.phorpiex"
+        hash_md5        = "0149c897678e3b6f8ed36c10db0802fd"
+        hash_sha1       = "6595a05cb9d7e554a2dabe5b8939401dc72a02de"
+        hash_sha256     = "f1c8a026f2e1bd19df7c83567e57d236f64a9323ff35ec98b62025223f59aa5c"
+
+    strings:
+        $path_1 = "\\public_html" ascii 
+        $path_2 = "\\htdocs" ascii
+        $path_3 = "\\httpdocs" ascii
+        $path_4 = "\\wwwroot" ascii
+        $path_5 = "\\ftproot" ascii
+        $path_6 = "\\share" ascii
+        $path_7 = "\\income" ascii
+        $path_8 = "\\upload" ascii
+
+        $pdb = "\\Release\\Trik.pdb" ascii
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of ($path*) and
+        $pdb
+}rule win_quasarrat_j1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "detects the Quasar RAT"
+
+    strings:
+        $str_1 = "DoAskElevate" ascii
+        $str_2 = "DoChangeRegistryValue" ascii
+        $str_3 = "DoClientDisconnect" ascii
+        $str_4 = "DoClientReconnect" ascii
+        $str_5 = "DoClientUninstall" ascii
+        $str_6 = "DoClientUpdate" ascii
+        $str_7 = "DoCloseConnection" ascii
+        $str_8 = "DoCreateRegistryKey" ascii
+        $str_9 = "DoCreateRegistryValue" ascii
+        $str_10 = "DoDeleteRegistryKey" ascii
+        $str_11 = "DoDeleteRegistryValue" ascii
+        $str_12 = "DoDownloadAndExecute" ascii
+        $str_13 = "DoDownloadFile" ascii
+        $str_14 = "DoDownloadFileCancel" ascii
+        $str_15 = "DoKeyboardEvent" ascii
+        $str_16 = "DoLoadRegistryKey" ascii
+        $str_17 = "DoMouseEvent" ascii
+        $str_18 = "DoPathDelete" ascii
+        $str_19 = "DoPathRename" ascii
+        $str_20 = "DoProcessKill" ascii
+        $str_21 = "DoProcessStart" ascii
+        $str_22 = "DoRenameRegistryKey" ascii
+        $str_23 = "DoRenameRegistryValue" ascii
+        $str_24 = "DoShellExecute" ascii
+        $str_25 = "DoShowMessageBox" ascii
+        $str_26 = "DoShutdownAction" ascii
+        $str_27 = "DoStartupItemAdd" ascii
+        $str_28 = "DoStartupItemRemove" ascii
+        $str_29 = "DoUploadAndExecute" ascii
+        $str_30 = "DoUploadFile" ascii
+        $str_31 = "DoVisitWebsite" ascii
+        $str_32 = "DoWebcamStop" ascii
+        $str_33 = "GetAuthentication" ascii
+        $str_34 = "GetConnections" ascii
+        $str_35 = "GetDesktop" ascii
+        $str_36 = "GetDirectory" ascii
+        $str_37 = "GetDrives" ascii
+        $str_38 = "GetKeyloggerLogs" ascii
+        $str_39 = "GetMonitors" ascii
+        $str_40 = "GetPasswords" ascii
+        $str_41 = "GetProcesses" ascii
+        $str_42 = "GetStartupItems" ascii
+        $str_43 = "GetSystemInfo" ascii
+        $str_44 = "GetWebcam" ascii
+        $str_45 = "GetWebcams" ascii
+        $str_46 = "SetAuthenticationSuccess" ascii
+    
+    condition:
+        uint16(0) == 0x5A4D and 
+        40 of them
+}
+
+rule win_quasarrat_j2 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "detects the Quasar RAT"
+
+    strings:
+        $str_1 = "get_usernameField" ascii
+        $str_2 = "get_timePasswordChanged" ascii
+        $str_3 = "get_encryptedUsername" ascii
+        $str_4 = "get_encryptedPassword" ascii
+        $str_5 = "get_VistaOrHigher" ascii
+        $str_6 = "get_UseProtoMembersOnly" ascii
+        $str_7 = "get_UseImplicitZeroDefaults" ascii
+        $str_8 = "get_TenOrHigher" ascii
+        $str_9 = "get_MetadataTimeoutMilliseconds" ascii
+        $str_10 = "get_EightPointOneOrHigher" ascii
+        $str_11 = "get_EightOrHigher" ascii
+        $str_12 = "get_DynamicType" ascii
+
+        $quasar = "Quasar.Client.Properties.Resources" wide
+
+        condition:
+            uint16(0) == 0x5A4D and 
+            8 of ($str_*) and $quasar
+}rule elf_rekoobe_b3 {
+
+    meta:
+        author       = "Johannes Bader @viql"
+        version      = "v1.0"
+        tlp          = "TLP:WHITE"
+        date         = "2022-09-02"
+        description  = "detects the Rekoobe Linux backdoor"
+        hash1_md5    = "55ab7e652976d25997875f678c935de7"
+        hash1_sha1   = "dc6beb5019ee21ab207c146ece5080d00f20a103"
+        hash1_sha256 = "a89ebd7157336141eb14ed9084491cc5bdfce103b4db065e433dff47a1803731"
+
+    strings:
+        $sha_1  = {01 23 45 67 [0-10] 89 AB CD EF [0-10] FE DC BA 98 [0-10] 76 54 32 10 [0-10] F0 E1 D2 C3}
+
+        $hmac_1 = {36 36 36 36 36 36 36 36}
+        $hmac_2 = {5C 5C 5C 5C 5C 5C 5C 5C}
+
+        $str_term_1  = {C6 00 54}
+        $str_term_2  = {C6 40 03 4D}
+        $str_term_3  = {C6 40 01 45}
+        $str_term_4  = {C6 40 04 3D}
+        $str_term_5  = {C6 40 02 52}
+        $str_term_6  = {C6 40 02 52}
+
+        $str_histfile_1 = {C6 00 48}
+        $str_histfile_2 = {C6 40 05 49}
+        $str_histfile_3 = {C6 40 01 49}
+        $str_histfile_4 = {C6 40 06 4C}
+        $str_histfile_5 = {C6 40 02 53}
+        $str_histfile_6 = {C6 40 07 45}
+        $str_histfile_7 = {C6 40 03 54}
+        $str_histfile_8 = {C6 40 08 3D}
+        $str_histfile_9 = {C6 40 04 46}
+
+    condition:
+        uint32(0) == 0x464C457F and 
+        (
+            all of them 
+        )
+}rule win_vidar_a {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        version         = "v1.0"
+        tlp             = "TLP:WHITE"
+        date            = "2023-03-30"
+        description     = "detect unpacked Vidar samples"
+        malpedia_family = "win.vidar"
+        hash_md5        = "ed4ddd89e6ab5211cd7fdbfe51d9576b"
+        hash_sha1       = "7b6beb9870646bc50b10014536ed3bb088a2e3de"
+        hash_sha256     = "352f8e45cd6085eea17fffeeef91251192ceaf494336460cc888bbdd0051ec71"
+
+    strings:
+        $leet_sleep  = {6A 01 FF D6 6A 03 FF D6 6A 03 FF D6 6A 07 FF D6} 
+
+        $wallets_01 = "Enkrypt"
+        $wallets_02 = "Braavos"
+        $wallets_03 = "Exodus Web3 Wallet"
+        $wallets_04 = "Trust Wallet"
+        $wallets_05 = "Tronium"
+        $wallets_06 = "Opera Wallet"
+        $wallets_07 = "OKX Web3 Wallet"
+        $wallets_08 = "Sender"
+        $wallets_09 = "Hashpack"
+        $wallets_10 = "Eternl"
+        $wallets_11 = "GeroWallet"
+        $wallets_12 = "Pontem Wallet"
+        $wallets_13 = "Martian Wallet"
+        $wallets_14 = "Finnie"
+        $wallets_15 = "Leap Terra"
+        $wallets_16 = "Microsoft AutoFill"
+        $wallets_17 = "Bitwarden"
+        $wallets_18 = "KeePass Tusk"
+        $wallets_19 = "KeePassXC-Browser"
+
+        $telegram_1 = "shortcuts-default.json"
+        $telegram_2 = "shortcuts-custom.json"
+        $telegram_3 = "settingss"
+        $telegram_4 = "prefix"
+        $telegram_5 = "countries"
+        $telegram_6 = "usertag"
+
+        $scp = "Software\\Martin Prikryl\\WinSCP 2\\Configuration" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            #leet_sleep > 10 and 
+            (16 of ($wallets_*) and all of ($telegram_*) and $scp)
+        )
+}
+rule win_wshrat_1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "identifies WSHRAT"
+
+    strings:
+        $str_a_1 = "WSHRat Plugin" ascii
+        $str_a_2 = "TotalMouseMoves" ascii
+        
+        $str_b_1 = "TotalKeyboardClick" ascii
+        $str_b_2 = "TotalMouseMoves" ascii
+        $str_b_3 = "TotalMouseClick" ascii
+        $str_b_4 = "SessionKeyboardClick" ascii
+        $str_b_5 = "SessionMouseMoves" ascii
+        $str_b_6 = "SessionMouseClick" ascii
+
+        $str_c_1 = "/open-keylogger" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of ($str_a_*) and 
+        4 of ($str_b_*) and 
+        all of ($str_c_*)
+}rule win_xfiles_stealer {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2022-04-15"
+        version     = "v1.0"
+        description = "detects XFiles-Stealer"
+        hash        = "d06072f959d895f2fc9a57f44bf6357596c5c3410e90dabe06b171161f37d690"
+        hash2       = "1ed070e0d33db9f159a576e6430c273c"
+        tlp         = "TLP:WHITE"
+        malpedia_family = "win.xfilesstealer"
+
+    strings:
+        $ad_1 = "Telegram bot - @XFILESShop_Bot" wide
+        $ad_2 = "Telegram support - @XFILES_Seller" wide
+
+        $names_1 = "XFiles.Models.Yeti"
+        $names_2 = "anti_vzlom_popki" // ???? ????? ?????
+        $names_3 = "assType"
+        $names_4 = "hackrjaw"
+
+        $upload_1  = "zipx" wide
+        $upload_2  = "user_id" wide
+        $upload_3  = "passworlds_x" wide
+        $upload_4  = "ip_x" wide
+        $upload_5  = "cc_x" wide
+        $upload_6  = "cookies_x" wide
+        $upload_7  = "zip_x" wide
+        $upload_8  = "contry_x" wide
+        $upload_9  = "tag_x" wide
+        $upload_10 = "piece" wide
+            
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            all of ($ad_*) or 
+            all of ($names_*) or 
+            all of ($upload_*)
+        )
+}rule win_xworm_s1 {
+    
+    meta:
+        author          = "Johannes Bader @viql"
+        date            = "2022-11-13"
+        version         = "v1.0"
+        description     = "detects unpacked Xworm samples"
+        tlp             = "TLP:WHITE"
+        hash1_md5       = "6005e1ccaea62626a5481e09bbb653da"
+        hash1_sha1      = "74138872ec0d0791b7f58eda8585250af40feaf9"
+        hash1_sha256    = "7fc6a365af13150e7b1738129832ebd91f1010705b0ab0955a295e2c7d88be62"
+
+    strings:
+        $str_01 = "Mutexx"
+        $str_02 = "USBS"
+        $str_03 = "_appMutex"
+        $str_04 = "dTimer2"
+        $str_05 = "dosstu"
+        $str_06 = "nameee"
+        $str_07 = "ruta"
+        $str_08 = "usbSP"
+        $str_09 = "GetEncoderInfo"
+        $str_10 = "AppendOutputText"
+        $str_11 = "capCreateCaptureWindowA"
+        $str_12 = "capGetDriverDescriptionA"
+        $str_13 = "MyProcess_ErrorDataReceived"
+        $str_14 = "MyProcess_OutputDataReceived"
+        $str_15 = "STOBS64"
+        $str_16 = "keybd_event"
+        $str_17 = "AES_Decryptor"
+        $str_18 = "AES_Encryptor"
+        $str_19 = "tickees"
+        $str_20 = "INDATE"
+        $str_21 = "GetHashT"
+        $str_22 = "isDisconnected"
+
+        $str_23   = "PING?" wide
+        $str_24   = "IsInRole" wide
+        $str_25   = "Select * from AntivirusProduct" wide
+        $str_26   = "FileManagerSplitFileManagerSplit" wide
+        $str_27   = "\nError: " wide
+        $str_28   = "[Folder]" wide
+
+        $str_29    = "XKlog.txt" wide
+        $str_30    = "<Xwormmm>" wide
+        $str_32    = "GfvaHzPAZuTqRREB" wide
+
+    condition: 
+        uint16(0) == 0x5A4D and 
+        (
+            20  of ($str*)
+        )
+}= "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1"
+        $accept_lang = "Accept-Language: ru-RU,ru;q=0.9,en;q=0.8" 
+        $accept_charset = "Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1"
+        $accept_encoding = "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0"
+        
+        $unkown = "<unknown>"
+        $cmd1 = "\" & exit" 
+        $cmd2 = "\" /f & erase "
+        $cmd3 = "/c taskkill /im \""
+
+        $anti1 = " Far "
+        $anti2 = "roxifier"
+        $anti3 = "HTTP Analyzer"
+        $anti4 = "Wireshark"
+        $anti5 = "NetworkMiner"
+
+        $mix1 = "mixshop"
+        $mix2 = "mixtwo"
+        $mix3 = "mixnull"
+        $mix4 = "mixazed"
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        15 of them
+}
+rule win_imminentrat_j1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "detects the imminent rat"
+        hash1       = "a728603061b5aa98fa40fb0447ba71e3"
+        hash2       = "5d8446a23b80e9b6cb7406c2ba81d606685cf11b24e9eb8309153a47b04f3aad"
+        malpedia_family = "win.imminent_monitor_rat"
+
+    strings:
+        $str_mining_1 = "Downloading miner data" wide
+        $str_mining_2 = "This client is already mining" wide
+        $str_mining_3 = "Started mining successfully" wide
+        $str_mining_4 = "Unable to start mining" wide
+        $str_mining_5 = "-o {0} -u {1} -p {2} -a scrypt -I {3} -T {4}" wide
+
+        $str_plugin_1 = "\\Imminent\\Plugins\\" wide
+
+        $str_fingerprint_1 = "Screens: {0}" wide
+        $str_fingerprint_2 = "Battery: {0}" wide
+        $str_fingerprint_3 = "Ram Usage: {0}%" wide
+        $str_fingerprint_4 = "Last Reboot: {0}" wide
+        $str_fingerprint_5 = "Graphics Card: {0}" wide
+        $str_fingerprint_6 = "Firewall: {0}" wide
+        $str_fingerprint_7 = "Anti-Virus: {0}" wide
+        $str_fingerprint_8 = "Unique Identifier: {0}" wide
+        $str_fingerprint_9 = "Privileges: {0}" wide
+        $str_fingerprint_10 = "MAC Address: {0}" wide
+        $str_fingerprint_11 = "Client Location: {0}" wide
+        $str_fingerprint_12 = "Ram: {0}" wide
+        $str_fingerprint_13 = "LAN: {0}" wide
+        $str_fingerprint_14 = "Processor: {0}" wide
+        $str_fingerprint_15 = "Computer Username: {0}" wide
+        $str_fingerprint_16 = "Operating System: {0}" wide
+        $str_fingerprint_17 = "Client Identifier: {0}" wide
+        $str_fingerprint_18 = "Computer Name: {0}" wide
+
+        $str_filedownload_1 = "File downloaded & executed" wide
+        $str_filedownload_2 = "File downloaded & updated" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        3 of ($str_mining_*) and 
+        $str_plugin_1 and 
+        15 of ($str_fingerprint_*) and 
+        all of ($str_filedownload_*)
+}rule win_laplas_clipper {
+    
+    meta:
+        author          = "Johannes Bader @viql"
+        date            = "2022-11-09"
+        version         = "v1.0"
+        description     = "detects unpacked Laplas Clipper"
+        tlp             = "TLP:WHITE"
+        hash1_md5       = "3afb4573dea2dbac4bb5f1915f7a4dce"
+        hash1_sha1      = "9ad8b880f3ab35f0d1a7fe46d9d8e0bea36e0d14"
+        hash1_sha256    = "52901dc481d1be2129725e3c4810ae895f9840e27a1dce69630dedcf71b6c021"
+
+    strings:
+        $func_names_0 = "main.request"
+        $func_names_1 = "main.setOnline"
+        $func_names_2 = "main.getRegex"
+        $func_names_3 = "main.getAddress"
+        $func_names_4 = "main.waitOpenClipboard"
+        $func_names_5 = "main.clipboardRead"
+        $func_names_6 = "main.clipboardWrite"
+        $func_names_7 = "main.startHandler"
+        $func_names_8 = "main.isRunning"
+        $func_names_9 = "main.main"
+        $func_names_10 = "main.isStartupEnabled"
+        $func_names_11 = "main.decrypt"
+        $func_names_12 = "main.existsPath"
+        $func_names_13 = "main.getPid"
+        $func_names_14 = "main.writePid"
+        $func_names_15 = "main.enableStartup"
+        $func_names_16 = "main.copyFile"
+        $func_names_17 = "main.clipboardWrite.func1"
+        $func_names_18 = "main.init"
+
+        $startup_0 = "/sc"
+        $startup_1 = "/ri"
+        $startup_2 = "/st"
+        $startup_3 = "/tr"
+        $startup_4 = "/tn"
+        $startup_5 = "/create"
+        $startup_6 = "/C"
+        $startup_7 = "once"
+        $startup_8 = "cmd.exe"
+        $startup_9 = "9999:59"
+        $startup_10 = "00:00"
+
+        $request_0 = "http://"
+        $request_1 = "/bot/"
+        $request_2 = "key="
+
+    condition: 
+        uint16(0) == 0x5A4D and 
+        17 of ($func_names_*)  and
+        9 of ($startup_*) and
+        all of ($request_*)
+}
+rule win_limerat_j1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.1"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "detects the lime rat"
+        hash        = "2a0575b66a700edb40a07434895bf7a9"
+        malpedia_family = "win.limerat"
+
+    strings:
+        $str_1 = "Y21kLmV4ZSAvYyBwaW5nIDAgLW4gMiAmIGRlbCA=" wide
+        $str_2 = "schtasks /create /f /sc ONLOGON /RL HIGHEST /tn LimeRAT-Admin" wide
+        $str_3 = "Minning..." wide
+        $str_4 = "--donate-level=" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        3 of them
+}
+rule win_lu0bot_loader {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2023-03-08"
+        description = "detects the loader of the Lu0bot malware"
+        tlp         = "TLP:WHITE"
+        version     = "v1.0"
+        hash_md5    = "c5eb9c6ded323a8db7eb739e514bb46c"
+        hash_sha1   = "cede3aa5e1821a47f416c64bc48d1aab72eb48ca"
+        hash_sha256 = "5a2283a997ab6a9680b69f9318315df3c9e634b3c4dd4a46f8bc5df35fc81284"
+
+    strings:
+        /*
+            add     edi, ?h 
+            sub     dword ptr [esi], <4 byte key>
+            add     esi, 4
+            (optional mov)
+            cmp     esi, edi
+        */
+        $decryption = { 81 C7 ?? 0? 00 00 
+                        81 2E ?? ?? ?? ??
+                        83 C6 04
+                        [0-4]
+                        39 FE} 
+        /*
+            mov     ebx, 0
+            push    ebx
+            push    eax
+            mov     eax, offset WinExec
+            call    dword ptr [eax]
+        */
+        $winexec    = { BB 00 00 00 00
+                        53
+                        50
+                        B8 ?? ?? ?? ??
+                        FF 10}
+        /*
+
+            mov     eax, 0
+            push    eax
+            call    ExitProcess
+        */
+        $exit       = { B8 00 00 00 00
+                        50
+                        E8}
+
+    condition:
+        (uint16(0) == 0x5A4D) and
+        $decryption and
+        $winexec and
+        $exit
+} rule win_matiex_keylogger {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2020-07-20"
+        description = "detects the Matiex Keylogger"
+        tlp         = "TLP:WHITE"
+        version     = "v1.0"
+
+    strings:
+        $obfuscator_1 = "OiCuntJollyGoodDayYeHavin_____________________________________________________"
+        $obfuscator_2 = "ObfuscatedByGoliath"
+        $obfuscator_3 = "de4fuckyou"
+        $obfuscator_4 = "ObfuscatedByGoliath"
+        $obfuscator_5 = "Beds-Protector"
+
+        $recoveries_1  = "Orginal_Slim"
+        $recoveries_2  = "Orginal_IceDragon"
+        $recoveries_3  = "Orginal_PaleMoon"
+        $recoveries_4  = "Orginal_IceCat"
+        $recoveries_5  = "Orginal_PostBox"
+        $recoveries_6  = "Orginal_FireFox"
+        $recoveries_7  = "Orginal_CyberFox"
+        $recoveries_8  = "Orginal_WaterFox"
+        $recoveries_9  = "Orginal_SeaMonkey"
+        $recoveries_10 = "Orginal_Outlook"
+        $recoveries_11 = "Orginal_Foxmail"
+        $recoveries_12 = "Orginal_Kinzaa"
+        $recoveries_13 = "Orginal_Sputnik"
+        $recoveries_14 = "Orginal_Falkon"
+        $recoveries_15 = "Orginal_SalamWeb"
+        $recoveries_16 = "Orginal_CoolNovo"
+        $recoveries_17 = "Orginal_QIPSurf"
+        $recoveries_18 = "Orginal_BlackHawk"
+        $recoveries_19 = "Orginal_7Star"
+        $recoveries_20 = "Orginal_Sleipnir"
+        $recoveries_21 = "Orginal_Citrio"
+        $recoveries_22 = "Orginal_Chrome_Canary"
+        $recoveries_23 = "Orginal_Chrome"
+        $recoveries_24 = "Orginal_Coowon"
+        $recoveries_25 = "Orginal_CocCoc"
+        $recoveries_26 = "Orginal_Uran"
+        $recoveries_27 = "Orginal_QQ"
+        $recoveries_28 = "Orginal_orbitum"
+        $recoveries_29 = "Orginal_Slimjet"
+        $recoveries_30 = "Orginal_Iridium"
+        $recoveries_31 = "Orginal_Vivaldi"
+        $recoveries_32 = "Orginal_Iron"
+        $recoveries_33 = "Orginal_Chromium"
+        $recoveries_34 = "Orginal_Ghost"
+        $recoveries_35 = "Orginal_Cent"
+        $recoveries_36 = "Orginal_xVast"
+        $recoveries_37 = "Orginal_Chedot"
+        $recoveries_38 = "Orginal_Superbird"
+        $recoveries_39 = "Orginal_360_English"
+        $recoveries_40 = "Orginal_360_China"
+        $recoveries_41 = "Orginal_Comodo"
+        $recoveries_42 = "Orginal_Brave"
+        $recoveries_43 = "Orginal_Torch"
+        $recoveries_44 = "Orginal_UC"
+        $recoveries_45 = "Orginal_Blisk"
+        $recoveries_46 = "Orginal_Epic"
+        $recoveries_47 = "Orginal_Yandex"
+        $recoveries_48 = "Orginal_Nichrome"
+        $recoveries_49 = "Orginal_Amigo"
+        $recoveries_50 = "Orginal_Kometa"
+        $recoveries_51 = "Orginal_Xpom"
+        $recoveries_52 = "Orginal_Elements"
+        $recoveries_53 = "Orginal_Microsoft"
+        $recoveries_54 = "Orginal_Opera"
+        $recoveries_55 = "Orginal_FileZilla"
+        $recoveries_56 = "Orginal_Pidgin"
+        $recoveries_57 = "Orginal_Liebao"
+        $recoveries_58 = "Orginal_avast"
+        $recoveries_59 = "Orginal_Discord"
+        $recoveries_60 = "Orginal_FireFox"
+        $recoveries_61 = "Orginal_WaterFox"
+        $recoveries_62 = "Orginal_Thunderbird"
+        $recoveries_63 = "Orginal_SeaMonkey"
+        $recoveries_64 = "Orginal_IceDragon"
+        $recoveries_65 = "Orginal_CyberFox"
+        $recoveries_66 = "Orginal_Slim"
+        $recoveries_67 = "Orginal_IceCat"
+        $recoveries_68 = "Orginal_PostBox"
+        $recoveries_69 = "Orginal_PaleMoon"
+        $recoveries_70 = "Orginal_Thunderbird"
+
+        $logger_1 = "KeyboardLoggerTimer"
+        $logger_2 = "ScreenshotLoggerTimer"
+        $logger_3 = "VoiceRecordLogger"
+        $logger_4 = "IPLogger"
+        $logger_5 = "ClipboardLoggerTimer"
+
+        $unique_1 = "TheWiFisOutput"
+        $unique_2 = "Decrypttttt"
+        $unique_3 = "ThewinProductss"
+        $unique_4 = "TheWiFi_Orginal"
+        $unique_5 = "isV10"
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of ($obfuscator_*) and
+        65 of ($recoveries_*) and
+        4 of ($logger_*) and
+        3 of ($unique_*)
+}
+rule win_modern_loader_v1_01 {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        version         = "v1.01"
+        tlp             = "TLP:WHITE"
+        date            = "2022-12-08"
+        description     = "matches unpacked ModernLoader samples"
+        malpedia_family = "win.modern_loader"
+        hash_md5        = "c6897769c0af03215d61e8e63416e5fc"
+        hash_sha1       = "12261b515dabba8a5bb0daf0a904792d3acd8f9b"
+        hash_sha256     = "ceae593f359a902398e094e1cdbc4502c8fd0ba6b71e625969da6df5464dea95"
+
+    strings:
+        $log_01 = "[DEBUG] Download & Execute Content: <" wide
+        $log_02 = "[DEBUG] Execute Content: <" wide
+        $log_03 = "[DEBUG] Init Completed Response: <" wide
+        $log_04 = "[DEBUG] Listen Response: <" wide
+        $log_05 = "[DEBUG] Task Completed Response: <" wide
+        $log_06 = "[DEBUG] Task Failed Response: <" wide
+        $log_07 = "[DEBUG] Task Result: <" wide
+        $log_08 = "[ERROR] Creating Request Failed" wide
+        $log_09 = "[ERROR] Listen Failed" wide
+        $log_10 = "[ERROR] No available tasks or tasks parsing error" wide
+        $log_11 = "[ERROR] Reading Response Failed" wide
+
+        $fingerprint_1 = "\"AntiVirus\":\"N/A\"," wide
+        $fingerprint_2 = "\"CORP\":\"N/A\"," wide
+        $fingerprint_3 = "\"Network PCs\":\"N/A\"}" wide
+        $fingerprint_4 = "\"RDP\":\"" wide
+        $fingerprint_5 = "\"Role\":\"Admin\"," wide
+        $fingerprint_6 = "\"Role\":\"User\"," wide
+        $fingerprint_7 = "\"Total Space\":\"" wide
+        $fingerprint_8 = "\"Version\":\"" wide
+
+        $varia_01 = "%XBoxLive%" wide
+        $varia_02 = "AddressWidth" wide
+        $varia_03 = "C:\\Users\\Public\\Documents\\Data\\hidden_service\\hostn" wide
+        $varia_04 = "Download & Execute" wide
+        $varia_05 = "HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\SYSTEM\\CENT" wide
+        $varia_06 = "ProcessorNameString" wide
+        $varia_07 = "RALPROCESSOR\\0" wide
+        $varia_08 = "Win32_ComputerSystem" wide
+        $varia_09 = "partofdomain" wide
+        $varia_10 = "root\\SecurityCenter2" wide
+
+        $sql_1 = "SELECT * FROM AntivirusProduct" wide
+        $sql_2 = "SELECT * FROM Win32_DisplayConfiguration" wide
+        $sql_3 = "SELECT Caption FROM Win32_OperatingSystem" wide
+        $sql_4 = "SELECT UUID FROM Win32_ComputerSystemProduct" wide
+        $sql_5 = "select * from Win32_Processor" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            30 of them
+        )
+}
+rule win_neshta_1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "detects Neshta"
+
+    strings:
+        $a = "! Best regards 2 Tommy Salo. [Nov-2005] yours [Dziadulja Apanas]" ascii
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        $a
+}rule win_njrat {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "identifies njRat version 0.7d"
+
+    strings:
+        $str_1 = "[TAP]" wide
+        $str_2 = "[ENTER]" wide
+        $str_3 = "cmd.exe /C Y /N /D Y /T 1 & Del" wide
+        $str_4 = "Download ERROR" wide
+        $str_5 = "Executed As" wide
+        $str_6 = "Updating To" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of them 
+}
+
+rule win_njrat_2 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "identifies njRat vesrion 0.7 Golden"
+
+    strings:
+        $a = "Njrat 0.7 Golden By Hassan Amiri" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of them
+}
+
+rule win_njrat_3 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "identifies njRat"
+
+    strings:
+        $str_var_1 = "HOST" ascii
+        $str_var_2 = "Port" ascii
+        $str_var_3 = "Botid" ascii
+        $str_var_4 = "Version" ascii
+        $str_var_5 = "InstallDir" ascii
+        $str_var_6 = "InstallPath" ascii
+        $str_var_7 = "InstallFname" ascii
+        $str_var_8 = "Reg_Key" ascii
+        $str_var_9 = "Start_Up" ascii
+        $str_var_10 = "PasswordSocket" ascii
+        $str_var_11 = "HOST2" ascii
+
+        $str_av_1 = "NOD32" wide
+        $str_av_2 = "AVG" wide
+        $str_av_3 = "Avira" wide
+        $str_av_4 = "AhnLab-V3" wide
+        $str_av_5 = "BitDefender" wide
+        $str_av_6 = "ByteHero" wide
+        $str_av_7 = "ClamAV" wide
+        $str_av_8 = "F-Prot" wide
+        $str_av_9 = "F-Secure" wide
+        $str_av_10 = "GData" wide
+        $str_av_11 = "Jiangmin" wide
+        $str_av_12 = "Kaspersky" wide
+        $str_av_13 = "McAfee" wide
+        $str_av_14 = "Microsoft Security Essentials" wide
+        $str_av_15 = "Windows Defender" wide
+        $str_av_16 = "Norman" wide
+        $str_av_17 = "nProtect" wide
+        $str_av_18 = "Panda" wide
+        $str_av_19 = "Prevx" wide
+        $str_av_20 = "Sophos" wide
+        $str_av_21 = "Sophos" wide
+        $str_av_22 = "SUPERAntiSpyware" wide
+        $str_av_23 = "Symantec" wide
+        $str_av_24 = "TheHacker" wide
+        $str_av_25 = "TrendMicro" wide
+        $str_av_26 = "VBA32" wide
+        $str_av_27 = "VIPRE" wide
+        $str_av_28 = "ViRobot" wide
+        $str_av_29 = "VBA32" wide
+        $str_av_30 = "VirusBuster" wide
+
+        $str_func_1 = "njLogger" ascii
+        $str_func_2 = "SetWindowsHookEx" ascii
+        $str_func_3 = "CallNextHookEx" ascii
+        $str_func_4 = "VKCodeToUnicode" ascii
+        $str_func_5 = "GetWindowThreadProcessId" ascii
+        $str_func_6 = "MapVirtualKey" ascii
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        10 of ($str_var_*) and 
+        28 of ($str_av_*) and 
+        4 of ($str_func_*)
+}
+
+rule win_njrat_x7 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "identifies njRat"
+
+    strings:
+        $str_keys_1 = "[TAP]" wide
+        $str_keys_2 = "[ENTER]" wide
+
+        $str_func_1 = "VKCodeToUnicode" ascii
+        $str_func_2 = "MapVirtualKey" ascii
+        $str_func_3 = "capGetDriverDescriptionA" ascii
+
+        $str_var_1 = "LastAS" ascii
+        $str_var_2 = "LastAV" ascii
+        $str_var_3 = "TempoSleep" ascii
+        $str_var_4 = "DownloadHostOrNotURL" ascii
+        $str_var_5 = "CopyMyFileDir" ascii
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of them 
+}rule win_origin_logger {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2022-09-20"
+        description = "detects Orign Logger"
+        tlp         = "TLP:WHITE"
+        version     = "v1.0"
+        hash_sha256 = "595a7ea981a3948c4f387a5a6af54a70a41dd604685c72cbd2a55880c2b702ed"
+        hash_md5    = "bd9981b13c37d3ba04e55152243b1e3e"
+        hash_sha1   = "4669160ec356a8640cef92ddbaf7247d717a3ef1"
+
+    strings:
+        $name           = "OriginLogger" wide
+        $exe            = "OriginLogger.exe" wide
+        $cfg_section_0  = "[LOGSETTINGS]"
+        $cfg_section_1  = "[ASSEMBLY]"
+        $cfg_section_2  = "[STEALER]"
+        $cfg_section_3  = "[BINDER]"
+        $cfg_section_4  = "[INSTALLATION]"
+        $cfg_section_5  = "[OPTIONS]"
+        $cfg_section_6  = "[DOWNLOADER]"
+        $cfg_section_7  = "[EXTENSION]"
+        $cfg_section_8  = "[FILEPUMPER]"
+        $cfg_section_9  = "[FAKEMSG]"
+        $cfg_section_10 = "[HOST]"
+        $cfg_section_11 = "[BUILD]"
+        $cfg_entries_0  = "BinderON="
+        $cfg_entries_1  = "blackhawk="
+        $cfg_entries_2  = "centbrowser="
+        $cfg_entries_3  = "chedot="
+        $cfg_entries_4  = "citrio="
+        $cfg_entries_5  = "clawsmail="
+        $cfg_entries_6  = "CloneON="
+        $cfg_entries_7  = "coccoc="
+        $cfg_entries_8  = "Coolnovo="
+        $cfg_entries_9  = "coowon="
+        $cfg_entries_10 = "cyberfox="
+        $cfg_entries_11 = "Delaysec="
+        $cfg_entries_12 = "dest_date="
+        $cfg_entries_13 = "Disablecp="
+        $cfg_entries_14 = "Disablemsconfig="
+        $cfg_entries_15 = "Disablesysrestore="
+        $cfg_entries_16 = "DownloaderON="
+        $cfg_entries_17 = "emclient="
+        $cfg_entries_18 = "epicpb="
+        $cfg_entries_19 = "estensionON="
+        $cfg_entries_20 = "Eudora="
+        $cfg_entries_21 = "falkon="
+        $cfg_entries_22 = "FileassemblyON="
+        $cfg_entries_23 = "FlashFXP="
+        $cfg_entries_24 = "FPRadiobut="
+        $cfg_entries_25 = "HostON="
+        $cfg_entries_26 = "icecat="
+        $cfg_entries_27 = "icedragon="
+        $cfg_entries_28 = "IconON="
+        $cfg_entries_29 = "IncrediMail="
+        $cfg_entries_30 = "iridium="
+        $cfg_entries_31 = "JustOne="
+        $cfg_entries_32 = "kmeleon="
+        $cfg_entries_33 = "kometa="
+        $cfg_entries_34 = "liebao="
+        $cfg_entries_35 = "orbitum="
+        $cfg_entries_36 = "palemoon="
+        $cfg_entries_37 = "pumderON="
+        $cfg_entries_38 = "pumpertext="
+        $cfg_entries_39 = "qqbrowser="
+        $cfg_entries_40 = "screeninterval="
+        $cfg_entries_41 = "SelectFolder="
+        $cfg_entries_42 = "sleipnir="
+        $cfg_entries_43 = "SmartLogger="
+        $cfg_entries_44 = "smartLoggerType="
+        $cfg_entries_45 = "SmartWords="
+        $cfg_entries_46 = "sputnik="
+        $cfg_entries_47 = "telegram_api="
+        $cfg_entries_48 = "telegram_chatid="
+        $cfg_entries_49 = "toemail="
+        $cfg_entries_50 = "trillian="
+        $cfg_entries_51 = "UCBrowser="
+        $cfg_entries_52 = "USBSpread="
+        $cfg_entries_53 = "vivaldi="
+        $cfg_entries_54 = "waterfox="
+        $cfg_entries_55 = "WebFilterON="
+
+    condition:
+        (uint16(0) == 0x5A4D or uint32(0) == 0x04034b50) and
+        (#name >= 4 or #exe >= 2) and 
+        10 of ($cfg_section_*)  and
+        50 of ($cfg_entries_*) 
+} rule win_phorpiex_a {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        version         = "v1.0"
+        tlp             = "TLP:WHITE"
+        date            = "2022-12-13"
+        description     = "detects unpacked Phorpiex samples"
+        malpedia_family = "win.phorpiex"
+        hash_md5        = "6b6398fa7d461b09b8652ec0f8bafeb4"
+        hash_sha1       = "43bf88ea96bb4de9f4bbc66686820260033cd2d7"
+        hash_sha256     = "bd2976d327a94f87c933a3632a1c56d0050b047506f5146b1a47d2b9fd5b798d"
+
+    strings:
+        $str_1 = ":--tLdr--:" 
+        $str_2 = "T-449505056674060607" wide
+
+        $path_1 = "\\public_html" wide 
+        $path_2 = "\\htdocs" wide
+        $path_3 = "\\httpdocs" wide
+        $path_4 = "\\wwwroot" wide
+        $path_5 = "\\ftproot" wide
+        $path_6 = "\\share" wide
+        $path_7 = "\\income" wide
+        $path_8 = "\\upload" wide
+
+        $cmd_0 = "/c start _ & _\\DeviceManager.exe & exit" wide 
+        $cmd_1 = "%ls\\_\\DeviceConfigManager.exe" wide
+        $cmd_2 = "%ls\\_\\DeviceManager.exe" wide
+        $cmd_3 = "/c rmdir /q /s \"%ls\"" wide
+        $cmd_4 = "/c move /y \"%ls\", \"%ls\"" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of ($str*) or 
+        all of ($path*) or
+        all of ($cmd*) 
+}
+
+rule win_phorpiex_b {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        version         = "v1.0"
+        tlp             = "TLP:WHITE"
+        date            = "2023-04-24"
+        description     = "detects unpacked Phorpiex samples"
+        malpedia_family = "win.phorpiex"
+        hash_md5        = "0149c897678e3b6f8ed36c10db0802fd"
+        hash_sha1       = "6595a05cb9d7e554a2dabe5b8939401dc72a02de"
+        hash_sha256     = "f1c8a026f2e1bd19df7c83567e57d236f64a9323ff35ec98b62025223f59aa5c"
+
+    strings:
+        $path_1 = "\\public_html" ascii 
+        $path_2 = "\\htdocs" ascii
+        $path_3 = "\\httpdocs" ascii
+        $path_4 = "\\wwwroot" ascii
+        $path_5 = "\\ftproot" ascii
+        $path_6 = "\\share" ascii
+        $path_7 = "\\income" ascii
+        $path_8 = "\\upload" ascii
+
+        $pdb = "\\Release\\Trik.pdb" ascii
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of ($path*) and
+        $pdb
+}rule win_quasarrat_j1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "detects the Quasar RAT"
+
+    strings:
+        $str_1 = "DoAskElevate" ascii
+        $str_2 = "DoChangeRegistryValue" ascii
+        $str_3 = "DoClientDisconnect" ascii
+        $str_4 = "DoClientReconnect" ascii
+        $str_5 = "DoClientUninstall" ascii
+        $str_6 = "DoClientUpdate" ascii
+        $str_7 = "DoCloseConnection" ascii
+        $str_8 = "DoCreateRegistryKey" ascii
+        $str_9 = "DoCreateRegistryValue" ascii
+        $str_10 = "DoDeleteRegistryKey" ascii
+        $str_11 = "DoDeleteRegistryValue" ascii
+        $str_12 = "DoDownloadAndExecute" ascii
+        $str_13 = "DoDownloadFile" ascii
+        $str_14 = "DoDownloadFileCancel" ascii
+        $str_15 = "DoKeyboardEvent" ascii
+        $str_16 = "DoLoadRegistryKey" ascii
+        $str_17 = "DoMouseEvent" ascii
+        $str_18 = "DoPathDelete" ascii
+        $str_19 = "DoPathRename" ascii
+        $str_20 = "DoProcessKill" ascii
+        $str_21 = "DoProcessStart" ascii
+        $str_22 = "DoRenameRegistryKey" ascii
+        $str_23 = "DoRenameRegistryValue" ascii
+        $str_24 = "DoShellExecute" ascii
+        $str_25 = "DoShowMessageBox" ascii
+        $str_26 = "DoShutdownAction" ascii
+        $str_27 = "DoStartupItemAdd" ascii
+        $str_28 = "DoStartupItemRemove" ascii
+        $str_29 = "DoUploadAndExecute" ascii
+        $str_30 = "DoUploadFile" ascii
+        $str_31 = "DoVisitWebsite" ascii
+        $str_32 = "DoWebcamStop" ascii
+        $str_33 = "GetAuthentication" ascii
+        $str_34 = "GetConnections" ascii
+        $str_35 = "GetDesktop" ascii
+        $str_36 = "GetDirectory" ascii
+        $str_37 = "GetDrives" ascii
+        $str_38 = "GetKeyloggerLogs" ascii
+        $str_39 = "GetMonitors" ascii
+        $str_40 = "GetPasswords" ascii
+        $str_41 = "GetProcesses" ascii
+        $str_42 = "GetStartupItems" ascii
+        $str_43 = "GetSystemInfo" ascii
+        $str_44 = "GetWebcam" ascii
+        $str_45 = "GetWebcams" ascii
+        $str_46 = "SetAuthenticationSuccess" ascii
+    
+    condition:
+        uint16(0) == 0x5A4D and 
+        40 of them
+}
+
+rule win_quasarrat_j2 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "detects the Quasar RAT"
+
+    strings:
+        $str_1 = "get_usernameField" ascii
+        $str_2 = "get_timePasswordChanged" ascii
+        $str_3 = "get_encryptedUsername" ascii
+        $str_4 = "get_encryptedPassword" ascii
+        $str_5 = "get_VistaOrHigher" ascii
+        $str_6 = "get_UseProtoMembersOnly" ascii
+        $str_7 = "get_UseImplicitZeroDefaults" ascii
+        $str_8 = "get_TenOrHigher" ascii
+        $str_9 = "get_MetadataTimeoutMilliseconds" ascii
+        $str_10 = "get_EightPointOneOrHigher" ascii
+        $str_11 = "get_EightOrHigher" ascii
+        $str_12 = "get_DynamicType" ascii
+
+        $quasar = "Quasar.Client.Properties.Resources" wide
+
+        condition:
+            uint16(0) == 0x5A4D and 
+            8 of ($str_*) and $quasar
+}rule elf_rekoobe_b3 {
+
+    meta:
+        author       = "Johannes Bader @viql"
+        version      = "v1.0"
+        tlp          = "TLP:WHITE"
+        date         = "2022-09-02"
+        description  = "detects the Rekoobe Linux backdoor"
+        hash1_md5    = "55ab7e652976d25997875f678c935de7"
+        hash1_sha1   = "dc6beb5019ee21ab207c146ece5080d00f20a103"
+        hash1_sha256 = "a89ebd7157336141eb14ed9084491cc5bdfce103b4db065e433dff47a1803731"
+
+    strings:
+        $sha_1  = {01 23 45 67 [0-10] 89 AB CD EF [0-10] FE DC BA 98 [0-10] 76 54 32 10 [0-10] F0 E1 D2 C3}
+
+        $hmac_1 = {36 36 36 36 36 36 36 36}
+        $hmac_2 = {5C 5C 5C 5C 5C 5C 5C 5C}
+
+        $str_term_1  = {C6 00 54}
+        $str_term_2  = {C6 40 03 4D}
+        $str_term_3  = {C6 40 01 45}
+        $str_term_4  = {C6 40 04 3D}
+        $str_term_5  = {C6 40 02 52}
+        $str_term_6  = {C6 40 02 52}
+
+        $str_histfile_1 = {C6 00 48}
+        $str_histfile_2 = {C6 40 05 49}
+        $str_histfile_3 = {C6 40 01 49}
+        $str_histfile_4 = {C6 40 06 4C}
+        $str_histfile_5 = {C6 40 02 53}
+        $str_histfile_6 = {C6 40 07 45}
+        $str_histfile_7 = {C6 40 03 54}
+        $str_histfile_8 = {C6 40 08 3D}
+        $str_histfile_9 = {C6 40 04 46}
+
+    condition:
+        uint32(0) == 0x464C457F and 
+        (
+            all of them 
+        )
+}rule win_vidar_a {
+
+    meta:
+        author          = "Johannes Bader @viql"
+        version         = "v1.0"
+        tlp             = "TLP:WHITE"
+        date            = "2023-03-30"
+        description     = "detect unpacked Vidar samples"
+        malpedia_family = "win.vidar"
+        hash_md5        = "ed4ddd89e6ab5211cd7fdbfe51d9576b"
+        hash_sha1       = "7b6beb9870646bc50b10014536ed3bb088a2e3de"
+        hash_sha256     = "352f8e45cd6085eea17fffeeef91251192ceaf494336460cc888bbdd0051ec71"
+
+    strings:
+        $leet_sleep  = {6A 01 FF D6 6A 03 FF D6 6A 03 FF D6 6A 07 FF D6} 
+
+        $wallets_01 = "Enkrypt"
+        $wallets_02 = "Braavos"
+        $wallets_03 = "Exodus Web3 Wallet"
+        $wallets_04 = "Trust Wallet"
+        $wallets_05 = "Tronium"
+        $wallets_06 = "Opera Wallet"
+        $wallets_07 = "OKX Web3 Wallet"
+        $wallets_08 = "Sender"
+        $wallets_09 = "Hashpack"
+        $wallets_10 = "Eternl"
+        $wallets_11 = "GeroWallet"
+        $wallets_12 = "Pontem Wallet"
+        $wallets_13 = "Martian Wallet"
+        $wallets_14 = "Finnie"
+        $wallets_15 = "Leap Terra"
+        $wallets_16 = "Microsoft AutoFill"
+        $wallets_17 = "Bitwarden"
+        $wallets_18 = "KeePass Tusk"
+        $wallets_19 = "KeePassXC-Browser"
+
+        $telegram_1 = "shortcuts-default.json"
+        $telegram_2 = "shortcuts-custom.json"
+        $telegram_3 = "settingss"
+        $telegram_4 = "prefix"
+        $telegram_5 = "countries"
+        $telegram_6 = "usertag"
+
+        $scp = "Software\\Martin Prikryl\\WinSCP 2\\Configuration" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            #leet_sleep > 10 and 
+            (16 of ($wallets_*) and all of ($telegram_*) and $scp)
+        )
+}
+rule win_wshrat_1 {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        version     = "v1.0"
+        tlp         = "TLP:WHITE"
+        date        = "2021-10-01"
+        description = "identifies WSHRAT"
+
+    strings:
+        $str_a_1 = "WSHRat Plugin" ascii
+        $str_a_2 = "TotalMouseMoves" ascii
+        
+        $str_b_1 = "TotalKeyboardClick" ascii
+        $str_b_2 = "TotalMouseMoves" ascii
+        $str_b_3 = "TotalMouseClick" ascii
+        $str_b_4 = "SessionKeyboardClick" ascii
+        $str_b_5 = "SessionMouseMoves" ascii
+        $str_b_6 = "SessionMouseClick" ascii
+
+        $str_c_1 = "/open-keylogger" wide
+
+    condition:
+        uint16(0) == 0x5A4D and 
+        all of ($str_a_*) and 
+        4 of ($str_b_*) and 
+        all of ($str_c_*)
+}rule win_xfiles_stealer {
+
+    meta:
+        author      = "Johannes Bader @viql"
+        date        = "2022-04-15"
+        version     = "v1.0"
+        description = "detects XFiles-Stealer"
+        hash        = "d06072f959d895f2fc9a57f44bf6357596c5c3410e90dabe06b171161f37d690"
+        hash2       = "1ed070e0d33db9f159a576e6430c273c"
+        tlp         = "TLP:WHITE"
+        malpedia_family = "win.xfilesstealer"
+
+    strings:
+        $ad_1 = "Telegram bot - @XFILESShop_Bot" wide
+        $ad_2 = "Telegram support - @XFILES_Seller" wide
+
+        $names_1 = "XFiles.Models.Yeti"
+        $names_2 = "anti_vzlom_popki" // ???? ????? ?????
+        $names_3 = "assType"
+        $names_4 = "hackrjaw"
+
+        $upload_1  = "zipx" wide
+        $upload_2  = "user_id" wide
+        $upload_3  = "passworlds_x" wide
+        $upload_4  = "ip_x" wide
+        $upload_5  = "cc_x" wide
+        $upload_6  = "cookies_x" wide
+        $upload_7  = "zip_x" wide
+        $upload_8  = "contry_x" wide
+        $upload_9  = "tag_x" wide
+        $upload_10 = "piece" wide
+            
+    condition:
+        uint16(0) == 0x5A4D and 
+        (
+            all of ($ad_*) or 
+            all of ($names_*) or 
+            all of ($upload_*)
+        )
+}rule win_xworm_s1 {
+    
+    meta:
+        author          = "Johannes Bader @viql"
+        date            = "2022-11-13"
+        version         = "v1.0"
+        description     = "detects unpacked Xworm samples"
+        tlp             = "TLP:WHITE"
+        hash1_md5       = "6005e1ccaea62626a5481e09bbb653da"
+        hash1_sha1      = "74138872ec0d0791b7f58eda8585250af40feaf9"
+        hash1_sha256    = "7fc6a365af13150e7b1738129832ebd91f1010705b0ab0955a295e2c7d88be62"
+
+    strings:
+        $str_01 = "Mutexx"
+        $str_02 = "USBS"
+        $str_03 = "_appMutex"
+        $str_04 = "dTimer2"
+        $str_05 = "dosstu"
+        $str_06 = "nameee"
+        $str_07 = "ruta"
+        $str_08 = "usbSP"
+        $str_09 = "GetEncoderInfo"
+        $str_10 = "AppendOutputText"
+        $str_11 = "capCreateCaptureWindowA"
+        $str_12 = "capGetDriverDescriptionA"
+        $str_13 = "MyProcess_ErrorDataReceived"
+        $str_14 = "MyProcess_OutputDataReceived"
+        $str_15 = "STOBS64"
+        $str_16 = "keybd_event"
+        $str_17 = "AES_Decryptor"
+        $str_18 = "AES_Encryptor"
+        $str_19 = "tickees"
+        $str_20 = "INDATE"
+        $str_21 = "GetHashT"
+        $str_22 = "isDisconnected"
+
+        $str_23   = "PING?" wide
+        $str_24   = "IsInRole" wide
+        $str_25   = "Select * from AntivirusProduct" wide
+        $str_26   = "FileManagerSplitFileManagerSplit" wide
+        $str_27   = "\nError: " wide
+        $str_28   = "[Folder]" wide
+
+        $str_29    = "XKlog.txt" wide
+        $str_30    = "<Xwormmm>" wide
+        $str_32    = "GfvaHzPAZuTqRREB" wide
+
+    condition: 
+        uint16(0) == 0x5A4D and 
+        (
+            20  of ($str*)
+        )
+}
 
