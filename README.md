@@ -13,6 +13,7 @@ You need use Firefox as your browser
 - ClamAV on Python
 - Rootkit scanner are united in one python script
 - Average daily 1k new virus hashes and 700+ new virus or phsihing websites
+- Heuristical Scanning With ClamAV and rfnx YARA rules
 ## Download
 Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA)
 - Phising Database: https://github.com/mitchellkrogza/Phishing.Database
@@ -131,5 +132,5 @@ Create requirements.txt
 - https://www.reddit.com/r/Malware/comments/7fabu5/sites_to_download_malware/
 - ## How To Improve Protection Rate Very Easily?
 - The best easiest way is the writing YARA rules otherwise learn reverse engeering.
-- You can use ClamAV via for that. Notice it may cause too many false positives but less false negatives and you can easily name the virus names. I'm going to convert my rules to YARA rules.
+- You can use ClamAV via for that. Notice it may cause too many false positives but less false negatives and you can easily name the virus names.
 - https://www.rfxn.com/projects/linux-malware-detect/ Use this thing too.
