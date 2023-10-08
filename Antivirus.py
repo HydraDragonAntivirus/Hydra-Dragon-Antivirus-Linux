@@ -17,8 +17,9 @@ import ssdeep
 import appdirs
 import getpass 
 import tkinter as tk
-from tkinter import messagebox, filedialog, simpledialog
+from tkinter import messagebox, filedialog, simpledialog, Scrollbar
 import threading
+from tkinter import ttk
 def calculate_tlsh(file_path):
     with open(file_path, "rb") as file:
         file_data = file.read()
@@ -2084,10 +2085,6 @@ class AntivirusGUI:
         self.scan_frame = tk.Frame(self.root)
         self.scan_frame.pack(padx=10, pady=10, fill=tk.BOTH, expand=True)
 
-        # Create a Text widget to simulate console
-        self.console_text = tk.Text(self.scan_frame, wrap="word", height=20, width=80)
-        self.console_text.pack(expand=True, fill=tk.BOTH)
-
         # Create a frame to hold infected and clean files section
         self.files_frame = tk.Frame(self.root)
         self.files_frame.pack(padx=10, pady=(0, 10), fill=tk.BOTH, expand=True)
@@ -2100,6 +2097,83 @@ class AntivirusGUI:
         # Initialize key_events to keep track of keyboard events
         self.key_events = []
         self.rat_detected = False
+
+        # Create a frame to hold the console-like text and scrollbar
+        self.console_frame = tk.Frame(self.scan_frame)
+        self.console_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        # Create a Text widget to simulate console
+        self.console_text = tk.Text(self.console_frame, wrap="word", width=80)
+        self.console_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        # Create a standard vertical scrollbar for the console_text
+        self.scrollbar = Scrollbar(self.console_frame, orient=tk.VERTICAL, command=self.console_text.yview)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.console_text.config(yscrollcommand=self.scrollbar.set)
+    def calculate_md5(self, file_path):
+        hash_md5 = hashlib.md5()
+        with open(file_path, "rb") as file:
+            for chunk in iter(lambda: file.read(4096), b""):
+                hash_md5.update(chunk)
+        return hash_md5.hexdigest()
+
+    def calculate_sha1(self, file_path):
+        hash_sha1 = hashlib.sha1()
+        with open(file_path, "rb") as file:
+            for chunk in iter(lambda: file.read(4096), b""):
+                hash_sha1.update(chunk)
+        return hash_sha1.hexdigest()
+
+    def calculate_sha256(self, file_path):
+        hash_sha256 = hashlib.sha256()
+        with open(file_path, "rb") as file:
+            for chunk in iter(lambda: file.read(4096), b""):
+                hash_sha256.update(chunk)
+        return hash_sha256.hexdigest()
+
+    def calculate_tlsh(self, file_path):
+        with open(file_path, "rb") as file:
+            file_data = file.read()
+            tlsh_value = tlsh.hash(file_data)
+        return tlsh_value
+
+    def calculate_ssdeep(self, file_path):
+        if ssdeep is None:
+            self.update_console("The 'ssdeep' module is not installed. Please install it to calculate ssdeep hashes.")
+            return None
+        try:
+            with open(file_path, "rb") as file:
+                file_data = file.read()
+                ssdeep_value = ssdeep.hash(file_data)
+            return ssdeep_value
+        except Exception as e:
+            self.update_console(f"Error calculating ssdeep hash: {e}")
+            return None
+    def calculate_hashes_in_folder(self, folder_path):
+        if os.path.exists(folder_path) and os.path.isdir(folder_path):
+            self.update_console(f"Calculating hashes for files in {folder_path}")
+            for root, _, files in os.walk(folder_path):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    self.update_console(f"Calculating hashes for {file_path}")
+                    md5_hash = self.calculate_md5(file_path)
+                    sha1_hash = self.calculate_sha1(file_path)
+                    sha256_hash = self.calculate_sha256(file_path)
+                    ssdeep_hash = self.calculate_ssdeep(file_path)
+                    tlsh_hash = self.calculate_tlsh(file_path)
+                    self.update_console(f"File: {file_path}")
+                    self.update_console(f"MD5 Hash: {md5_hash}")
+                    self.update_console(f"SHA-1 Hash: {sha1_hash}")
+                    self.update_console(f"SHA-256 Hash: {sha256_hash}")
+                    self.update_console(f"SSDEEP Hash: {ssdeep_hash}")
+                    self.update_console(f"TLSH Hash: {tlsh_hash}")
+                    self.update_console("-" * 40)
+                    self.root.update()  # Update the GUI to display incremental changes
+        else:
+            self.update_console("Invalid folder path.")
+    def calculate_hashes_in_folder_gui(self):
+        folder_path = filedialog.askdirectory(title="Select a folder to calculate hashes for")
+        if folder_path:
+            self.calculate_hashes_in_folder(folder_path)
     def create_menu(self):
         menu = tk.Menu(self.root)
         self.root.config(menu=menu)
@@ -2118,6 +2192,7 @@ class AntivirusGUI:
         test_keyboard_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Test Keyboard Activity", menu=test_keyboard_menu)
         test_keyboard_menu.add_command(label="Test Keyboard Activity", command=self.test_keyboard_activity)
+        menu.add_command(label="Calculate Hashes in Folder", command=self.calculate_hashes_in_folder_gui)
     def test_keyboard_activity(self):
         # Function to test keyboard activity
         print("Testing keyboard activity... Press any key.")
