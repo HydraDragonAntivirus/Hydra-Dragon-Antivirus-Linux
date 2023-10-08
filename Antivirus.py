@@ -2076,7 +2076,7 @@ def check_website_infection():
 class AntivirusGUI:
     def __init__(self, root):
         self.root = root
-        self.root.title("Antivirus Program")
+        self.root.title("Hydra Dragon Antivirus")
 
         # Create the menu
         self.create_menu()
