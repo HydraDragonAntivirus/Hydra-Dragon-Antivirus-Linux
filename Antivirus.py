@@ -428,7 +428,7 @@ def calculate_sha256(file_path):
 def scan_folder_with_clamscan(folder_path):
     try:
         current_folder = os.getcwd()
-        subprocess.run(["clamscan","-r", "--heuristic-alerts=yes", "--remove=yes", "--detect-pua=yes", "--normalize=no", folder_path])
+        subprocess.run(["clamscan", "-r", "--heuristic-alerts=yes", "--remove=yes", "--detect-pua=yes", "--normalize=no", "--detect-yara", "rfnx.yara", folder_path])
     except Exception as e:
         print(f"Error running ClamScan: {e}")
 def delete_file(file_path):
@@ -470,7 +470,7 @@ def scan_file(file_path):
         return f"Error processing {file_path}: {e}"
 def scan_file_with_clamscan(file_path):
     try:
-        subprocess.run(["clamscan", "--heuristic-alerts=yes", "--remove=yes", "--detect-pua=yes", "--normalize=no", file_path])
+     subprocess.run(["clamscan", "--heuristic-alerts=yes", "--remove=yes", "--detect-pua=yes", "--normalize=no", "--detect-yara", "rfnx.yara", file_path])
     except Exception as e:
         print(f"Error running ClamScan: {e}")
 def scan_folder_parallel(folder_path):
@@ -699,7 +699,7 @@ def scan_running_files_with_clamav():
             # Perform a ClamAV scan on the copied running files
             if os.listdir(temp_dir):
                 print("Scanning running files with ClamAV...")
-                subprocess.run(["clamscan", "-r", temp_dir])
+                subprocess.run(["clamscan", "-r", "--detect-yara", "rfnx.yara", temp_dir])
             else:
                 print("No running files found for scanning.")
 
@@ -2239,7 +2239,7 @@ class AntivirusGUI:
     def run_clamscan(self, file_path):
         try:
             # Run clamscan
-            command = ['clamscan', file_path]
+            command = ['clamscan', '--detect-yara', 'rfnx.yara', file_path]
             result = subprocess.run(command, capture_output=True, text=True)
             return result.stdout
         except Exception as e:
