@@ -135,3 +135,4 @@ Create requirements.txt
 - You can use ClamAV via for that. Notice it may cause too many false positives but less false negatives and you can easily name the virus names.
 - https://www.rfxn.com/projects/linux-malware-detect/ Use this thing too.
 - https://github.com/reversinglabs/reversinglabs-yara-rules
+- https://www.virustotal.com/gui/file/d35eb98fe63f11d5f979a5cbad5ae6ebbb9a1e8ec3fae9db80537e153a009263?nocache=1
