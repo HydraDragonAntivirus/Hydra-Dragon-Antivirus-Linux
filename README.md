@@ -126,7 +126,8 @@ No data collected
   -phishtank 8.5 million
   -Me 4.7 million
 ## TODO 
-Create requirements.txt
+- Create requirements.txt
+- Create Quarantine Option In GUI
 ## How To Test Antivirus?
 - You can use virusshare.com but have some false positives be careful or look this:
 - https://tracker.h3x.eu/download/5000
