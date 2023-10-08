@@ -1029,9 +1029,6 @@ def is_website_infected(url):
     cursor.close()
     conn.close()
 
-    if checking_same_url:
-        return "Already checking the same website"  # Indicate that we are checking the same website again
-
     return False  # Return False if no match is found in database
 # Creating a set to store checked websites
 checked_websites = set()
@@ -1098,10 +1095,6 @@ def is_website_infected0(content):
 
     cursor.close()
     conn.close()
-
-    if checking_same_url:
-        return "Already checking the same website"  # Indicate that we are checking the same website again
-
     return False  # Return False if no match is found in database
 def check_tracking_cookies(url, cursor):
     try:
@@ -2062,7 +2055,6 @@ def perform_folder_scan():
             executor.submit(scan_folder_with_clamscan, folder_path)
             executor.submit(scan_folder_parallel, folder_path)
             executor.submit(scan_folder_with_malware_content_check, folder_path)
-
 def check_website_infection():
     website_url = simpledialog.askstring("Website URL", "Enter the website URL to check:")
     if website_url:
@@ -2185,7 +2177,7 @@ class AntivirusGUI:
         website_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Website", menu=website_menu)
         website_menu.add_command(label="Check Website in blist", command=self.check_website_in_blist0)
-
+        website_menu.add_command(label="Check Website", command=self.check_website)
         firefox_menu = tk.Menu(menu, tearoff=0)
         menu.add_cascade(label="Firefox", menu=firefox_menu)
         firefox_menu.add_command(label="Check Firefox Profile", command=self.check_firefox_profile)
@@ -2193,6 +2185,21 @@ class AntivirusGUI:
         menu.add_cascade(label="Test Keyboard Activity", menu=test_keyboard_menu)
         test_keyboard_menu.add_command(label="Test Keyboard Activity", command=self.test_keyboard_activity)
         menu.add_command(label="Calculate Hashes in Folder", command=self.calculate_hashes_in_folder_gui)
+        website_menu = tk.Menu(menu, tearoff=0)
+    def check_website(self):
+        website_url = simpledialog.askstring("Check Website", "Enter the website URL to check:")
+        if not website_url:
+            return  # User cancelled or entered an empty URL
+
+        result = None
+        if is_website_infected(website_url):
+            result = "The website is infected."
+        elif is_phishing_website(website_url):
+            result = "The website is phishing."
+        else:
+            result = "The website is clean."
+
+        messagebox.showinfo("Website Check Result", result)
     def test_keyboard_activity(self):
         # Function to test keyboard activity
         print("Testing keyboard activity... Press any key.")
@@ -2392,8 +2399,7 @@ def main():
                     executor.submit(scan_folder_parallel, folder_path)
                     executor.submit(scan_folder_with_malware_content_check, folder_path)
             else:
-                print("Invalid folder path.")
-        
+                print("Invalid folder path.")  
         elif choice == "3":
             website_url = input("Enter the website URL to check: ")
             if is_website_infected(website_url):
