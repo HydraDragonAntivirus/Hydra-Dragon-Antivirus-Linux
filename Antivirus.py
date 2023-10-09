@@ -20,6 +20,7 @@ import tkinter as tk
 from tkinter import messagebox, filedialog, simpledialog, Scrollbar
 import threading
 from tkinter import ttk
+import yara
 def calculate_tlsh(file_path):
     with open(file_path, "rb") as file:
         file_data = file.read()
@@ -2359,6 +2360,24 @@ class AntivirusGUI:
         # Create and display the new label
         result_label = tk.Label(self.root, text=text)
         result_label.pack()
+def scan_with_yara(file_path):
+    try:
+        # Load YARA rule file
+        rules = yara.compile(filepath='rfxn.yara')
+
+        # Scan the file and get matching rules
+        matches = rules.match(file_path)
+
+        if matches:
+            print("Matching rules:")
+            for match in matches:
+                print(f"- Rule Name: {match.rule}")
+                print(f"  Description: {match.meta['description']}")
+        else:
+            print("No matching rule found.")
+
+    except yara.Error as e:
+        print(f"Error: {str(e)}")
 def main():
     while True:
         print("You need to install firejail, strace, chkrootkit, clamav and rkhunter.")
@@ -2376,7 +2395,8 @@ def main():
         print("10. Rootkit scan with rkhunter")
         print("11.Check Firefox profile")
         print("12.User Interface Mode")
-        print("13. Exit")
+        print("13.YARA rule scanner")
+        print("14. Exit")
         
         choice = input("Enter your choice: ")
         if choice == "1":
@@ -2489,6 +2509,17 @@ def main():
             gui = AntivirusGUI(root)
             root.mainloop()
         elif choice == "13":
+            # Get File Path From User
+            file_path = input("Enter the path of the file to scan: ").strip("'")
+            if os.path.exists(file_path):
+                if os.path.getsize(file_path) == 0:
+                    print("File is empty (0-byte size), rejecting.")
+                else:
+                    # YARA taramasını yap
+                    scan_with_yara(file_path)
+            else:
+                print(f"File not found: {file_path}")
+        elif choice == "14":
             print("Exiting...")
             break
         else:
