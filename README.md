@@ -48,6 +48,7 @@ No data collected
 - sudo pacman -S rkhunter
 - sudo pacman -S clamav
 - sudo pacman -S firejail
+- sudo pacman -S python-yara
 ### Download This Files
 - http://database.clamav.net/main.cvd
 - http://database.clamav.net/daily.cvd
@@ -85,6 +86,7 @@ No data collected
 - DatabaseCustomURL https://www.securiteinfo.com/get/signatures/9e46fcf748515c2e273120875878728d48c4aa222679a44eb5bbddbcd59914f4dc15ae118bd3e47a0b1e6129009ee1f31860406710c2581773be718f70f515ae/securiteinfopdf.hdb
 - Then Ctrl+S then Ctrl+X then sudo freshclam
 - https://blog.frehi.be/2021/01/25/using-fangfrisch-to-improve-malware-e-mail-detection-with-clamav/
+
 - sudo freshclam
 - sudo systemctl
 - start clamav-daemon
