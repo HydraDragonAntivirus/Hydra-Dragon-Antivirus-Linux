@@ -2360,13 +2360,25 @@ class AntivirusGUI:
         # Create and display the new label
         result_label = tk.Label(self.root, text=text)
         result_label.pack()
-def scan_with_yara(file_path):
+def load_yara_rules(file_path):
     try:
-        # Load YARA rule file
-        rules = yara.compile(filepath='rfxn.yara')
+        # Load YARA rule file with ignoring duplicates
+        rules = yara.compile(filepath=file_path, includes=False)
+
+        return rules
+
+    except yara.Error as e:
+        print(f"Error: {str(e)}")
+        return None
+
+def scan_with_yara(file_path, rules):
+    try:
+        # Check if rules were loaded successfully
+        if rules is None:
+            return
 
         # Scan the file and get matching rules
-        matches = rules.match(file_path)
+        matches = rules.match(filepath=file_path)
 
         if matches:
             print("Matching rules:")
@@ -2393,11 +2405,11 @@ def main():
         print("8. Check urlbl2.db for known websites. Don't add www. or http etc")
         print("9. Rootkit scan with chkrootkit")
         print("10. Rootkit scan with rkhunter")
-        print("11.Check Firefox profile")
-        print("12.User Interface Mode")
-        print("13.YARA rule scanner")
+        print("11. Check Firefox profile")
+        print("12. User Interface Mode")
+        print("13. YARA rule scanner")
         print("14. Exit")
-        
+
         choice = input("Enter your choice: ")
         if choice == "1":
             file_path = input("Enter the path of the file to scan: ").strip("'")
@@ -2438,15 +2450,15 @@ def main():
                 executor.submit(monitoring_running_processes)        
         elif choice == "5":
             file_path = input("Enter the path of the file to intuitively scan: ").strip("'")
-                 # Check if the file exists before proceeding
+            # Check if the file exists before proceeding
             if not os.path.exists(file_path):
                 print(f"File not found: {file_path}")
                 continue
             # Check if the file is empty (0-byte size)
             if os.path.getsize(file_path) == 0:
-               print("File is empty (0-byte size), rejecting.")
-               return
-            # Prompt the user to enter the home directorun_clamry
+                print("File is empty (0-byte size), rejecting.")
+                return
+            # Prompt the user to enter the home directory
             home_dir = input("Enter the home directory and username for Firefox history scan (e.g., /home/yourusername If you haven't started it as sudo, leave it blank): ")
 
             suspicious_file_path = file_path
@@ -2479,7 +2491,7 @@ def main():
                 # Print or handle results as needed
                 print("access_firefox_history_continuous0 result:", result1)
                 print("start_monitoring result:", result4)
-                print("check_mbr_ovfile_for_malicious_content result:", result2)
+                print("check_mbr_overwrite result:", result2)
                 print("real_time_web_protection0 result:", result3)
                 print("check_mbr_overwrite result:", result5)
                 print("find_connected_ips result:", result6)
@@ -2504,7 +2516,7 @@ def main():
             else:
                 print("No Firefox profile found.")
         elif choice == "12":
-            print("UI Mode Enabled")
+            print("GUI Mode Enabled")
             root = tk.Tk()
             gui = AntivirusGUI(root)
             root.mainloop()
@@ -2515,14 +2527,17 @@ def main():
                 if os.path.getsize(file_path) == 0:
                     print("File is empty (0-byte size), rejecting.")
                 else:
-                    # YARA taramasını yap
-                    scan_with_yara(file_path)
-            else:
-                print(f"File not found: {file_path}")
+                    # Make YARA Scan
+                    yara_rules = load_yara_rules('rfxn.yara')
+                    if yara_rules:
+                        scan_with_yara(file_path, yara_rules)
+                    else:
+                        print(f"File not found: {file_path}")
         elif choice == "14":
             print("Exiting...")
             break
         else:
             print("Invalid choice. Please select a valid option.")
+
 if __name__ == "__main__":
     main()
