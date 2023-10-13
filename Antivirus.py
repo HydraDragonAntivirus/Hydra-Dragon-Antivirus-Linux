@@ -2281,6 +2281,7 @@ class AntivirusGUI:
         if self.rkhunter_process:
             self.rkhunter_process.stdin.write('\n')
             self.rkhunter_process.stdin.flush()
+
     def run_rkhunter(self):
         try:
             # Run rkhunter with sudo
@@ -2359,14 +2360,8 @@ class AntivirusGUI:
         # Create and display the new label
         result_label = tk.Label(self.root, text=text)
         result_label.pack()
-def scan_with_yara(file_path, rule_files):
+def scan_with_yara(file_path, rules):
     try:
-        # Create a dictionary that maps rule names to their content
-        rules_dict = {os.path.basename(rule_file): open(rule_file).read() for rule_file in rule_files}
-
-        # Initialize an empty rules object and compile the rules
-        rules = yara.compile(sources=rules_dict)
-
         # Check if rules were loaded successfully
         if rules is None:
             return
@@ -2375,15 +2370,15 @@ def scan_with_yara(file_path, rule_files):
         matches = rules.match(filepath=file_path)
 
         if matches:
-            print("Matching rules in:", list(rules_dict.keys()))
+            print("Matching rules:")
             for match in matches:
                 print(f"- Rule Name: {match.rule}")
                 print(f"  Description: {match.meta['description']}")
         else:
-            print("No matching rule found in:", list(rules_dict.keys()))
+            print("No matching rule found.")
 
     except yara.Error as e:
-        print(f"Error in {rule_files[0]}: {str(e)}")
+        print(f"Error: {str(e)}")
 def main():
     while True:
         print("You need to install firejail, strace, chkrootkit, clamav and rkhunter.")
@@ -2522,9 +2517,9 @@ def main():
                     print("File is empty (0-byte size), rejecting.")
                 else:
                     # Make YARA Scan
-                    rule_files = ["split_1.yara", "split_2.yara", "split_3.yara", "split_4.yara"]
-                    if rule_files:
-                        scan_with_yara(file_path, rule_files)
+                    yara_rules = load_yara_rules('rfxn.yara')
+                    if yara_rules:
+                        scan_with_yara(file_path, yara_rules)
                     else:
                         print(f"File not found: {file_path}")
         elif choice == "14":
@@ -2532,5 +2527,6 @@ def main():
             break
         else:
             print("Invalid choice. Please select a valid option.")
+
 if __name__ == "__main__":
     main()
