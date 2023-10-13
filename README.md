@@ -141,3 +141,4 @@ No data collected
 - https://github.com/reversinglabs/reversinglabs-yara-rules
 - https://www.virustotal.com/gui/file/d35eb98fe63f11d5f979a5cbad5ae6ebbb9a1e8ec3fae9db80537e153a009263?nocache=1
 - Awesome YARA rules
+- I have currently 98036 YARA rules with including same rules.
