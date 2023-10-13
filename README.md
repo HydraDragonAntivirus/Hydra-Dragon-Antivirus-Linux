@@ -120,7 +120,7 @@ No data collected
 - dailyfuzzyhashes: daily.ldb
 - to remove: daily.cdb daily.cfg daily.crb daily.ftm daily.idb daily.ign daily.ign2 daily.info daily.ldu daily.ndb daily.ndu daily.pdb daily.wdb
 - YARA: https://yaraify.abuse.ch/yarahub/
-- -YARA: Look the Awesome YARA rules.
+- -YARA: Look the Awesome YARA rules. I only collected YARA rules from there and please look the web archive.
   ## Database Comprasion
   -Kaspersky have 2 billion databases
   -Virussign 600 million
@@ -141,5 +141,5 @@ No data collected
 - https://www.rfxn.com/projects/linux-malware-detect/ Use this thing too.
 - https://github.com/reversinglabs/reversinglabs-yara-rules
 - https://www.virustotal.com/gui/file/d35eb98fe63f11d5f979a5cbad5ae6ebbb9a1e8ec3fae9db80537e153a009263?nocache=1
-- Awesome YARA rules
+- Awesome YARA
 - I have currently 108634 YARA rules with including same rules.
