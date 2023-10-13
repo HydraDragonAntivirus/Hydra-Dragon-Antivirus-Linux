@@ -2281,7 +2281,6 @@ class AntivirusGUI:
         if self.rkhunter_process:
             self.rkhunter_process.stdin.write('\n')
             self.rkhunter_process.stdin.flush()
-
     def run_rkhunter(self):
         try:
             # Run rkhunter with sudo
@@ -2360,52 +2359,14 @@ class AntivirusGUI:
         # Create and display the new label
         result_label = tk.Label(self.root, text=text)
         result_label.pack()
-def load_yara_rules(file_path):
+def scan_with_yara(file_path, rule_files):
     try:
-        # Load YARA rule file
-        rules = yara.compile(filepath=file_path, includes=True)
-        return rules
+        # Create a dictionary that maps rule names to their content
+        rules_dict = {os.path.basename(rule_file): open(rule_file).read() for rule_file in rule_files}
 
-    except yara.SyntaxError as e:
-        error_message = str(e)
-        if "duplicated identifier" in error_message:
-            print("Duplicated identifier error: Renaming the duplicated rule.")
+        # Initialize an empty rules object and compile the rules
+        rules = yara.compile(sources=rules_dict)
 
-            # Extract the duplicated identifier using a regular expression
-            import re
-            match = re.search(r'duplicated identifier "(.+?)"', error_message)
-            if match:
-                duplicate_identifier = match.group(1)
-
-                # Generate a new identifier by appending '_duplicated'
-                new_identifier = f"{duplicate_identifier}_duplicated"
-
-                # Read the YARA rules from the file
-                with open(file_path, 'r') as file:
-                    yara_rules = file.read()
-
-                # Replace the first occurrence of the duplicated identifier with the new identifier in the YARA rules
-                yara_rules = yara_rules.replace(duplicate_identifier, new_identifier, 1)
-
-                # Write the updated YARA rules back to the file
-                with open(file_path, 'w') as file:
-                    file.write(yara_rules)
-
-                print(f"Duplicated identifier '{duplicate_identifier}' renamed to '{new_identifier}'.")
-                print("Retrying the operation.")
-                return load_yara_rules(file_path)  # Retry the operation
-
-            else:
-                print(f"Failed to extract duplicated identifier from the error message: {error_message}")
-                return None
-        else:
-            print(f"SyntaxError in YARA rules: {error_message}")
-            return None
-    except yara.Error as e:
-        print(f"Error: {str(e)}")
-        return None
-def scan_with_yara(file_path, rules):
-    try:
         # Check if rules were loaded successfully
         if rules is None:
             return
@@ -2414,15 +2375,15 @@ def scan_with_yara(file_path, rules):
         matches = rules.match(filepath=file_path)
 
         if matches:
-            print("Matching rules:")
+            print("Matching rules in:", list(rules_dict.keys()))
             for match in matches:
                 print(f"- Rule Name: {match.rule}")
                 print(f"  Description: {match.meta['description']}")
         else:
-            print("No matching rule found.")
+            print("No matching rule found in:", list(rules_dict.keys()))
 
     except yara.Error as e:
-        print(f"Error: {str(e)}")
+        print(f"Error in {rule_files[0]}: {str(e)}")
 def main():
     while True:
         print("You need to install firejail, strace, chkrootkit, clamav and rkhunter.")
@@ -2561,9 +2522,9 @@ def main():
                     print("File is empty (0-byte size), rejecting.")
                 else:
                     # Make YARA Scan
-                    yara_rules = load_yara_rules('rfxn.yara')
-                    if yara_rules:
-                        scan_with_yara(file_path, yara_rules)
+                    rule_files = ["split_1.yara", "split_2.yara", "split_3.yara", "split_4.yara"]
+                    if rule_files:
+                        scan_with_yara(file_path, rule_files)
                     else:
                         print(f"File not found: {file_path}")
         elif choice == "14":
@@ -2571,6 +2532,5 @@ def main():
             break
         else:
             print("Invalid choice. Please select a valid option.")
-
 if __name__ == "__main__":
     main()
