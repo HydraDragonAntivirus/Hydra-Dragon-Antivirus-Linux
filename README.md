@@ -119,7 +119,8 @@ No data collected
 - dailyz: daily.msb daily.hsu daily.hsb
 - dailyfuzzyhashes: daily.ldb
 - to remove: daily.cdb daily.cfg daily.crb daily.ftm daily.idb daily.ign daily.ign2 daily.info daily.ldu daily.ndb daily.ndu daily.pdb daily.wdb
-- YARA: https://yaraify.abuse.ch/yarahub/ 
+- YARA: https://yaraify.abuse.ch/yarahub/
+- -YARA: Look the Awesome YARA rules.
   ## Database Comprasion
   -Kaspersky have 2 billion databases
   -Virussign 600 million
