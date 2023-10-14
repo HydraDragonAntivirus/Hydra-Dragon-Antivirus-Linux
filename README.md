@@ -123,6 +123,7 @@ No data collected
 - https://github.com/ditekshen
 - https://github.com/baderj/yara
 - Phising Database: https://github.com/mitchellkrogza/Phishing.Database
+- https://yaraify.abuse.ch/ Download YARA rules via YARAifyhub
   ## Database Comprasion
   -Kaspersky have 2 billion databases
   -Virussign 600 million
