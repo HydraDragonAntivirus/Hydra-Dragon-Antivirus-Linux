@@ -121,6 +121,7 @@ No data collected
 - YARA: https://yaraify.abuse.ch/yarahub/
 - -YARA: Look the Awesome YARA rules. I collected YARA rules from there and please look the web archive.
 - https://github.com/ditekshen
+- https://github.com/baderj/yara
 - Phising Database: https://github.com/mitchellkrogza/Phishing.Database
   ## Database Comprasion
   -Kaspersky have 2 billion databases
