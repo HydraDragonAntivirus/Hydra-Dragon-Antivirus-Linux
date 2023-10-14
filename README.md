@@ -16,7 +16,6 @@ You need use Firefox as your browser
 - Heuristical Scanning With ClamAV and YARA rules
 ## Download
 Download full version [here](https://mega.nz/folder/n85EkQwa#6E6xSXO5Y2NQ4rzrg-nIzA)
-- Phising Database: https://github.com/mitchellkrogza/Phishing.Database
 ### Read before using
 - Don't forget give permission access.
 - It really disconnect infected ip address and it deletes file so be careful!
@@ -122,6 +121,7 @@ No data collected
 - YARA: https://yaraify.abuse.ch/yarahub/
 - -YARA: Look the Awesome YARA rules. I collected YARA rules from there and please look the web archive.
 - https://github.com/ditekshen
+- Phising Database: https://github.com/mitchellkrogza/Phishing.Database
   ## Database Comprasion
   -Kaspersky have 2 billion databases
   -Virussign 600 million
