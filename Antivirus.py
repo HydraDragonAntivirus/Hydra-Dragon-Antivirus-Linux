@@ -2360,34 +2360,38 @@ class AntivirusGUI:
         # Create and display the new label
         result_label = tk.Label(self.root, text=text)
         result_label.pack()
+# Function to load YARA rules from a folder
 def load_yara_rules(yara_folder):
+    yara_rules = []
+    for root, dirs, files in os.walk(yara_folder):
+        for file in files:
+            if file.endswith(".yar"):
+                rule_file = os.path.join(root, file)
+                try:
+                    rules = yara.compile(filepath=rule_file)
+                    yara_rules.append(rules)
+                except yara.Error as e:
+                    print(f"Error compiling YARA rule from {rule_file}: {e}")
+    return yara_rules
+# Function to scan a file using loaded YARA rules
+def scan_with_yara(file_path, yara_rules):
     try:
-        # Load the YARA rules from the specified folder
-        rules = yara.compile(filepath=os.path.join(yara_folder, '*.yar'))
-        return rules
-    except yara.Error as e:
-        print(f"Error loading YARA rules: {str(e)}")
-        return None
-
-def scan_with_yara(file_path, rules):
-    try:
-        # Check if rules were loaded successfully
-        if rules is None:
-            return
-
-        # Scan the file and get matching rules
-        matches = rules.match(filepath=file_path)
-
-        if matches:
-            print("Matching rules:")
-            for match in matches:
-                print(f"- Rule Name: {match.rule}")
-                print(f"  Description: {match.meta['description']}")
-        else:
-            print("No matching rule found.")
-
-    except yara.Error as e:
-        print(f"Error: {str(e)}")
+        with open(file_path, 'rb') as f:
+            file_content = f.read()
+        
+        match_found = False  # Flag to track if a match was found
+        
+        for rules in yara_rules:
+            matches = rules.match(data=file_content)
+            if matches:
+                match_found = True
+                print(f"Match found in file {file_path} for rule(s): {', '.join(match.rule for match in matches)}")
+        
+        if not match_found:
+            print(f"No matches found in file {file_path}")
+            
+    except Exception as e:
+        print(f"Error scanning file {file_path}: {e}")
 def main():
     while True:
         print("You need to install firejail, strace, chkrootkit, clamav and rkhunter.")
@@ -2409,6 +2413,7 @@ def main():
         print("14. Exit")
 
         choice = input("Enter your choice: ")
+
         if choice == "1":
             file_path = input("Enter the path of the file to scan: ").strip("'")
             if os.path.exists(file_path):
@@ -2420,16 +2425,17 @@ def main():
                     scan_file_for_malicious_content_without_sandbox(file_path)
             else:
                 print(f"File not found: {file_path}")
+
         elif choice == "2":
             folder_path = input("Enter the path of the folder to scan: ")
-            
             if os.path.exists(folder_path) and os.path.isdir(folder_path):
                 with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
                     executor.submit(scan_folder_with_clamscan, folder_path)
                     executor.submit(scan_folder_parallel, folder_path)
                     executor.submit(scan_folder_with_malware_content_check, folder_path)
             else:
-                print("Invalid folder path.")  
+                print("Invalid folder path.")
+
         elif choice == "3":
             website_url = input("Enter the website URL to check: ")
             if is_website_infected(website_url):
@@ -2437,32 +2443,31 @@ def main():
             elif is_phishing_website(website_url):
                 print("The website is phishing.")
             else:
-                print("The website is clean.")   
+                print("The website is clean.")
+
         elif choice == "4":
-            # Prompt the user to enter the home directory
-            home_dir = input("Enter the home directory and username for Firefox history scan (e.g., /home/yourusername If you haven't started it as sudo, leave it blank): ")
+            home_dir = input("Enter the home directory and username for Firefox history scan "
+                             "(e.g., /home/yourusername If you haven't started it as sudo, leave it blank): ")
             with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
                 executor.submit(real_time_web_protection)
                 executor.submit(access_firefox_history_continuous)
                 executor.submit(scan_running_files_with_custom_and_clamav_continuous)
-                executor.submit(monitoring_running_processes)        
+                executor.submit(monitoring_running_processes)
+
         elif choice == "5":
             file_path = input("Enter the path of the file to intuitively scan: ").strip("'")
-            # Check if the file exists before proceeding
             if not os.path.exists(file_path):
                 print(f"File not found: {file_path}")
                 continue
-            # Check if the file is empty (0-byte size)
             if os.path.getsize(file_path) == 0:
                 print("File is empty (0-byte size), rejecting.")
                 return
-            # Prompt the user to enter the home directory
-            home_dir = input("Enter the home directory and username for Firefox history scan (e.g., /home/yourusername If you haven't started it as sudo, leave it blank): ")
+            home_dir = input("Enter the home directory and username for Firefox history scan "
+                             "(e.g., /home/yourusername If you haven't started it as sudo, leave it blank): ")
 
             suspicious_file_path = file_path
             exe_path = file_path
 
-            # Start functions in parallel
             with concurrent.futures.ThreadPoolExecutor(max_workers=8) as executor:
                 future4 = executor.submit(start_monitoring, suspicious_file_path, file_path)
                 future1 = executor.submit(access_firefox_history_continuous0, file_path)
@@ -2473,10 +2478,8 @@ def main():
                 future7 = executor.submit(continuously_monitor_file, file_path)
                 future8 = executor.submit(extract_ips_from_strace, exe_path)
 
-                # Wait for all functions to complete
                 concurrent.futures.wait([future1, future2, future3, future4, future5, future6, future7, future8])
 
-                # Get the results from the futures
                 result1 = future1.result()
                 result2 = future2.result()
                 result3 = future3.result()
@@ -2486,7 +2489,6 @@ def main():
                 result7 = future7.result()
                 result8 = future8.result()
 
-                # Print or handle results as needed
                 print("access_firefox_history_continuous0 result:", result1)
                 print("start_monitoring result:", result4)
                 print("check_mbr_overwrite result:", result2)
@@ -2494,52 +2496,62 @@ def main():
                 print("check_mbr_overwrite result:", result5)
                 print("find_connected_ips result:", result6)
                 print("continuously_monitor_file result:", result7)
-                print("extract_ips_from_strace result:", result8)     
+                print("extract_ips_from_strace result:", result8)
+
         elif choice == "6":
             folder_path = input("Enter the path of the folder to calculate hashes for: ")
-            calculate_hashes_in_folder(folder_path)      
+            calculate_hashes_in_folder(folder_path)
+
         elif choice == "7":
-            curses.wrapper(on_key_press)     
+            curses.wrapper(on_key_press)
+
         elif choice == "8":
             check_website_in_blist()
+
         elif choice == "9":
             subprocess.run(['sudo', 'chkrootkit'])
+
         elif choice == "10":
             subprocess.run(['sudo', 'rkhunter', '--check'])
+
         elif choice == "11":
-            home_dir = input("Enter the home directory and username (e.g., /home/yourusername If you haven't started it as sudo, leave it blank):  ").strip()
+            home_dir = input("Enter the home directory and username "
+                             "(e.g., /home/yourusername If you haven't started it as sudo, leave it blank):  ").strip()
             profile_path = find_firefox_profile(home_dir)
             if profile_path:
                 print(f"Found Firefox profile at: {profile_path}")
             else:
                 print("No Firefox profile found.")
+
         elif choice == "12":
             print("GUI Mode Enabled")
             root = tk.Tk()
             gui = AntivirusGUI(root)
             root.mainloop()
+
         elif choice == "13":
-            # Get File Path From User
+            yara_folder = os.path.join(os.getcwd(), "YARA")
             file_path = input("Enter the path of the file to scan: ").strip("'")
             if os.path.exists(file_path):
                 if os.path.getsize(file_path) == 0:
                     print("File is empty (0-byte size), rejecting.")
                 else:
-                    # Load YARA rules
-                    yara_folder = os.path.join(os.getcwd(), "YARA")
-                    yara_rules = load_yara_rules(yara_folder)
-                    if yara_rules:
-                        # Scan the file using YARA rules
-                        scan_with_yara(file_path, yara_rules)
+                    if os.path.exists(yara_folder):
+                        yara_rules = load_yara_rules(yara_folder)
+                        if yara_rules:
+                            scan_with_yara(file_path, yara_rules)
+                        else:
+                            print(f"No YARA rules found in folder: {yara_folder}")
                     else:
-                        print(f"File not found: {file_path}")
+                        print(f"YARA rules folder not found: {yara_folder}")
             else:
                 print(f"File not found: {file_path}")
+
         elif choice == "14":
             print("Exiting...")
             break
+
         else:
             print("Invalid choice. Please select a valid option.")
-
 if __name__ == "__main__":
     main()
