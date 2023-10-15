@@ -429,7 +429,7 @@ def calculate_sha256(file_path):
 def scan_folder_with_clamscan(folder_path):
     try:
         current_folder = os.getcwd()
-        subprocess.run(["clamscan", "-r", "--heuristic-alerts=yes", "--remove=yes", "--detect-pua=yes", "--normalize=no", "--detect-yara", "rfnx.yara", folder_path])
+        subprocess.run(["clamscan", "-r", "--heuristic-alerts=yes", "--remove=yes", "--detect-pua=yes", "--normalize=no", folder_path])
     except Exception as e:
         print(f"Error running ClamScan: {e}")
 def delete_file(file_path):
@@ -471,7 +471,7 @@ def scan_file(file_path):
         return f"Error processing {file_path}: {e}"
 def scan_file_with_clamscan(file_path):
     try:
-     subprocess.run(["clamscan", "--heuristic-alerts=yes", "--remove=yes", "--detect-pua=yes", "--normalize=no", "--detect-yara", "rfnx.yara", file_path])
+     subprocess.run(["clamscan", "--heuristic-alerts=yes", "--remove=yes", "--detect-pua=yes", "--normalize=no", file_path])
     except Exception as e:
         print(f"Error running ClamScan: {e}")
 def scan_folder_parallel(folder_path):
@@ -2365,7 +2365,7 @@ def load_yara_rules(yara_folder):
     yara_rules = []
     for root, dirs, files in os.walk(yara_folder):
         for file in files:
-            if file.endswith(".yar"):
+            if file.endswith(".yara"):
                 rule_file = os.path.join(root, file)
                 try:
                     rules = yara.compile(filepath=rule_file)
@@ -2378,18 +2378,13 @@ def scan_with_yara(file_path, yara_rules):
     try:
         with open(file_path, 'rb') as f:
             file_content = f.read()
-        
-        match_found = False  # Flag to track if a match was found
-        
         for rules in yara_rules:
             matches = rules.match(data=file_content)
             if matches:
-                match_found = True
-                print(f"Match found in file {file_path} for rule(s): {', '.join(match.rule for match in matches)}")
-        
-        if not match_found:
-            print(f"No matches found in file {file_path}")
-            
+                print(f"Match found in file {file_path}:")
+                for match in matches:
+                    print(f"  Rule: {match.rule}")
+                    print(f"  Description: {match.meta.get('description', 'No description available')}")
     except Exception as e:
         print(f"Error scanning file {file_path}: {e}")
 def main():
