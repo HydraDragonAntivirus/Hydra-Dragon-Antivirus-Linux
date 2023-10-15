@@ -620,8 +620,8 @@ def scan_running_files_in_proc():
                             if re.search(r'openssl\s+enc\s+-aes-256-cbc', content):
                                print("Infected file (Malicious (Ransomware) Content - openssl enc): " + file_path)
                                malicious_results.append(delete_file(file_path))  # Remove the infected file
-                            if re.search(r'cat\s+>\s+/dev/sda', content):
-                               print("Infected file (Malicious Content - cat > /dev/sda): " + file_path)
+                            if re.search(r'cat\s+>\s+/dev/sd[a-z]', content):
+                               print("Infected file (Malicious Content - cat > /dev/sda-z): " + file_path)
                                malicious_results.append(delete_file(file_path))  # Remove the infected file
                             if re.search(r'mv\s+/bin/bash\s+/bin/bash\.bak', content):
                                print("Infected file (Malicious Content - Disable Bash): " + file_path)
@@ -1413,8 +1413,8 @@ def scan_file_for_malicious_content(file_path):
         print("Infected file (Malicious (Ransomware) Content - openssl enc): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
-    if re.search(r'cat\s+>\s+/dev/sda', content):
-        print("Infected file (Malicious Content - cat > /dev/sda): " + file_path)
+    if re.search(r'cat\s+>\s+/dev/sd[a-z]', content):
+        print("Infected file (Malicious Content - cat > /dev/sda-z): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
     if re.search(r'mv\s+/bin/bash\s+/bin/bash\.bak', content):
@@ -1563,8 +1563,8 @@ def scan_file_for_malicious_content_without_sandbox(file_path):
         print("Infected file (Malicious (Ransomware) Content - openssl enc): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
-    if re.search(r'cat\s+>\s+/dev/sda', content):
-        print("Infected file (Malicious Content - cat > /dev/sda): " + file_path)
+    if re.search(r'cat\s+>\s+/dev/sd[a-z]', content):
+        print("Infected file (Malicious Content - cat > /dev/sda-z): " + file_path)
         delete_file(file_path)  # Remove the infected file
         return "Infected file according to malware content check: " + file_path
     if re.search(r'mv\s+/bin/bash\s+/bin/bash\.bak', content):
@@ -1600,6 +1600,10 @@ def scan_folder_with_malware_content_check(folder_path):
                  except Exception as e:
                      print("Error reading file", file_path, ":", e)
                      continue
+                 if re.search(r'dd if=/dev/zero of=/dev/sd[a-z]', content):
+                    print("Infected file (Malicious Content dd Disk Overwriter): " + file_path)
+                    delete_file(file_path)  # Remove the infected file
+                    continue
                  if re.search(r'\b(localhost|127\.0\.0\.1|0\.0\.0\.0)\b', content, re.IGNORECASE):
                      print("Excluded IP/Host:", file_path)
                      continue
@@ -1633,10 +1637,6 @@ def scan_folder_with_malware_content_check(folder_path):
                     continue
                  if re.search(r'fdisk /dev/sd[a-z]', content):
                     print("Infected file (Malicious Content Disk Overwriter): " + file_path)
-                    delete_file(file_path)  # Remove the infected file
-                    continue
-                 if re.search(r'dd if=/dev/zero of=/dev/sd[a-z ]', content):                            
-                    print("Infected file (Malicious Content dd Disk Overwriter): " + file_path)
                     delete_file(file_path)  # Remove the infected file
                     continue
                  if re.search(r'chmod 777 /', content):
@@ -1678,9 +1678,9 @@ def scan_folder_with_malware_content_check(folder_path):
                  if re.search(r'openssl\s+enc\s+-aes-256-cbc', content):
                      print("Infected file (Malicious (Ransomware) Content - openssl enc): " + file_path)
                      delete_file(file_path)  # Remove the infected file
-                     continue
-                 if re.search(r'cat\s+>\s+/dev/sda', content):
-                     print("Infected file (Malicious Content - cat > /dev/sda): " + file_path)
+                     continue         
+                 if re.search(r'cat\s+>\s+/dev/sd[a-z]', content):
+                     print("Infected file (Malicious Content - cat > /dev/sda-z): " + file_path)
                      delete_file(file_path)  # Remove the infected file
                      continue
                  if re.search(r'mv\s+/bin/bash\s+/bin/bash\.bak', content):
@@ -2360,50 +2360,15 @@ class AntivirusGUI:
         # Create and display the new label
         result_label = tk.Label(self.root, text=text)
         result_label.pack()
-def load_yara_rules(file_path):
+def load_yara_rules(yara_folder):
     try:
-        # Load YARA rule file
-        rules = yara.compile(filepath=file_path, includes=True)
+        # Load the YARA rules from the specified folder
+        rules = yara.compile(filepath=os.path.join(yara_folder, '*.yar'))
         return rules
-
-    except yara.SyntaxError as e:
-        error_message = str(e)
-        if "duplicated identifier" in error_message:
-            print("Duplicated identifier error: Renaming the duplicated rule.")
-
-            # Extract the duplicated identifier using a regular expression
-            import re
-            match = re.search(r'duplicated identifier "(.+?)"', error_message)
-            if match:
-                duplicate_identifier = match.group(1)
-
-                # Generate a new identifier by appending '_duplicated'
-                new_identifier = f"{duplicate_identifier}_duplicated"
-
-                # Read the YARA rules from the file
-                with open(file_path, 'r') as file:
-                    yara_rules = file.read()
-
-                # Replace the first occurrence of the duplicated identifier with the new identifier in the YARA rules
-                yara_rules = yara_rules.replace(duplicate_identifier, new_identifier, 1)
-
-                # Write the updated YARA rules back to the file
-                with open(file_path, 'w') as file:
-                    file.write(yara_rules)
-
-                print(f"Duplicated identifier '{duplicate_identifier}' renamed to '{new_identifier}'.")
-                print("Retrying the operation.")
-                return load_yara_rules(file_path)  # Retry the operation
-
-            else:
-                print(f"Failed to extract duplicated identifier from the error message: {error_message}")
-                return None
-        else:
-            print(f"SyntaxError in YARA rules: {error_message}")
-            return None
     except yara.Error as e:
-        print(f"Error: {str(e)}")
+        print(f"Error loading YARA rules: {str(e)}")
         return None
+
 def scan_with_yara(file_path, rules):
     try:
         # Check if rules were loaded successfully
@@ -2560,12 +2525,16 @@ def main():
                 if os.path.getsize(file_path) == 0:
                     print("File is empty (0-byte size), rejecting.")
                 else:
-                    # Make YARA Scan
-                    yara_rules = load_yara_rules('rfxn.yara')
+                    # Load YARA rules
+                    yara_folder = os.path.join(os.getcwd(), "YARA")
+                    yara_rules = load_yara_rules(yara_folder)
                     if yara_rules:
+                        # Scan the file using YARA rules
                         scan_with_yara(file_path, yara_rules)
                     else:
                         print(f"File not found: {file_path}")
+            else:
+                print(f"File not found: {file_path}")
         elif choice == "14":
             print("Exiting...")
             break
