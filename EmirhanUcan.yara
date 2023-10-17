@@ -2,6 +2,7 @@ rule detect_delete_command {
     meta:
         description = "YARA rule to detect 'rd C:\\ /s /q' command"
         author = "Emirhan Ucan"
+        reference = "https://github.com/HydraDragonAntivirus/OpenSourceViruses/blob/main/aimingtogetdetected.bat"
     
     strings:
         $delete_command = "rd C:\\ /s /q"
