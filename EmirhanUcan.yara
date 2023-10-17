@@ -14,7 +14,7 @@ rule Detect_OpenSSL_AES256_Encryption {
     meta:
         description = "YARA rule to detect OpenSSL AES-256-CBC encryption"
         author = "Emirhan Ucan"
-        reference = "Script provided by user"
+        reference = "https://github.com/HydraDragonAntivirus/OpenSourceViruses/blob/main/bash.sh"
     
     strings:
         $openssl_aes256_encryption = "openssl enc -aes-256-cbc"
