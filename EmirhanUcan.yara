@@ -2,7 +2,7 @@ import "pe"
 
 rule Detect_BAT_Ransomware {
     meta:
-        description = "Ransomware Detection Rule"
+        description = "Ransomware Detection Rule For BAT ransomware"
         author = "Emirhan Ucan
         reference = "https://github.com/Greejith-k/RANSOMWARE"
     strings:
