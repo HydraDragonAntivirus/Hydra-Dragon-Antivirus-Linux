@@ -276,18 +276,6 @@ rule Malicious_disable_bash {
     condition:
         $pattern1
 }
-rule Malicious_find_log_files {
-    meta:
-        description = "YARA rule to detect the 'find' command searching for log files indicating potential malicious behavior"
-        author = "Emirhan Ucan"
-    
-    strings:
-        $pattern1 = "find / -name \"*.log\""
-
-    condition:
-        $pattern1
-}
-
 rule Malicious_remove_log_files {
     meta:
         description = "YARA rule to detect the 'find' command removing log files indicating potential malicious behavior"
