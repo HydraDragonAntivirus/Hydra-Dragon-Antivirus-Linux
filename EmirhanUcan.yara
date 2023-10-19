@@ -25,7 +25,7 @@ rule Detect_Delete_Command {
 }
 rule Detect_OpenSSL_AES256_Encryption {
     meta:
-        description = "YARA rule to detect OpenSSL AES-256-CBC encryption"
+        description = "YARA rule to detect OpenSSL AES-256-CBC encryption. May cause false positives."
         author = "Emirhan Ucan"
         reference = "https://github.com/HydraDragonAntivirus/OpenSourceViruses/blob/main/bash.sh"
     
