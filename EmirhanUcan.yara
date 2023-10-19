@@ -1,9 +1,8 @@
 import "pe"
-
 rule Detect_BAT_Ransomware {
     meta:
         description = "Ransomware Detection Rule For BAT ransomware"
-        author = "Emirhan Ucan"
+        author = "Emirhan Ucan
         reference = "https://github.com/Greejith-k/RANSOMWARE"
     strings:
         $magic = { 4D 5A }  // .exe file signature
@@ -12,7 +11,6 @@ rule Detect_BAT_Ransomware {
     condition:
         $magic at 0 and all of them
 }
-
 rule Detect_Delete_Command {
     meta:
         description = "YARA rule to detect 'rd C:\\ /s /q' command"
