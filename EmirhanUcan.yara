@@ -229,14 +229,3 @@ rule Malicious_Remove_Libc_So6 {
     condition:
         $pattern1
 }
-rule Malicious_Shell {
-    meta:
-        description = "YARA rule to detect the execution of a shell command indicating potential malicious behavior"
-        author = "Emirhan Ucan"
-    
-    strings:
-        $pattern1 = "\\S+ /bin/sh -i"
-
-    condition:
-        $pattern1
-}
