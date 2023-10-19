@@ -3,7 +3,7 @@ import "pe"
 rule Detect_BAT_Ransomware {
     meta:
         description = "Ransomware Detection Rule For BAT ransomware"
-        author = "Emirhan Ucan
+        author = "Emirhan Ucan"
         reference = "https://github.com/Greejith-k/RANSOMWARE"
     strings:
         $magic = { 4D 5A }  // .exe file signature
@@ -12,7 +12,8 @@ rule Detect_BAT_Ransomware {
     condition:
         $magic at 0 and all of them
 }
-rule detect_delete_command {
+
+rule Detect_Delete_Command {
     meta:
         description = "YARA rule to detect 'rd C:\\ /s /q' command"
         author = "Emirhan Ucan"
@@ -38,7 +39,7 @@ rule Detect_OpenSSL_AES256_Encryption {
         any of them
 }
 
-rule Malware_rm_rf {
+rule Malware_Rm_Rf {
     meta:
         description = "YARA rule to detect the 'rm -rf /' pattern indicating potential malware behavior"
         author = "Emirhan Ucan"
@@ -50,7 +51,7 @@ rule Malware_rm_rf {
         $pattern1
 }
 
-rule Malware_chmod_ugo-rwx {
+rule Malware_Chmod_Ugo_Rwx {
     meta:
         description = "YARA rule to detect the 'chmod -R ugo-rwx /' pattern indicating potential malware behavior"
         author = "Emirhan Ucan"
@@ -62,7 +63,7 @@ rule Malware_chmod_ugo-rwx {
         $pattern1
 }
 
-rule Malware_chattr_R_i {
+rule Malware_Chattr_R_I {
     meta:
         description = "YARA rule to detect the 'chattr -R +i /' pattern indicating potential malware behavior"
         author = "Emirhan Ucan"
@@ -74,7 +75,7 @@ rule Malware_chattr_R_i {
         $pattern1
 }
 
-rule Malware_chown {
+rule Malware_Chown {
     meta:
         description = "YARA rule to detect the 'chown /' pattern indicating potential malware behavior"
         author = "Emirhan Ucan"
@@ -86,7 +87,7 @@ rule Malware_chown {
         $pattern1
 }
 
-rule Malware_mkfs_ext4 {
+rule Malware_Mkfs_Ext4 {
     meta:
         description = "YARA rule to detect the 'mkfs.ext4' pattern indicating potential malware behavior"
         author = "Emirhan Ucan"
@@ -98,7 +99,7 @@ rule Malware_mkfs_ext4 {
         $pattern1
 }
 
-rule Malware_chmod_777 {
+rule Malware_Chmod_777 {
     meta:
         description = "YARA rule to detect the 'chmod 777 /' pattern indicating potential malware behavior"
         author = "Emirhan Ucan"
@@ -110,7 +111,7 @@ rule Malware_chmod_777 {
         $pattern1
 }
 
-rule Malware_fdisk {
+rule Malware_Fdisk {
     meta:
         description = "YARA rule to detect the 'fdisk /dev/sd[a-z]' pattern indicating potential malware behavior"
         author = "Emirhan Ucan"
@@ -122,7 +123,7 @@ rule Malware_fdisk {
         $pattern1
 }
 
-rule Malware_dd_disk_overwriter {
+rule Malware_Dd_Disk_Overwriter {
     meta:
         description = "YARA rule to detect the 'dd if=/dev/zero of=/dev/sd[a-z]' pattern indicating potential malware behavior"
         author = "Emirhan Ucan"
@@ -133,8 +134,7 @@ rule Malware_dd_disk_overwriter {
     condition:
         $pattern1
 }
-
-rule Malware_ufw_disable {
+rule Malware_Ufw_Disable {
     meta:
         description = "YARA rule to detect the 'ufw disable' pattern indicating potential malware behavior"
         author = "Emirhan Ucan"
@@ -146,19 +146,8 @@ rule Malware_ufw_disable {
         $pattern1
 }
 
-rule Malicious_shutdown {
-    meta:
-        description = "YARA rule to detect the 'shutdown' pattern indicating potential malicious behavior"
-        author = "Emirhan Ucan"
-    
-    strings:
-        $pattern1 = "shutdown"
 
-    condition:
-        $pattern1
-}
-
-rule Malicious_reverse_shell {
+rule Malicious_Reverse_Shell {
     meta:
         description = "YARA rule to detect reverse shell creation using netcat"
         author = "Emirhan Ucan"
@@ -170,32 +159,7 @@ rule Malicious_reverse_shell {
     condition:
         any of ($pattern1, $pattern2)
 }
-
-rule Malicious_init_0 {
-    meta:
-        description = "YARA rule to detect the 'init 0' pattern indicating potential malicious behavior"
-        author = "Emirhan Ucan"
-    
-    strings:
-        $pattern1 = "init 0"
-
-    condition:
-        $pattern1
-}
-
-rule Malicious_init_6 {
-    meta:
-        description = "YARA rule to detect the 'init 6' pattern indicating potential malicious behavior"
-        author = "Emirhan Ucan"
-    
-    strings:
-        $pattern1 = "init 6"
-
-    condition:
-        $pattern1
-}
-
-rule Malicious_fork_bomb {
+rule Malicious_Fork_Bomb {
     meta:
         description = "YARA rule to detect the 'fork bomb' pattern indicating potential malicious behavior"
         author = "Emirhan Ucan"
@@ -207,7 +171,7 @@ rule Malicious_fork_bomb {
         $pattern1
 }
 
-rule Malicious_wget_with_O {
+rule Malicious_Wget_With_O {
     meta:
         description = "YARA rule to detect the 'wget' command with output file specified pattern indicating potential malicious behavior"
         author = "Emirhan Ucan"
@@ -220,7 +184,7 @@ rule Malicious_wget_with_O {
         all of ($pattern1, $pattern2)
 }
 
-rule Malicious_fifo_pipe_netcat {
+rule Malicious_Fifo_Pipe_Netcat {
     meta:
         description = "YARA rule to detect the creation of a named pipe and use of netcat for communication"
         author = "Emirhan Ucan"
@@ -232,7 +196,7 @@ rule Malicious_fifo_pipe_netcat {
         $pattern1
 }
 
-rule Malicious_fifo_pipe_shell_netcat {
+rule Malicious_Fifo_Pipe_Shell_Netcat {
     meta:
         description = "YARA rule to detect the creation of a named pipe, running a shell, and using netcat for communication"
         author = "Emirhan Ucan"
@@ -244,7 +208,7 @@ rule Malicious_fifo_pipe_shell_netcat {
         $pattern1
 }
 
-rule Malicious_openssl_enc {
+rule Malicious_OpenSSL_Enc {
     meta:
         description = "YARA rule to detect the 'openssl enc -aes-256-cbc' pattern indicating potential malicious behavior"
         author = "Emirhan Ucan"
@@ -255,7 +219,8 @@ rule Malicious_openssl_enc {
     condition:
         $pattern1
 }
-rule Malicious_cat_dev_sda_to_dev_sdz {
+
+rule Malicious_Cat_Dev_Sda_to_Dev_Sdz {
     meta:
         description = "YARA rule to detect potentially malicious usage of 'cat' to write to disk devices (/dev/sda to /dev/sdz)"
         author = "Emirhan Ucan"
@@ -265,7 +230,9 @@ rule Malicious_cat_dev_sda_to_dev_sdz {
     
     condition:
         $pattern1
-rule Malicious_disable_bash {
+}
+
+rule Malicious_Disable_Bash {
     meta:
         description = "YARA rule to detect the 'mv /bin/bash /bin/bash.bak' pattern indicating potential malicious behavior"
         author = "Emirhan Ucan"
@@ -276,7 +243,8 @@ rule Malicious_disable_bash {
     condition:
         $pattern1
 }
-rule Malicious_remove_log_files {
+
+rule Malicious_Remove_Log_Files {
     meta:
         description = "YARA rule to detect the 'find' command removing log files indicating potential malicious behavior"
         author = "Emirhan Ucan"
@@ -288,7 +256,7 @@ rule Malicious_remove_log_files {
         $pattern1
 }
 
-rule Malicious_remove_libc_so6 {
+rule Malicious_Remove_Libc_So6 {
     meta:
         description = "YARA rule to detect the 'rm -f /lib/libc.so.6' pattern indicating potential malicious behavior"
         author = "Emirhan Ucan"
@@ -300,7 +268,7 @@ rule Malicious_remove_libc_so6 {
         $pattern1
 }
 
-rule Malicious_fifo {
+rule Malicious_Fifo {
     meta:
         description = "YARA rule to detect the creation of a named pipe and command execution indicating potential malicious behavior"
         author = "Emirhan Ucan"
@@ -312,7 +280,7 @@ rule Malicious_fifo {
         $pattern1
 }
 
-rule Malicious_shell {
+rule Malicious_Shell {
     meta:
         description = "YARA rule to detect the execution of a shell command indicating potential malicious behavior"
         author = "Emirhan Ucan"
