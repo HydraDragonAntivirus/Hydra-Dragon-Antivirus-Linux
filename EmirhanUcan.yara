@@ -170,19 +170,6 @@ rule Malicious_Fork_Bomb {
     condition:
         $pattern1
 }
-
-rule Malicious_Wget_With_O {
-    meta:
-        description = "YARA rule to detect the 'wget' command with output file specified pattern indicating potential malicious behavior"
-        author = "Emirhan Ucan"
-    
-    strings:
-        $pattern1 = "wget https://"
-        $pattern2 = "\\s+-O \\w+\\.\\w+"
-
-    condition:
-        all of ($pattern1, $pattern2)
-}
 rule Malicious_OpenSSL_Enc {
     meta:
         description = "YARA rule to detect the 'openssl enc -aes-256-cbc' pattern indicating potential malicious behavior"
