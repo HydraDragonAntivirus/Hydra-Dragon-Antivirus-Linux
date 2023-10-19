@@ -23,7 +23,6 @@ rule Detect_Delete_Command {
     condition:
         $delete_command
 }
-
 rule Detect_OpenSSL_AES256_Encryption {
     meta:
         description = "YARA rule to detect OpenSSL AES-256-CBC encryption"
@@ -36,7 +35,6 @@ rule Detect_OpenSSL_AES256_Encryption {
     condition:
         any of them
 }
-
 rule Malware_Rm_Rf {
     meta:
         description = "YARA rule to detect the 'rm -rf /' pattern indicating potential malware behavior"
@@ -48,7 +46,6 @@ rule Malware_Rm_Rf {
     condition:
         $pattern1
 }
-
 rule Malware_Chmod_Ugo_Rwx {
     meta:
         description = "YARA rule to detect the 'chmod -R ugo-rwx /' pattern indicating potential malware behavior"
@@ -60,7 +57,6 @@ rule Malware_Chmod_Ugo_Rwx {
     condition:
         $pattern1
 }
-
 rule Malware_Chattr_R_I {
     meta:
         description = "YARA rule to detect the 'chattr -R +i /' pattern indicating potential malware behavior"
@@ -72,7 +68,6 @@ rule Malware_Chattr_R_I {
     condition:
         $pattern1
 }
-
 rule Malware_Chown {
     meta:
         description = "YARA rule to detect the 'chown /' pattern indicating potential malware behavior"
@@ -96,7 +91,6 @@ rule Malware_Mkfs_Ext4 {
     condition:
         $pattern1
 }
-
 rule Malware_Chmod_777 {
     meta:
         description = "YARA rule to detect the 'chmod 777 /' pattern indicating potential malware behavior"
@@ -108,7 +102,6 @@ rule Malware_Chmod_777 {
     condition:
         $pattern1
 }
-
 rule Malware_Fdisk {
     meta:
         description = "YARA rule to detect the 'fdisk /dev/sd[a-z]' pattern indicating potential malware behavior"
@@ -120,7 +113,6 @@ rule Malware_Fdisk {
     condition:
         $pattern1
 }
-
 rule Malware_Dd_Disk_Overwriter {
     meta:
         description = "YARA rule to detect the 'dd if=/dev/zero of=/dev/sd[a-z]' pattern indicating potential malware behavior"
@@ -143,8 +135,6 @@ rule Malware_Ufw_Disable {
     condition:
         $pattern1
 }
-
-
 rule Malicious_Reverse_Shell {
     meta:
         description = "YARA rule to detect reverse shell creation using netcat"
@@ -179,7 +169,6 @@ rule Malicious_OpenSSL_Enc {
     condition:
         $pattern1
 }
-
 rule Malicious_Cat_Dev_Sda_to_Dev_Sdz {
     meta:
         description = "YARA rule to detect potentially malicious usage of 'cat' to write to disk devices (/dev/sda to /dev/sdz)"
@@ -191,7 +180,6 @@ rule Malicious_Cat_Dev_Sda_to_Dev_Sdz {
     condition:
         $pattern1
 }
-
 rule Malicious_Disable_Bash {
     meta:
         description = "YARA rule to detect the 'mv /bin/bash /bin/bash.bak' pattern indicating potential malicious behavior"
@@ -203,7 +191,6 @@ rule Malicious_Disable_Bash {
     condition:
         $pattern1
 }
-
 rule Malicious_Remove_Log_Files {
     meta:
         description = "YARA rule to detect the 'find' command removing log files indicating potential malicious behavior"
@@ -215,7 +202,6 @@ rule Malicious_Remove_Log_Files {
     condition:
         $pattern1
 }
-
 rule Malicious_Remove_Libc_So6 {
     meta:
         description = "YARA rule to detect the 'rm -f /lib/libc.so.6' pattern indicating potential malicious behavior"
