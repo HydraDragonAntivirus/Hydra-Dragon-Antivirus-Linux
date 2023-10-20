@@ -2365,7 +2365,7 @@ def load_yara_rules(yara_folder):
     yara_rules = []
     for root, dirs, files in os.walk(yara_folder):
         for file in files:
-            if file.endswith(".yara"):
+            if file.endswith(".yar"):
                 rule_file = os.path.join(root, file)
                 try:
                     rules = yara.compile(filepath=rule_file)
