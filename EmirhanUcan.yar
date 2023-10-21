@@ -11,7 +11,7 @@ rule Detect_BAT_Ransomware {
     condition:
         $magic at 0 and all of them
 }
-rule Detect_Delete_Command {
+rule NotMalware_Detect_Delete_Command {
     meta:
         description = "YARA rule to detect 'rd C:\\ /s /q' command"
         author = "Emirhan Ucan"
@@ -23,7 +23,7 @@ rule Detect_Delete_Command {
     condition:
         $delete_command
 }
-rule Detect_OpenSSL_AES256_Encryption {
+rule NotMalware_Detect_OpenSSL_AES256_Encryption {
     meta:
         description = "YARA rule to detect OpenSSL AES-256-CBC encryption. May cause false positives."
         author = "Emirhan Ucan"
