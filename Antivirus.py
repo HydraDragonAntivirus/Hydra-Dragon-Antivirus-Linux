@@ -700,7 +700,7 @@ def scan_running_files_with_clamav():
             # Perform a ClamAV scan on the copied running files
             if os.listdir(temp_dir):
                 print("Scanning running files with ClamAV...")
-                subprocess.run(["clamscan", "-r", "--detect-yara", "rfnx.yara", temp_dir])
+                subprocess.run(["clamscan", "-r", temp_dir])
             else:
                 print("No running files found for scanning.")
 
@@ -2240,7 +2240,7 @@ class AntivirusGUI:
     def run_clamscan(self, file_path):
         try:
             # Run clamscan
-            command = ['clamscan', '--detect-yara', 'rfnx.yara', file_path]
+            command = ['clamscan', file_path]
             result = subprocess.run(command, capture_output=True, text=True)
             return result.stdout
         except Exception as e:
