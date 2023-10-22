@@ -146,3 +146,4 @@ No data collected
 - https://www.virustotal.com/gui/file/d35eb98fe63f11d5f979a5cbad5ae6ebbb9a1e8ec3fae9db80537e153a009263?nocache=1
 - Awesome YARA
 - https://github.com/jatrost/awesome-detection-rules
+- https://github.com/eybisi/hacky-yara-androguard/blob/master/dropper.yar
