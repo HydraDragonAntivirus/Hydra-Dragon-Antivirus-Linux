@@ -147,3 +147,4 @@ No data collected
 - Awesome YARA
 - https://github.com/jatrost/awesome-detection-rules
 - https://github.com/eybisi/hacky-yara-androguard/blob/master/dropper.yar
+- https://github.com/BiteFoo/androyara
