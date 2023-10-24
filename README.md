@@ -70,6 +70,7 @@ No data collected
 - sudo pacman -S python-pip
 - sudo pacman -S ssdeep
 - python setup.py build
+- pip install sigmatools
 - sudo python setup.py install
 - cd ..
 - sudo nano /etc/clamav/freshclam.conf
