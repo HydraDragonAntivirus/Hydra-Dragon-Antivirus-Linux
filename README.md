@@ -149,3 +149,4 @@ No data collected
 - https://github.com/jatrost/awesome-detection-rules
 - https://github.com/eybisi/hacky-yara-androguard/blob/master/dropper.yar
 - https://github.com/BiteFoo/androyara
+- https://unprotect.it/detection-rule/yara_disable_antivirus/
