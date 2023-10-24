@@ -146,6 +146,7 @@ No data collected
 - https://github.com/reversinglabs/reversinglabs-yara-rules
 - https://www.virustotal.com/gui/file/d35eb98fe63f11d5f979a5cbad5ae6ebbb9a1e8ec3fae9db80537e153a009263?nocache=1
 - Awesome YARA
+- https://github.com/WithSecureLabs/lazarus-sigma-rules
 - https://github.com/jatrost/awesome-detection-rules
 - https://github.com/eybisi/hacky-yara-androguard/blob/master/dropper.yar
 - https://github.com/BiteFoo/androyara
