@@ -2395,7 +2395,6 @@ def scan_with_yara(file_path, yara_rules):
             print(f"No matches found in file {file_path}")
     except Exception as e:
         print(f"Error while scanning {file_path}: {str(e)}")
-
 def load_sigma_rules(sigma_folder):
     sigma_rules = []
     for root, _, files in os.walk(sigma_folder):
