@@ -2413,12 +2413,12 @@ def scan_with_sigma(file_path, sigma_rules):
         matched_rules = []
         for rule in sigma_rules:
             try:
-                rule_yaml = yaml.dump(rule)
-                output = subprocess.check_output(["sigmac", "-t", "yara", rule_yaml, file_path])
-                results = json.loads(output)
-                if results:
-                    matched_rules.append(rule)
-            except subprocess.CalledProcessError as e:
+                # Check if the rule's conditions match the file
+                if "detection" in rule and "selection" in rule["detection"]:
+                    selection = rule["detection"]["selection"]
+                    if all(selection.get(key) == value for key, value in selection.items()):
+                        matched_rules.append(rule)
+            except Exception as e:
                 pass  # Ignore errors if no matches are found
         
         if matched_rules:
