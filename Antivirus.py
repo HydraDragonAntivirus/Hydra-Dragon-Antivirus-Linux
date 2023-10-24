@@ -2360,36 +2360,78 @@ class AntivirusGUI:
         # Create and display the new label
         result_label = tk.Label(self.root, text=text)
         result_label.pack()
-# Function to load YARA rules from a folder
 def load_yara_rules(yara_folder):
-    yara_rules = []
+    yara_rules = {}
     for root, dirs, files in os.walk(yara_folder):
         for file in files:
             if file.endswith(".yar"):
                 rule_file = os.path.join(root, file)
                 try:
                     rules = yara.compile(filepath=rule_file)
-                    yara_rules.append(rules)
+                    yara_rules[file] = rules  # Use the file name as the key
                 except yara.Error as e:
                     print(f"Error compiling YARA rule from {rule_file}: {e}")
     return yara_rules
-# Function to scan a file using loaded YARA rules
 def scan_with_yara(file_path, yara_rules):
     try:
         with open(file_path, 'rb') as f:
             file_content = f.read()
-        for rules in yara_rules:
+        
+        matched_rules = {}
+        
+        for rule_file_name, rules in yara_rules.items():
             matches = rules.match(data=file_content)
             if matches:
-                print(f"Match found in file {file_path}:")
-                for match in matches:
-                    print(f"  Rule: {match.rule}")
-                    print(f"  Description: {match.meta.get('description', 'No description available')}")
+                matched_rules[rule_file_name] = [(match.rule, match.meta.get('description', 'No description available')) for match in matches]
+        
+        if matched_rules:
+            print(f"Matches found in file {file_path}:")
+            for rule_file_name, rules in matched_rules.items():
+                print(f"  Rule File: {rule_file_name}")
+                for rule, description in rules:
+                    print(f"    Rule: {rule}")
+                    print(f"    Description: {description}")
+        else:
+            print(f"No matches found in file {file_path}")
     except Exception as e:
-        print(f"Error scanning file {file_path}: {e}")
+        print(f"Error while scanning {file_path}: {str(e)}")
+
+def load_sigma_rules(sigma_folder):
+    sigma_rules = []
+    for root, _, files in os.walk(sigma_folder):
+        for file in files:
+            if file.endswith(".yml"):
+                rule_file = os.path.join(root, file)
+                try:
+                    with open(rule_file, "r") as f:
+                        sigma_rules.append(yaml.safe_load(f))
+                except Exception as e:
+                    print(f"Error loading Sigma rule from {rule_file}: {e}")
+    return sigma_rules
+def scan_with_sigma(file_path, sigma_rules):
+    try:
+        matched_rules = []
+        for rule in sigma_rules:
+            try:
+                rule_yaml = yaml.dump(rule)
+                output = subprocess.check_output(["sigmac", "-t", "yara", rule_yaml, file_path])
+                results = json.loads(output)
+                if results:
+                    matched_rules.append(rule)
+            except subprocess.CalledProcessError as e:
+                pass  # Ignore errors if no matches are found
+        
+        if matched_rules:
+            print(f"Matches found in file {file_path}:")
+            for rule in matched_rules:
+                print(f"  Rule: {rule['title']}")
+        else:
+            print(f"No matches found in file {file_path}")
+    except Exception as e:
+        print(f"Error while scanning {file_path}: {str(e)}")
 def main():
     while True:
-        print("You need to install firejail, strace, chkrootkit, clamav and rkhunter.")
+        print("You need to install firejail, strace, chkrootkit, clamav, and rkhunter.")
         print("You need to give root access to the program.")
         print("Select an option:")
         print("1. Perform a file scan")
@@ -2405,7 +2447,8 @@ def main():
         print("11. Check Firefox profile")
         print("12. User Interface Mode")
         print("13. YARA rule scanner")
-        print("14. Exit")
+        print("14. SIGMA rule scanner")
+        print("15. Exit")
 
         choice = input("Enter your choice: ")
 
@@ -2415,6 +2458,7 @@ def main():
                 if os.path.getsize(file_path) == 0:
                     print("File is empty (0-byte size), rejecting.")
                 else:
+                    # Replace with actual functions for file scanning
                     scan_file(file_path)
                     scan_file_with_clamscan(file_path)
                     scan_file_for_malicious_content_without_sandbox(file_path)
@@ -2454,7 +2498,7 @@ def main():
             if not os.path.exists(file_path):
                 print(f"File not found: {file_path}")
                 continue
-            if os.path.getsize(file_path) == 0:
+            if os.getsize(file_path) == 0:
                 print("File is empty (0-byte size), rejecting.")
                 return
             home_dir = input("Enter the home directory and username for Firefox history scan "
@@ -2539,14 +2583,29 @@ def main():
                             print(f"No YARA rules found in folder: {yara_folder}")
                     else:
                         print(f"YARA rules folder not found: {yara_folder}")
-            else:
-                print(f"File not found: {file_path}")
 
         elif choice == "14":
+            sigma_folder = os.path.join(os.getcwd(), "SIGMA")
+            file_path = input("Enter the path of the file to scan: ").strip("'")
+            if os.path.exists(file_path):
+                if os.path.getsize(file_path) == 0:
+                    print("File is empty (0-byte size), rejecting.")
+                else:
+                    if os.path.exists(sigma_folder):
+                        sigma_rules = load_sigma_rules(sigma_folder)
+                        if sigma_rules:
+                            scan_with_sigma(file_path, sigma_rules)
+                        else:
+                            print(f"No Sigma rules found in folder: {sigma_folder}")
+                    else:
+                        print(f"Sigma rules folder not found: {sigma_folder}")
+
+        elif choice == "15":
             print("Exiting...")
             break
 
         else:
             print("Invalid choice. Please select a valid option.")
+
 if __name__ == "__main__":
     main()
