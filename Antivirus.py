@@ -21,6 +21,7 @@ from tkinter import messagebox, filedialog, simpledialog, Scrollbar
 import threading
 from tkinter import ttk
 import yara
+import yaml
 def calculate_tlsh(file_path):
     with open(file_path, "rb") as file:
         file_data = file.read()
