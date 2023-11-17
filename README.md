@@ -31,7 +31,7 @@ Do What The F*ck You Want To Public License ![foto](https://github.com/HydraDrag
 sudo python Antivirus.py
 ## Current Statics
 I have **65247054+** normal virus hashes **1596191+** virus or illegal websites and IP address list except other phishing databases and KADhosts also others 16k 3k iblocklist and dnsblocklist  **2.5 million** virus, phishing or safe website. Total fuzzy hashes
-**4893048+ (800k≈ Malwarebazaar+ClamAV)** Phishing Database github **1050851** TR Phishing Database github **922180** and **4.000.00+** secureinfo.com signatures. **50.000** other unoffical free clamav database signatures and KADhosts **98083** https://linuxreviews.org/Comparison_of_HOST_file_blacklists others **16k** dnsblocklist **1 million** iblocklist **3294** opensquat**176594**
+**4893048+ (800k≈ Malwarebazaar+ClamAV)** Phishing Database github **1050851** TR Phishing Database github **922180** and **4.000.00+** secureinfo.com signatures. **50.000** other unoffical free clamav database signatures and KADhosts **98083** https://linuxreviews.org/Comparison_of_HOST_file_blacklists others **16k** iblocklist **3294** dnsblocklist **1 million**opensquat**176594**
 ## Detection Rate
 ClamAV 60% Hydra Dragon Antivirus 65%
 ## Collected Datas
