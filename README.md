@@ -6,7 +6,7 @@
 
 ## Notice
 You need use Firefox as your browser
-The project is dead now. I created my first very effective malware cleanner. Join my discord server to download that or https://mega.nz/file/OpYnkZaQ#8yWQRY-yZvvBchZnCsluOaUu4dr-OL42Fe955IniGg8
+The project is dead now. I created my first very effective malware cleanner.
 ## Feautres
 - Real-time protection
 - Web protection
