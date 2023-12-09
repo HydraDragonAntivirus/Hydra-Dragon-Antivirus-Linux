@@ -1,5 +1,5 @@
 # Hydra Dragon Anti-virus For Linux
-# The Project Is Dead I created New Project Use Wine To Open That https://mega.nz/file/i9YBxRzb#DFH6OnSkL20h4PG-Z21ETG3m-VRNNoFwCGdaYvWoJGY Inoo Setup Settings: https://mega.nz/file/WwoBHZDL#KqDj2JJBJqPjzAl9MIazsqowwfkrqU-gO6x1OiZw59U Current Detection Rate above than 90% I'm serious
+# The Project Is Dead I created New Project Use Wine To Open That https://github.com/HydraDragonAntivirus/HydraDragonAV Current Detection Rate over than 90% I'm serious
 <p align="center">
 <img src="assets/logo.png" width= 200px>
 </p>
