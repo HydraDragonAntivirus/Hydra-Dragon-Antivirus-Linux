@@ -1,5 +1,5 @@
 # Hydra Dragon Anti-virus For Linux
-# The Project Is Dead I created New Project Use Wine To Open That https://github.com/HydraDragonAntivirus/HydraDragonAV Current Detection Rate over than 90% I'm serious
+# The Project Is Dead Now I'm going to create Hydra Dragon Antivirus Rust project please wait!
 <p align="center">
 <img src="assets/logo.png" width= 200px>
 </p>
