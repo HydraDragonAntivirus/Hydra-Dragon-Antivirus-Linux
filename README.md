@@ -1,5 +1,5 @@
 # Hydra Dragon Anti-virus For Linux
-# The Project Is Dead Now I'm going to create Hydra Dragon Antivirus Rust project please wait!
+# The Project Is Dead Now Please Use Xylent Instead https://sourceforge.net/projects/xylent/
 <p align="center">
 <img src="assets/logo.png" width= 200px>
 </p>
